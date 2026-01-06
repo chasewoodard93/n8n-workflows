@@ -1,0 +1,1365 @@
+{
+  "active": false,
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get Active Sequences",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "New Lead Webhook": {
+      "main": [
+        [
+          {
+            "node": "Determine Sequence Type",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Lead Response Webhook": {
+      "main": [
+        [
+          {
+            "node": "Handle Lead Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Manual Sequence Trigger": {
+      "main": [
+        [
+          {
+            "node": "Determine Sequence Type",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Active Sequences": {
+      "main": [
+        [
+          {
+            "node": "Loop Through Sequences",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Through Sequences": {
+      "main": [
+        [
+          {
+            "node": "Check Sequence Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Sequence Status": {
+      "main": [
+        [
+          {
+            "node": "Get Next Step",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Skip - Not Ready",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Sequence Completed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Determine Sequence Type": {
+      "main": [
+        [
+          {
+            "node": "Hot Lead Sequence",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Warm Lead Sequence",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Cold Lead Sequence",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Re-engagement Sequence",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Hot Lead Sequence": {
+      "main": [
+        [
+          {
+            "node": "Initialize Sequence",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Warm Lead Sequence": {
+      "main": [
+        [
+          {
+            "node": "Initialize Sequence",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Cold Lead Sequence": {
+      "main": [
+        [
+          {
+            "node": "Initialize Sequence",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Re-engagement Sequence": {
+      "main": [
+        [
+          {
+            "node": "Initialize Sequence",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Initialize Sequence": {
+      "main": [
+        [
+          {
+            "node": "Store Sequence State",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Store Sequence State": {
+      "main": [
+        [
+          {
+            "node": "Get Next Step",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Next Step": {
+      "main": [
+        [
+          {
+            "node": "Select Channel",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Select Channel": {
+      "main": [
+        [
+          {
+            "node": "AI Personalize Email",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "AI Personalize SMS",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Create Call Task",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "AI Personalize LinkedIn",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait Step",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Personalize Email": {
+      "main": [
+        [
+          {
+            "node": "Send Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Anthropic Claude": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Personalize Email",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "AI Personalize SMS",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "AI Personalize LinkedIn",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Personalize SMS": {
+      "main": [
+        [
+          {
+            "node": "Send SMS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Personalize LinkedIn": {
+      "main": [
+        [
+          {
+            "node": "Send LinkedIn Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Email": {
+      "main": [
+        [
+          {
+            "node": "Log Activity",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send SMS": {
+      "main": [
+        [
+          {
+            "node": "Log Activity",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Call Task": {
+      "main": [
+        [
+          {
+            "node": "Log Activity",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send LinkedIn Message": {
+      "main": [
+        [
+          {
+            "node": "Log Activity",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait Step": {
+      "main": [
+        [
+          {
+            "node": "Log Activity",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log Activity": {
+      "main": [
+        [
+          {
+            "node": "Update Sequence State",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Sequence State": {
+      "main": [
+        [
+          {
+            "node": "Update CRM",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Handle Lead Response": {
+      "main": [
+        [
+          {
+            "node": "Check Response Type",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Response Type": {
+      "main": [
+        [
+          {
+            "node": "Pause Sequence",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Mark as Converted",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Mark as Unsubscribed",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Continue Sequence",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pause Sequence": {
+      "main": [
+        [
+          {
+            "node": "Notify Sales Rep",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mark as Converted": {
+      "main": [
+        [
+          {
+            "node": "Notify Sales Rep",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sequence Completed": {
+      "main": [
+        [
+          {
+            "node": "Sequence Complete Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-01-06T00:00:00.000Z",
+  "id": "follow-up-sequences",
+  "isArchived": false,
+  "meta": {
+    "instanceId": "sales-workflows"
+  },
+  "name": "Sales Follow-up Sequences",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "hoursInterval": 1
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [-400, -200],
+      "id": "schedule-trigger",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "sequence/new-lead",
+        "options": {
+          "responseMode": "onReceived"
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [-400, 0],
+      "id": "new-lead-webhook",
+      "name": "New Lead Webhook",
+      "webhookId": "sequence-new-lead"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "sequence/lead-response",
+        "options": {
+          "responseMode": "onReceived"
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [-400, 200],
+      "id": "lead-response-webhook",
+      "name": "Lead Response Webhook",
+      "webhookId": "sequence-lead-response"
+    },
+    {
+      "parameters": {
+        "formTitle": "Start Follow-up Sequence",
+        "formDescription": "Manually start a follow-up sequence for a lead",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Lead Email",
+              "requiredField": true,
+              "fieldType": "email"
+            },
+            {
+              "fieldLabel": "Lead Name",
+              "requiredField": true,
+              "fieldType": "text"
+            },
+            {
+              "fieldLabel": "Company",
+              "requiredField": false,
+              "fieldType": "text"
+            },
+            {
+              "fieldLabel": "Lead Score",
+              "requiredField": true,
+              "fieldType": "number"
+            },
+            {
+              "fieldLabel": "Lead Quality",
+              "requiredField": true,
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {"option": "Hot"},
+                  {"option": "Warm"},
+                  {"option": "Cold"},
+                  {"option": "Re-engagement"}
+                ]
+              }
+            },
+            {
+              "fieldLabel": "Sequence Type",
+              "requiredField": true,
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {"option": "Aggressive (Hot Lead)"},
+                  {"option": "Standard (Warm Lead)"},
+                  {"option": "Nurture (Cold Lead)"},
+                  {"option": "Re-engagement (Stale Lead)"}
+                ]
+              }
+            },
+            {
+              "fieldLabel": "Sales Rep Email",
+              "requiredField": true,
+              "fieldType": "email"
+            },
+            {
+              "fieldLabel": "Notes",
+              "requiredField": false,
+              "fieldType": "textarea"
+            }
+          ]
+        },
+        "options": {
+          "responseMode": "onReceived",
+          "formSubmittedText": "Sequence has been started for this lead."
+        }
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.3,
+      "position": [-400, 400],
+      "id": "manual-sequence-trigger",
+      "name": "Manual Sequence Trigger",
+      "webhookId": "manual-sequence-start"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get all active sequences from database/storage\n// In production, this would query a database\n// For now, we'll use n8n's static data or an external store\n\nconst activeSequences = [\n  // Example structure - would come from database\n  /*\n  {\n    sequenceId: 'seq_123',\n    leadEmail: 'john@company.com',\n    leadName: 'John Doe',\n    company: 'Acme Corp',\n    sequenceType: 'hot',\n    currentStep: 2,\n    totalSteps: 7,\n    status: 'active',\n    lastActionAt: '2026-01-05T10:00:00Z',\n    nextActionAt: '2026-01-06T10:00:00Z',\n    salesRep: 'rep@company.com',\n    createdAt: '2026-01-04T08:00:00Z'\n  }\n  */\n];\n\n// Filter sequences that are due for action\nconst now = new Date();\nconst dueSequences = activeSequences.filter(seq => {\n  if (seq.status !== 'active') return false;\n  const nextAction = new Date(seq.nextActionAt);\n  return nextAction <= now;\n});\n\nif (dueSequences.length === 0) {\n  return [{ json: { hasSequences: false, message: 'No sequences due for action' } }];\n}\n\nreturn dueSequences.map(seq => ({ json: { ...seq, hasSequences: true } }));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [-180, -200],
+      "id": "get-active-sequences",
+      "name": "Get Active Sequences"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [40, -200],
+      "id": "loop-through-sequences",
+      "name": "Loop Through Sequences"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.status }}",
+                    "rightValue": "active",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  },
+                  {
+                    "leftValue": "={{ $json.currentStep < $json.totalSteps }}",
+                    "rightValue": true,
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Ready"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.status }}",
+                    "rightValue": "paused",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "Paused"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.currentStep >= $json.totalSteps }}",
+                    "rightValue": true,
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "Completed"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [260, -200],
+      "id": "check-sequence-status",
+      "name": "Check Sequence Status"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.leadQuality || $json['Lead Quality'] }}",
+                    "rightValue": "Hot",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "Hot"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.leadQuality || $json['Lead Quality'] }}",
+                    "rightValue": "Warm",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "Warm"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.leadQuality || $json['Lead Quality'] }}",
+                    "rightValue": "Cold",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "Cold"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.leadQuality || $json['Lead Quality'] }}",
+                    "rightValue": "Re-engagement",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "Re-engagement"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [-180, 200],
+      "id": "determine-sequence-type",
+      "name": "Determine Sequence Type"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Hot Lead Sequence - Aggressive follow-up (7 steps over 10 days)\nconst lead = $input.first().json;\n\nconst sequence = {\n  sequenceId: `seq_${Date.now()}_hot`,\n  sequenceType: 'hot',\n  sequenceName: 'Hot Lead - Aggressive Follow-up',\n  leadEmail: lead.email || lead['Lead Email'],\n  leadName: lead.fullName || lead['Lead Name'] || lead.name,\n  company: lead.company || lead.Company || '',\n  leadScore: lead.leadScore || lead['Lead Score'] || 85,\n  phone: lead.phone || '',\n  salesRep: lead.salesRep || lead['Sales Rep Email'] || '',\n  notes: lead.notes || lead.Notes || '',\n  \n  steps: [\n    {\n      step: 1,\n      channel: 'email',\n      template: 'hot_initial',\n      subject: 'Quick question about {{company}}',\n      delayHours: 0,\n      description: 'Initial personalized outreach'\n    },\n    {\n      step: 2,\n      channel: 'call',\n      template: 'hot_call_1',\n      delayHours: 4,\n      description: 'Same-day follow-up call'\n    },\n    {\n      step: 3,\n      channel: 'email',\n      template: 'hot_followup_1',\n      subject: 'Following up on my call',\n      delayHours: 24,\n      description: 'Day 2 - Call follow-up email'\n    },\n    {\n      step: 4,\n      channel: 'linkedin',\n      template: 'hot_linkedin',\n      delayHours: 48,\n      description: 'Day 3 - LinkedIn connection + message'\n    },\n    {\n      step: 5,\n      channel: 'email',\n      template: 'hot_value',\n      subject: 'Thought you might find this valuable',\n      delayHours: 96,\n      description: 'Day 5 - Value-add content'\n    },\n    {\n      step: 6,\n      channel: 'call',\n      template: 'hot_call_2',\n      delayHours: 168,\n      description: 'Day 8 - Second call attempt'\n    },\n    {\n      step: 7,\n      channel: 'email',\n      template: 'hot_breakup',\n      subject: 'Should I close your file?',\n      delayHours: 240,\n      description: 'Day 11 - Break-up email'\n    }\n  ],\n  \n  currentStep: 0,\n  totalSteps: 7,\n  status: 'active',\n  createdAt: new Date().toISOString(),\n  lastActionAt: null,\n  nextActionAt: new Date().toISOString()\n};\n\nreturn { json: sequence };"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [40, 0],
+      "id": "hot-lead-sequence",
+      "name": "Hot Lead Sequence"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Warm Lead Sequence - Standard follow-up (6 steps over 14 days)\nconst lead = $input.first().json;\n\nconst sequence = {\n  sequenceId: `seq_${Date.now()}_warm`,\n  sequenceType: 'warm',\n  sequenceName: 'Warm Lead - Standard Follow-up',\n  leadEmail: lead.email || lead['Lead Email'],\n  leadName: lead.fullName || lead['Lead Name'] || lead.name,\n  company: lead.company || lead.Company || '',\n  leadScore: lead.leadScore || lead['Lead Score'] || 60,\n  phone: lead.phone || '',\n  salesRep: lead.salesRep || lead['Sales Rep Email'] || '',\n  notes: lead.notes || lead.Notes || '',\n  \n  steps: [\n    {\n      step: 1,\n      channel: 'email',\n      template: 'warm_initial',\n      subject: 'Thanks for your interest, {{firstName}}',\n      delayHours: 0,\n      description: 'Initial outreach'\n    },\n    {\n      step: 2,\n      channel: 'email',\n      template: 'warm_value_1',\n      subject: 'How {{company}} companies are solving {{painPoint}}',\n      delayHours: 72,\n      description: 'Day 4 - Value content'\n    },\n    {\n      step: 3,\n      channel: 'call',\n      template: 'warm_call',\n      delayHours: 120,\n      description: 'Day 6 - Discovery call attempt'\n    },\n    {\n      step: 4,\n      channel: 'email',\n      template: 'warm_case_study',\n      subject: 'How {{similarCompany}} achieved {{result}}',\n      delayHours: 192,\n      description: 'Day 9 - Case study'\n    },\n    {\n      step: 5,\n      channel: 'linkedin',\n      template: 'warm_linkedin',\n      delayHours: 264,\n      description: 'Day 12 - LinkedIn touch'\n    },\n    {\n      step: 6,\n      channel: 'email',\n      template: 'warm_final',\n      subject: 'One last thing before I go...',\n      delayHours: 336,\n      description: 'Day 15 - Final outreach'\n    }\n  ],\n  \n  currentStep: 0,\n  totalSteps: 6,\n  status: 'active',\n  createdAt: new Date().toISOString(),\n  lastActionAt: null,\n  nextActionAt: new Date().toISOString()\n};\n\nreturn { json: sequence };"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [40, 200],
+      "id": "warm-lead-sequence",
+      "name": "Warm Lead Sequence"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Cold Lead Sequence - Nurture (5 steps over 30 days)\nconst lead = $input.first().json;\n\nconst sequence = {\n  sequenceId: `seq_${Date.now()}_cold`,\n  sequenceType: 'cold',\n  sequenceName: 'Cold Lead - Nurture Sequence',\n  leadEmail: lead.email || lead['Lead Email'],\n  leadName: lead.fullName || lead['Lead Name'] || lead.name,\n  company: lead.company || lead.Company || '',\n  leadScore: lead.leadScore || lead['Lead Score'] || 35,\n  phone: lead.phone || '',\n  salesRep: lead.salesRep || lead['Sales Rep Email'] || '',\n  notes: lead.notes || lead.Notes || '',\n  \n  steps: [\n    {\n      step: 1,\n      channel: 'email',\n      template: 'cold_welcome',\n      subject: 'Welcome, {{firstName}} - here\\'s what you need to know',\n      delayHours: 0,\n      description: 'Welcome + educational content'\n    },\n    {\n      step: 2,\n      channel: 'email',\n      template: 'cold_education_1',\n      subject: '3 trends shaping {{industry}} in 2026',\n      delayHours: 168,\n      description: 'Week 2 - Educational content'\n    },\n    {\n      step: 3,\n      channel: 'email',\n      template: 'cold_education_2',\n      subject: 'The hidden cost of {{painPoint}}',\n      delayHours: 336,\n      description: 'Week 3 - Problem awareness'\n    },\n    {\n      step: 4,\n      channel: 'email',\n      template: 'cold_solution',\n      subject: 'A better way to handle {{challenge}}',\n      delayHours: 504,\n      description: 'Week 4 - Solution introduction'\n    },\n    {\n      step: 5,\n      channel: 'email',\n      template: 'cold_cta',\n      subject: 'Ready to explore options?',\n      delayHours: 720,\n      description: 'Week 5 - Soft CTA'\n    }\n  ],\n  \n  currentStep: 0,\n  totalSteps: 5,\n  status: 'active',\n  createdAt: new Date().toISOString(),\n  lastActionAt: null,\n  nextActionAt: new Date().toISOString()\n};\n\nreturn { json: sequence };"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [40, 400],
+      "id": "cold-lead-sequence",
+      "name": "Cold Lead Sequence"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Re-engagement Sequence - Win back stale leads (4 steps over 21 days)\nconst lead = $input.first().json;\n\nconst sequence = {\n  sequenceId: `seq_${Date.now()}_reengagement`,\n  sequenceType: 'reengagement',\n  sequenceName: 'Re-engagement Sequence',\n  leadEmail: lead.email || lead['Lead Email'],\n  leadName: lead.fullName || lead['Lead Name'] || lead.name,\n  company: lead.company || lead.Company || '',\n  leadScore: lead.leadScore || lead['Lead Score'] || 40,\n  phone: lead.phone || '',\n  salesRep: lead.salesRep || lead['Sales Rep Email'] || '',\n  notes: lead.notes || lead.Notes || '',\n  \n  steps: [\n    {\n      step: 1,\n      channel: 'email',\n      template: 'reengage_hello',\n      subject: 'It\\'s been a while, {{firstName}}',\n      delayHours: 0,\n      description: 'Re-connection email'\n    },\n    {\n      step: 2,\n      channel: 'email',\n      template: 'reengage_update',\n      subject: 'What\\'s new since we last spoke',\n      delayHours: 168,\n      description: 'Week 2 - Product/company updates'\n    },\n    {\n      step: 3,\n      channel: 'email',\n      template: 'reengage_offer',\n      subject: 'Exclusive: Something special for past contacts',\n      delayHours: 336,\n      description: 'Week 3 - Special offer'\n    },\n    {\n      step: 4,\n      channel: 'email',\n      template: 'reengage_final',\n      subject: 'Should I remove you from my list?',\n      delayHours: 504,\n      description: 'Week 4 - Final attempt'\n    }\n  ],\n  \n  currentStep: 0,\n  totalSteps: 4,\n  status: 'active',\n  createdAt: new Date().toISOString(),\n  lastActionAt: null,\n  nextActionAt: new Date().toISOString()\n};\n\nreturn { json: sequence };"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [40, 600],
+      "id": "reengagement-lead-sequence",
+      "name": "Re-engagement Sequence"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Initialize and store sequence state\nconst sequence = $input.first().json;\n\n// In production, this would save to a database\n// For now, we prepare the data for n8n's static data or external storage\n\nconst sequenceState = {\n  ...sequence,\n  initialized: true,\n  initializedAt: new Date().toISOString()\n};\n\n// Log initialization\nconsole.log(`Initialized sequence ${sequence.sequenceId} for ${sequence.leadEmail}`);\n\nreturn { json: sequenceState };"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [260, 300],
+      "id": "initialize-sequence",
+      "name": "Initialize Sequence"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "your-sequences-spreadsheet-id"
+        },
+        "sheetName": "Active Sequences",
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Sequence ID": "={{ $json.sequenceId }}",
+            "Lead Email": "={{ $json.leadEmail }}",
+            "Lead Name": "={{ $json.leadName }}",
+            "Company": "={{ $json.company }}",
+            "Sequence Type": "={{ $json.sequenceType }}",
+            "Current Step": "={{ $json.currentStep }}",
+            "Total Steps": "={{ $json.totalSteps }}",
+            "Status": "={{ $json.status }}",
+            "Sales Rep": "={{ $json.salesRep }}",
+            "Created At": "={{ $json.createdAt }}",
+            "Next Action At": "={{ $json.nextActionAt }}"
+          }
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.2,
+      "position": [480, 300],
+      "id": "store-sequence-state",
+      "name": "Store Sequence State",
+      "disabled": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "google-sheets-credentials",
+          "name": "Google Sheets OAuth2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get the next step in the sequence\nconst sequence = $input.first().json;\nconst nextStepIndex = sequence.currentStep;\nconst step = sequence.steps[nextStepIndex];\n\nif (!step) {\n  return { json: { ...sequence, completed: true, message: 'Sequence completed' } };\n}\n\nreturn {\n  json: {\n    ...sequence,\n    currentStepDetails: step,\n    channel: step.channel,\n    template: step.template,\n    subject: step.subject || '',\n    stepDescription: step.description\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [700, 100],
+      "id": "get-next-step",
+      "name": "Get Next Step"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.channel }}",
+                    "rightValue": "email",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "Email"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.channel }}",
+                    "rightValue": "sms",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "SMS"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.channel }}",
+                    "rightValue": "call",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "Call"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.channel }}",
+                    "rightValue": "linkedin",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "LinkedIn"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.channel }}",
+                    "rightValue": "wait",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "Wait"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [920, 100],
+      "id": "select-channel",
+      "name": "Select Channel"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Write a personalized sales email for this lead. Use the template style indicated and personalize based on the lead's information.\n\n**Lead Information:**\n- Name: {{ $json.leadName }}\n- Company: {{ $json.company || 'their company' }}\n- Email: {{ $json.leadEmail }}\n- Lead Score: {{ $json.leadScore }}\n- Notes: {{ $json.notes || 'None' }}\n\n**Email Template Style:** {{ $json.template }}\n**Subject Line Hint:** {{ $json.subject }}\n**Sequence Type:** {{ $json.sequenceType }}\n**Step Description:** {{ $json.stepDescription }}\n\n**Guidelines:**\n1. Keep the email concise (under 150 words)\n2. Use a conversational, professional tone\n3. Include a clear call-to-action\n4. Personalize using the lead's name and company\n5. Don't be overly salesy\n6. Make it feel like a 1-on-1 email, not a mass template\n\n**Respond in this exact JSON format:**\n```json\n{\n  \"subject\": \"The personalized subject line\",\n  \"body\": \"The email body with proper formatting\",\n  \"callToAction\": \"The specific CTA\"\n}\n```",
+        "options": {
+          "systemMessage": "You are an expert sales copywriter. You write emails that get responses - concise, personalized, and value-focused. Never be pushy. Always be helpful."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [1140, -100],
+      "id": "ai-personalize-email",
+      "name": "AI Personalize Email"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Write a personalized SMS message for this lead.\n\n**Lead Information:**\n- Name: {{ $json.leadName }}\n- Company: {{ $json.company || 'their company' }}\n\n**Sequence Type:** {{ $json.sequenceType }}\n**Step Description:** {{ $json.stepDescription }}\n\n**Guidelines:**\n1. Keep it under 160 characters\n2. Be friendly but professional\n3. Include a clear next step\n4. Use their first name only\n\n**Respond in this exact JSON format:**\n```json\n{\n  \"message\": \"The SMS message text\"\n}\n```",
+        "options": {
+          "systemMessage": "You are an expert at writing concise, effective SMS messages for sales outreach. Keep messages short, friendly, and action-oriented."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [1140, 100],
+      "id": "ai-personalize-sms",
+      "name": "AI Personalize SMS"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Write a personalized LinkedIn connection request or message for this lead.\n\n**Lead Information:**\n- Name: {{ $json.leadName }}\n- Company: {{ $json.company || 'their company' }}\n- Notes: {{ $json.notes || 'None' }}\n\n**Sequence Type:** {{ $json.sequenceType }}\n**Step Description:** {{ $json.stepDescription }}\n\n**Guidelines:**\n1. For connection requests: under 300 characters\n2. For messages: under 500 characters\n3. Reference something specific about them or their company\n4. Be genuine and avoid salesy language\n5. Focus on mutual value\n\n**Respond in this exact JSON format:**\n```json\n{\n  \"messageType\": \"connection_request\" or \"message\",\n  \"message\": \"The LinkedIn message text\"\n}\n```",
+        "options": {
+          "systemMessage": "You are an expert at LinkedIn networking. You write messages that build genuine professional relationships, not spammy sales pitches."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [1140, 300],
+      "id": "ai-personalize-linkedin",
+      "name": "AI Personalize LinkedIn"
+    },
+    {
+      "parameters": {
+        "model": "claude-sonnet-4-20250514",
+        "options": {
+          "temperature": 0.7,
+          "maxTokensToSample": 1024
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatAnthropic",
+      "typeVersion": 1.2,
+      "position": [1160, 520],
+      "id": "anthropic-claude",
+      "name": "Anthropic Claude",
+      "credentials": {
+        "anthropicApi": {
+          "id": "anthropic-credentials",
+          "name": "Anthropic API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Parse AI response and prepare email for sending\nconst data = $input.first().json;\n\nlet emailContent = {\n  subject: data.subject || 'Following up',\n  body: 'Thank you for your interest. I wanted to reach out to discuss how we can help.',\n  callToAction: 'Would you have 15 minutes this week for a quick call?'\n};\n\ntry {\n  const aiOutput = data.output || data.text || data.response || '';\n  const jsonMatch = aiOutput.match(/```json\\n?([\\s\\S]*?)\\n?```/) || aiOutput.match(/\\{[\\s\\S]*\\}/);\n  \n  if (jsonMatch) {\n    const jsonStr = jsonMatch[1] || jsonMatch[0];\n    emailContent = { ...emailContent, ...JSON.parse(jsonStr) };\n  }\n} catch (e) {\n  console.log('Using default email content');\n}\n\nreturn {\n  json: {\n    ...data,\n    emailSubject: emailContent.subject,\n    emailBody: emailContent.body,\n    emailCTA: emailContent.callToAction,\n    channel: 'email',\n    readyToSend: true\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1360, -100],
+      "id": "parse-email-response",
+      "name": "Send Email"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Parse AI response and prepare SMS for sending\nconst data = $input.first().json;\n\nlet smsContent = {\n  message: `Hi ${data.leadName?.split(' ')[0] || 'there'}, following up on my email. Would love to connect briefly. Reply YES to schedule a call.`\n};\n\ntry {\n  const aiOutput = data.output || data.text || data.response || '';\n  const jsonMatch = aiOutput.match(/```json\\n?([\\s\\S]*?)\\n?```/) || aiOutput.match(/\\{[\\s\\S]*\\}/);\n  \n  if (jsonMatch) {\n    const jsonStr = jsonMatch[1] || jsonMatch[0];\n    smsContent = { ...smsContent, ...JSON.parse(jsonStr) };\n  }\n} catch (e) {\n  console.log('Using default SMS content');\n}\n\nreturn {\n  json: {\n    ...data,\n    smsMessage: smsContent.message,\n    channel: 'sms',\n    readyToSend: true\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1360, 100],
+      "id": "parse-sms-response",
+      "name": "Send SMS"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Create a call task for the sales rep\nconst data = $input.first().json;\n\nconst callTask = {\n  type: 'call',\n  leadName: data.leadName,\n  leadEmail: data.leadEmail,\n  phone: data.phone || 'No phone on file',\n  company: data.company,\n  salesRep: data.salesRep,\n  dueDate: new Date().toISOString(),\n  priority: data.leadScore >= 70 ? 'high' : 'medium',\n  notes: `Sequence: ${data.sequenceName}\\nStep: ${data.currentStep + 1}/${data.totalSteps}\\n\\n${data.stepDescription}\\n\\nLead Notes: ${data.notes || 'None'}`,\n  talkingPoints: [\n    'Introduce yourself and reference previous touchpoints',\n    `Ask about current challenges at ${data.company || 'their company'}`,\n    'Listen for pain points and buying signals',\n    'Propose next steps based on their interest level'\n  ]\n};\n\nreturn {\n  json: {\n    ...data,\n    callTask,\n    channel: 'call',\n    taskCreated: true\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1360, 300],
+      "id": "create-call-task",
+      "name": "Create Call Task"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Parse AI response and prepare LinkedIn message\nconst data = $input.first().json;\n\nlet linkedInContent = {\n  messageType: 'connection_request',\n  message: `Hi ${data.leadName?.split(' ')[0] || 'there'}, I noticed we're both in the ${data.industry || 'same industry'}. Would love to connect and share insights.`\n};\n\ntry {\n  const aiOutput = data.output || data.text || data.response || '';\n  const jsonMatch = aiOutput.match(/```json\\n?([\\s\\S]*?)\\n?```/) || aiOutput.match(/\\{[\\s\\S]*\\}/);\n  \n  if (jsonMatch) {\n    const jsonStr = jsonMatch[1] || jsonMatch[0];\n    linkedInContent = { ...linkedInContent, ...JSON.parse(jsonStr) };\n  }\n} catch (e) {\n  console.log('Using default LinkedIn content');\n}\n\nreturn {\n  json: {\n    ...data,\n    linkedInMessageType: linkedInContent.messageType,\n    linkedInMessage: linkedInContent.message,\n    channel: 'linkedin',\n    readyToSend: true\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1360, 500],
+      "id": "parse-linkedin-response",
+      "name": "Send LinkedIn Message"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Wait step - just pass through with updated timing\nconst data = $input.first().json;\n\nreturn {\n  json: {\n    ...data,\n    channel: 'wait',\n    message: 'Wait step - no action taken'\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1360, 700],
+      "id": "wait-step",
+      "name": "Wait Step"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Log the activity to tracking sheet/database\nconst data = $input.first().json;\n\nconst activity = {\n  timestamp: new Date().toISOString(),\n  sequenceId: data.sequenceId,\n  leadEmail: data.leadEmail,\n  leadName: data.leadName,\n  company: data.company,\n  channel: data.channel,\n  step: data.currentStep + 1,\n  totalSteps: data.totalSteps,\n  sequenceType: data.sequenceType,\n  \n  // Channel-specific details\n  emailSubject: data.emailSubject || null,\n  smsMessage: data.smsMessage || null,\n  linkedInMessage: data.linkedInMessage || null,\n  callTaskCreated: data.taskCreated || false,\n  \n  salesRep: data.salesRep,\n  status: 'sent'\n};\n\nreturn {\n  json: {\n    ...data,\n    activity,\n    activityLogged: true\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1580, 300],
+      "id": "log-activity",
+      "name": "Log Activity"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Update sequence state for next step\nconst data = $input.first().json;\n\nconst nextStep = data.currentStep + 1;\nconst currentStepDetails = data.steps[data.currentStep];\nconst nextStepDetails = data.steps[nextStep];\n\n// Calculate when next action should happen\nlet nextActionAt = new Date();\nif (nextStepDetails) {\n  nextActionAt = new Date(Date.now() + (nextStepDetails.delayHours * 60 * 60 * 1000));\n}\n\nconst updatedSequence = {\n  ...data,\n  currentStep: nextStep,\n  lastActionAt: new Date().toISOString(),\n  lastChannel: data.channel,\n  nextActionAt: nextStepDetails ? nextActionAt.toISOString() : null,\n  status: nextStep >= data.totalSteps ? 'completed' : 'active'\n};\n\nreturn {\n  json: updatedSequence\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1800, 300],
+      "id": "update-sequence-state",
+      "name": "Update Sequence State"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Update CRM with activity\nconst data = $input.first().json;\n\n// This would integrate with the lead's CRM\n// Adding activity/task records\n\nconst crmUpdate = {\n  leadEmail: data.leadEmail,\n  activityType: data.channel,\n  subject: `Sequence Step ${data.currentStep}/${data.totalSteps}`,\n  description: `${data.sequenceName}\\n\\nChannel: ${data.channel}\\n${data.emailSubject ? 'Email Subject: ' + data.emailSubject : ''}${data.smsMessage ? 'SMS: ' + data.smsMessage : ''}`,\n  status: 'completed',\n  dueDate: data.channel === 'call' ? new Date().toISOString() : null\n};\n\nreturn {\n  json: {\n    ...data,\n    crmUpdate,\n    crmUpdated: true\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [2020, 300],
+      "id": "update-crm",
+      "name": "Update CRM"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Handle lead response (reply, click, call back, etc.)\nconst response = $input.first().json;\n\nconst responseType = response.responseType || response.type || 'unknown';\nconst leadEmail = response.leadEmail || response.email;\nconst sequenceId = response.sequenceId;\n\nconst responseData = {\n  ...response,\n  responseType,\n  leadEmail,\n  sequenceId,\n  processedAt: new Date().toISOString(),\n  \n  // Determine action based on response\n  shouldPause: ['reply', 'call_back', 'meeting_booked'].includes(responseType),\n  shouldConvert: ['meeting_booked', 'deal_created', 'converted'].includes(responseType),\n  shouldUnsubscribe: ['unsubscribe', 'do_not_contact', 'spam'].includes(responseType),\n  shouldContinue: ['no_response', 'auto_reply'].includes(responseType)\n};\n\nreturn { json: responseData };"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [-180, 600],
+      "id": "handle-lead-response",
+      "name": "Handle Lead Response"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.shouldPause }}",
+                    "rightValue": true,
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "Pause"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.shouldConvert }}",
+                    "rightValue": true,
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "Convert"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.shouldUnsubscribe }}",
+                    "rightValue": true,
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "Unsubscribe"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.shouldContinue }}",
+                    "rightValue": true,
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "Continue"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [40, 800],
+      "id": "check-response-type",
+      "name": "Check Response Type"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Pause the sequence due to lead engagement\nconst data = $input.first().json;\n\nreturn {\n  json: {\n    ...data,\n    status: 'paused',\n    pausedAt: new Date().toISOString(),\n    pauseReason: data.responseType,\n    message: `Sequence paused - lead ${data.responseType.replace('_', ' ')}`\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [260, 700],
+      "id": "pause-sequence",
+      "name": "Pause Sequence"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Mark lead as converted and complete sequence\nconst data = $input.first().json;\n\nreturn {\n  json: {\n    ...data,\n    status: 'converted',\n    convertedAt: new Date().toISOString(),\n    conversionType: data.responseType,\n    message: 'Lead converted! Sequence completed successfully.'\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [260, 900],
+      "id": "mark-as-converted",
+      "name": "Mark as Converted"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Mark lead as unsubscribed and stop sequence\nconst data = $input.first().json;\n\nreturn {\n  json: {\n    ...data,\n    status: 'unsubscribed',\n    unsubscribedAt: new Date().toISOString(),\n    unsubscribeReason: data.responseType,\n    message: 'Lead unsubscribed - sequence stopped'\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [260, 1100],
+      "id": "mark-as-unsubscribed",
+      "name": "Mark as Unsubscribed"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Continue sequence - auto-reply or no meaningful response\nconst data = $input.first().json;\n\nreturn {\n  json: {\n    ...data,\n    status: 'active',\n    message: 'No action required - sequence continues'\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [260, 1300],
+      "id": "continue-sequence",
+      "name": "Continue Sequence"
+    },
+    {
+      "parameters": {
+        "channel": "#sales-notifications",
+        "text": "=:bell: *Lead Response Alert*\n\n*Lead:* {{ $json.leadName }}\n*Email:* {{ $json.leadEmail }}\n*Company:* {{ $json.company || 'N/A' }}\n\n*Response Type:* {{ $json.responseType }}\n*Status:* {{ $json.status }}\n*Message:* {{ $json.message }}\n\n{{ $json.status === 'paused' ? ':pause_button: Sequence paused - sales rep action required' : '' }}\n{{ $json.status === 'converted' ? ':tada: Congratulations on the conversion!' : '' }}",
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.1,
+      "position": [480, 800],
+      "id": "notify-sales-rep",
+      "name": "Notify Sales Rep",
+      "credentials": {
+        "slackApi": {
+          "id": "slack-credentials",
+          "name": "Slack API"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [480, -300],
+      "id": "skip-not-ready",
+      "name": "Skip - Not Ready"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Mark sequence as completed\nconst data = $input.first().json;\n\nreturn {\n  json: {\n    ...data,\n    status: 'completed',\n    completedAt: new Date().toISOString(),\n    message: `Sequence completed - all ${data.totalSteps} steps executed`\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [480, -100],
+      "id": "sequence-completed",
+      "name": "Sequence Completed"
+    },
+    {
+      "parameters": {
+        "channel": "#sales-notifications",
+        "text": "=:checkered_flag: *Sequence Completed*\n\n*Lead:* {{ $json.leadName }}\n*Email:* {{ $json.leadEmail }}\n*Company:* {{ $json.company || 'N/A' }}\n\n*Sequence:* {{ $json.sequenceName }}\n*Total Steps:* {{ $json.totalSteps }}\n*Completed At:* {{ $json.completedAt }}\n\n_No response received. Consider re-engagement sequence or manual outreach._",
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.1,
+      "position": [700, -100],
+      "id": "sequence-complete-notification",
+      "name": "Sequence Complete Notification",
+      "credentials": {
+        "slackApi": {
+          "id": "slack-credentials",
+          "name": "Slack API"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "shared": [],
+  "staticData": null,
+  "tags": [
+    {
+      "name": "Sales"
+    },
+    {
+      "name": "Automation"
+    },
+    {
+      "name": "Follow-up"
+    }
+  ],
+  "triggerCount": 0,
+  "updatedAt": "2026-01-06T00:00:00.000Z",
+  "versionId": "follow-up-sequences-v1"
+}
