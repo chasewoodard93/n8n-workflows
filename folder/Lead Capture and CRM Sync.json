@@ -1,0 +1,1302 @@
+{
+  "active": false,
+  "connections": {
+    "Website Form Webhook": {
+      "main": [
+        [
+          {
+            "node": "Normalize Lead Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Landing Page Form": {
+      "main": [
+        [
+          {
+            "node": "Normalize Lead Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "LinkedIn Lead Gen": {
+      "main": [
+        [
+          {
+            "node": "Normalize Lead Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Facebook Lead Ads": {
+      "main": [
+        [
+          {
+            "node": "Normalize Lead Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Email Inquiry Trigger": {
+      "main": [
+        [
+          {
+            "node": "Parse Email Lead",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Manual Lead Entry": {
+      "main": [
+        [
+          {
+            "node": "Normalize Lead Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Email Lead": {
+      "main": [
+        [
+          {
+            "node": "Normalize Lead Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize Lead Data": {
+      "main": [
+        [
+          {
+            "node": "Validate Lead",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Lead": {
+      "main": [
+        [
+          {
+            "node": "Enrich Lead Data",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Invalid Lead Handler",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Enrich Lead Data": {
+      "main": [
+        [
+          {
+            "node": "AI Lead Scoring",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Lead Scoring": {
+      "main": [
+        [
+          {
+            "node": "Check Duplicate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Anthropic Claude": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Lead Scoring",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Duplicate": {
+      "main": [
+        [
+          {
+            "node": "Select CRM",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Update Existing Lead",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Select CRM": {
+      "main": [
+        [
+          {
+            "node": "Create Salesforce Lead",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Create HubSpot Contact",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Create Pipedrive Person",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Create Dynamics Lead",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Create Zoho Lead",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Salesforce Lead": {
+      "main": [
+        [
+          {
+            "node": "Merge CRM Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create HubSpot Contact": {
+      "main": [
+        [
+          {
+            "node": "Merge CRM Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Pipedrive Person": {
+      "main": [
+        [
+          {
+            "node": "Merge CRM Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Dynamics Lead": {
+      "main": [
+        [
+          {
+            "node": "Merge CRM Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Zoho Lead": {
+      "main": [
+        [
+          {
+            "node": "Merge CRM Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Existing Lead": {
+      "main": [
+        [
+          {
+            "node": "Merge CRM Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge CRM Response": {
+      "main": [
+        [
+          {
+            "node": "Post-CRM Actions",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Post-CRM Actions": {
+      "main": [
+        [
+          {
+            "node": "Add to Email List",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Log to Spreadsheet",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Check Lead Score",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Lead Score": {
+      "main": [
+        [
+          {
+            "node": "High Priority Alert",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Standard Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "High Priority Alert": {
+      "main": [
+        [
+          {
+            "node": "Send Welcome Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Standard Notification": {
+      "main": [
+        [
+          {
+            "node": "Send Welcome Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-01-06T00:00:00.000Z",
+  "id": "lead-capture-crm-sync",
+  "isArchived": false,
+  "meta": {
+    "instanceId": "sales-workflows"
+  },
+  "name": "Lead Capture and CRM Sync",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "lead-capture",
+        "options": {
+          "responseMode": "onReceived",
+          "responseData": "allEntries"
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [-200, -400],
+      "id": "website-form-webhook",
+      "name": "Website Form Webhook",
+      "webhookId": "lead-capture-webhook"
+    },
+    {
+      "parameters": {
+        "formTitle": "Lead Capture Form",
+        "formDescription": "Capture new lead information",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "First Name",
+              "requiredField": true,
+              "fieldType": "text"
+            },
+            {
+              "fieldLabel": "Last Name",
+              "requiredField": true,
+              "fieldType": "text"
+            },
+            {
+              "fieldLabel": "Email",
+              "requiredField": true,
+              "fieldType": "email"
+            },
+            {
+              "fieldLabel": "Phone",
+              "requiredField": false,
+              "fieldType": "text"
+            },
+            {
+              "fieldLabel": "Company",
+              "requiredField": false,
+              "fieldType": "text"
+            },
+            {
+              "fieldLabel": "Job Title",
+              "requiredField": false,
+              "fieldType": "text"
+            },
+            {
+              "fieldLabel": "Lead Source",
+              "requiredField": true,
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {"option": "Website"},
+                  {"option": "Referral"},
+                  {"option": "Trade Show"},
+                  {"option": "Cold Outreach"},
+                  {"option": "Partner"},
+                  {"option": "Other"}
+                ]
+              }
+            },
+            {
+              "fieldLabel": "Message/Interest",
+              "requiredField": false,
+              "fieldType": "textarea"
+            },
+            {
+              "fieldLabel": "Target CRM",
+              "requiredField": true,
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {"option": "Salesforce"},
+                  {"option": "HubSpot"},
+                  {"option": "Pipedrive"},
+                  {"option": "Microsoft Dynamics"},
+                  {"option": "Zoho CRM"}
+                ]
+              }
+            }
+          ]
+        },
+        "options": {
+          "responseMode": "onReceived",
+          "formSubmittedText": "Thank you! Your information has been received."
+        }
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.3,
+      "position": [-200, -200],
+      "id": "landing-page-form",
+      "name": "Landing Page Form",
+      "webhookId": "landing-page-lead"
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.linkedIn",
+      "typeVersion": 1,
+      "position": [-200, 0],
+      "id": "linkedin-lead-gen",
+      "name": "LinkedIn Lead Gen",
+      "disabled": true,
+      "credentials": {
+        "linkedInOAuth2Api": {
+          "id": "linkedin-credentials",
+          "name": "LinkedIn OAuth2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "triggerOn": "newLead",
+        "formId": "your-form-id"
+      },
+      "type": "n8n-nodes-base.facebookLeadAdsTrigger",
+      "typeVersion": 1,
+      "position": [-200, 200],
+      "id": "facebook-lead-ads",
+      "name": "Facebook Lead Ads",
+      "disabled": true,
+      "credentials": {
+        "facebookLeadAdsOAuth2Api": {
+          "id": "facebook-credentials",
+          "name": "Facebook Lead Ads OAuth2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "simple": false
+      },
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1,
+      "position": [-200, 400],
+      "id": "email-inquiry-trigger",
+      "name": "Email Inquiry Trigger",
+      "disabled": true,
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "gmail-credentials",
+          "name": "Gmail OAuth2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "formTitle": "Manual Lead Entry",
+        "formDescription": "Manually enter a new lead into the system",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "First Name",
+              "requiredField": true,
+              "fieldType": "text"
+            },
+            {
+              "fieldLabel": "Last Name",
+              "requiredField": true,
+              "fieldType": "text"
+            },
+            {
+              "fieldLabel": "Email",
+              "requiredField": true,
+              "fieldType": "email"
+            },
+            {
+              "fieldLabel": "Phone",
+              "requiredField": false,
+              "fieldType": "text"
+            },
+            {
+              "fieldLabel": "Company",
+              "requiredField": true,
+              "fieldType": "text"
+            },
+            {
+              "fieldLabel": "Job Title",
+              "requiredField": false,
+              "fieldType": "text"
+            },
+            {
+              "fieldLabel": "Industry",
+              "requiredField": false,
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {"option": "Technology"},
+                  {"option": "Healthcare"},
+                  {"option": "Finance"},
+                  {"option": "Manufacturing"},
+                  {"option": "Retail"},
+                  {"option": "Education"},
+                  {"option": "Government"},
+                  {"option": "Other"}
+                ]
+              }
+            },
+            {
+              "fieldLabel": "Company Size",
+              "requiredField": false,
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {"option": "1-10"},
+                  {"option": "11-50"},
+                  {"option": "51-200"},
+                  {"option": "201-500"},
+                  {"option": "501-1000"},
+                  {"option": "1001-5000"},
+                  {"option": "5000+"}
+                ]
+              }
+            },
+            {
+              "fieldLabel": "Lead Source",
+              "requiredField": true,
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {"option": "Website"},
+                  {"option": "Referral"},
+                  {"option": "Trade Show"},
+                  {"option": "Cold Outreach"},
+                  {"option": "Partner"},
+                  {"option": "Social Media"},
+                  {"option": "Webinar"},
+                  {"option": "Content Download"},
+                  {"option": "Other"}
+                ]
+              }
+            },
+            {
+              "fieldLabel": "Notes",
+              "requiredField": false,
+              "fieldType": "textarea"
+            },
+            {
+              "fieldLabel": "Target CRM",
+              "requiredField": true,
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {"option": "Salesforce"},
+                  {"option": "HubSpot"},
+                  {"option": "Pipedrive"},
+                  {"option": "Microsoft Dynamics"},
+                  {"option": "Zoho CRM"}
+                ]
+              }
+            }
+          ]
+        },
+        "options": {
+          "responseMode": "onReceived",
+          "formSubmittedText": "Lead has been added to the CRM."
+        }
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.3,
+      "position": [-200, 600],
+      "id": "manual-lead-entry",
+      "name": "Manual Lead Entry",
+      "webhookId": "manual-lead-entry"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Parse lead data from email inquiry\nconst email = $input.first().json;\n\n// Extract potential lead info from email\nconst fromAddress = email.from?.value?.[0]?.address || email.from || '';\nconst fromName = email.from?.value?.[0]?.name || '';\nconst subject = email.subject || '';\nconst body = email.text || email.snippet || '';\n\n// Try to parse name\nlet firstName = '';\nlet lastName = '';\nif (fromName) {\n  const nameParts = fromName.trim().split(' ');\n  firstName = nameParts[0] || '';\n  lastName = nameParts.slice(1).join(' ') || '';\n}\n\n// Extract company from email domain\nconst emailDomain = fromAddress.split('@')[1] || '';\nconst company = emailDomain.split('.')[0] || '';\n\nreturn {\n  json: {\n    firstName,\n    lastName,\n    email: fromAddress,\n    company: company.charAt(0).toUpperCase() + company.slice(1),\n    phone: '',\n    jobTitle: '',\n    source: 'Email Inquiry',\n    message: `Subject: ${subject}\\n\\n${body}`,\n    targetCRM: 'HubSpot', // Default CRM for email leads\n    rawEmail: email\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [20, 400],
+      "id": "parse-email-lead",
+      "name": "Parse Email Lead"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Normalize lead data from various sources into consistent format\nconst input = $input.first().json;\n\n// Map different field names to standard format\nconst normalizedLead = {\n  firstName: input.firstName || input['First Name'] || input.first_name || input.fname || '',\n  lastName: input.lastName || input['Last Name'] || input.last_name || input.lname || '',\n  email: (input.email || input.Email || input.email_address || '').toLowerCase().trim(),\n  phone: input.phone || input.Phone || input.phone_number || input.telephone || '',\n  company: input.company || input.Company || input.company_name || input.organization || '',\n  jobTitle: input.jobTitle || input['Job Title'] || input.job_title || input.title || input.position || '',\n  industry: input.industry || input.Industry || '',\n  companySize: input.companySize || input['Company Size'] || input.company_size || input.employees || '',\n  source: input.source || input['Lead Source'] || input.lead_source || input.utm_source || 'Unknown',\n  message: input.message || input.Message || input['Message/Interest'] || input.notes || input.Notes || '',\n  targetCRM: input.targetCRM || input['Target CRM'] || 'HubSpot',\n  \n  // Metadata\n  capturedAt: new Date().toISOString(),\n  ipAddress: input.ip || input.ip_address || '',\n  userAgent: input.userAgent || input.user_agent || '',\n  pageUrl: input.pageUrl || input.page_url || input.referrer || '',\n  utmCampaign: input.utm_campaign || '',\n  utmMedium: input.utm_medium || '',\n  utmContent: input.utm_content || ''\n};\n\n// Clean phone number\nif (normalizedLead.phone) {\n  normalizedLead.phone = normalizedLead.phone.replace(/[^0-9+\\-()\\s]/g, '');\n}\n\n// Create full name\nnormalizedLead.fullName = `${normalizedLead.firstName} ${normalizedLead.lastName}`.trim();\n\nreturn {\n  json: normalizedLead\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [240, 100],
+      "id": "normalize-lead",
+      "name": "Normalize Lead Data"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": false,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "has-email",
+              "leftValue": "={{ $json.email }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "isNotEmpty"
+              }
+            },
+            {
+              "id": "valid-email",
+              "leftValue": "={{ $json.email }}",
+              "rightValue": "^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$",
+              "operator": {
+                "type": "string",
+                "operation": "regex"
+              }
+            },
+            {
+              "id": "has-name",
+              "leftValue": "={{ $json.firstName || $json.lastName }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "isNotEmpty"
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [460, 100],
+      "id": "validate-lead",
+      "name": "Validate Lead"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Enrich lead data with additional information\nconst lead = $input.first().json;\n\n// Extract domain from email for company enrichment\nconst emailDomain = lead.email.split('@')[1] || '';\n\n// Check if it's a personal email domain\nconst personalDomains = ['gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com', 'aol.com', 'icloud.com', 'mail.com', 'protonmail.com'];\nconst isPersonalEmail = personalDomains.includes(emailDomain.toLowerCase());\n\n// Determine lead type\nlet leadType = 'B2C';\nif (!isPersonalEmail && lead.company) {\n  leadType = 'B2B';\n} else if (!isPersonalEmail) {\n  // Use domain as company name if not provided\n  lead.company = lead.company || emailDomain.split('.')[0].charAt(0).toUpperCase() + emailDomain.split('.')[0].slice(1);\n  leadType = 'B2B';\n}\n\n// Estimate company size category if not provided\nlet companySizeCategory = lead.companySize || 'Unknown';\nif (companySizeCategory === 'Unknown' && leadType === 'B2B') {\n  companySizeCategory = 'To Be Determined';\n}\n\n// Determine region from email domain TLD\nconst tld = emailDomain.split('.').pop()?.toLowerCase() || '';\nlet region = 'Unknown';\nconst regionMap = {\n  'com': 'Global/US',\n  'us': 'United States',\n  'uk': 'United Kingdom',\n  'co.uk': 'United Kingdom',\n  'de': 'Germany',\n  'fr': 'France',\n  'au': 'Australia',\n  'ca': 'Canada',\n  'jp': 'Japan',\n  'in': 'India'\n};\nregion = regionMap[tld] || 'International';\n\nconst enrichedLead = {\n  ...lead,\n  emailDomain,\n  isPersonalEmail,\n  leadType,\n  companySizeCategory,\n  region,\n  enrichedAt: new Date().toISOString()\n};\n\nreturn {\n  json: enrichedLead\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [680, 0],
+      "id": "enrich-lead",
+      "name": "Enrich Lead Data"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Analyze this sales lead and provide a score and insights:\n\n**Lead Information:**\n- Name: {{ $json.fullName }}\n- Email: {{ $json.email }}\n- Company: {{ $json.company || 'Not provided' }}\n- Job Title: {{ $json.jobTitle || 'Not provided' }}\n- Industry: {{ $json.industry || 'Not provided' }}\n- Company Size: {{ $json.companySizeCategory || 'Unknown' }}\n- Lead Source: {{ $json.source }}\n- Lead Type: {{ $json.leadType }}\n- Message/Interest: {{ $json.message || 'None provided' }}\n\n**Please provide:**\n1. Lead Score (1-100): Based on likelihood to convert\n2. Lead Quality: Hot, Warm, or Cold\n3. Recommended Priority: High, Medium, or Low\n4. Key Insights: 2-3 bullet points about this lead\n5. Suggested Next Action: What should sales do first?\n6. Potential Value: Estimated deal size category (Small: <$10k, Medium: $10k-50k, Large: $50k-250k, Enterprise: >$250k)\n\nRespond in this exact JSON format:\n```json\n{\n  \"score\": 75,\n  \"quality\": \"Warm\",\n  \"priority\": \"Medium\",\n  \"insights\": [\"insight 1\", \"insight 2\"],\n  \"nextAction\": \"suggested action\",\n  \"potentialValue\": \"Medium\"\n}\n```",
+        "options": {
+          "systemMessage": "You are a sales lead scoring AI assistant. Analyze leads objectively based on the information provided. Consider factors like: company size, job title seniority, industry fit, lead source quality, and expressed interest. Be realistic with scores - most leads should score between 30-70. Only score above 80 for exceptionally qualified leads with clear buying signals."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [900, 0],
+      "id": "ai-lead-scoring",
+      "name": "AI Lead Scoring"
+    },
+    {
+      "parameters": {
+        "model": "claude-sonnet-4-20250514",
+        "options": {
+          "temperature": 0.3,
+          "maxTokensToSample": 1024
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatAnthropic",
+      "typeVersion": 1.2,
+      "position": [920, 220],
+      "id": "anthropic-claude",
+      "name": "Anthropic Claude",
+      "credentials": {
+        "anthropicApi": {
+          "id": "anthropic-credentials",
+          "name": "Anthropic API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Parse AI response and merge with lead data\nconst lead = $input.first().json;\n\n// Try to extract JSON from AI response\nlet aiAnalysis = {\n  score: 50,\n  quality: 'Warm',\n  priority: 'Medium',\n  insights: [],\n  nextAction: 'Follow up via email',\n  potentialValue: 'Medium'\n};\n\ntry {\n  // The AI response might be in different formats\n  const aiOutput = lead.output || lead.text || lead.response || '';\n  \n  // Try to find JSON in the response\n  const jsonMatch = aiOutput.match(/```json\\n?([\\s\\S]*?)\\n?```/) || aiOutput.match(/\\{[\\s\\S]*\\}/);\n  \n  if (jsonMatch) {\n    const jsonStr = jsonMatch[1] || jsonMatch[0];\n    aiAnalysis = JSON.parse(jsonStr);\n  }\n} catch (e) {\n  // Use defaults if parsing fails\n  console.log('AI response parsing failed, using defaults');\n}\n\n// Merge AI analysis with lead data\nconst scoredLead = {\n  ...lead,\n  leadScore: aiAnalysis.score || 50,\n  leadQuality: aiAnalysis.quality || 'Warm',\n  priority: aiAnalysis.priority || 'Medium',\n  aiInsights: aiAnalysis.insights || [],\n  suggestedNextAction: aiAnalysis.nextAction || 'Follow up via email',\n  potentialValue: aiAnalysis.potentialValue || 'Medium',\n  scoredAt: new Date().toISOString()\n};\n\n// Determine if this is a high-priority lead\nscoredLead.isHighPriority = scoredLead.leadScore >= 70 || scoredLead.priority === 'High';\n\nreturn {\n  json: scoredLead\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1120, 0],
+      "id": "parse-ai-response",
+      "name": "Check Duplicate"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.targetCRM }}",
+                    "rightValue": "Salesforce",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "Salesforce"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.targetCRM }}",
+                    "rightValue": "HubSpot",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "HubSpot"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.targetCRM }}",
+                    "rightValue": "Pipedrive",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "Pipedrive"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.targetCRM }}",
+                    "rightValue": "Microsoft Dynamics",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "Dynamics"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.targetCRM }}",
+                    "rightValue": "Zoho CRM",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "Zoho"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [1340, 0],
+      "id": "select-crm",
+      "name": "Select CRM"
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "objectType": "Lead",
+        "fields": {
+          "field": [
+            {
+              "fieldId": "FirstName",
+              "value": "={{ $json.firstName }}"
+            },
+            {
+              "fieldId": "LastName",
+              "value": "={{ $json.lastName }}"
+            },
+            {
+              "fieldId": "Email",
+              "value": "={{ $json.email }}"
+            },
+            {
+              "fieldId": "Phone",
+              "value": "={{ $json.phone }}"
+            },
+            {
+              "fieldId": "Company",
+              "value": "={{ $json.company }}"
+            },
+            {
+              "fieldId": "Title",
+              "value": "={{ $json.jobTitle }}"
+            },
+            {
+              "fieldId": "Industry",
+              "value": "={{ $json.industry }}"
+            },
+            {
+              "fieldId": "LeadSource",
+              "value": "={{ $json.source }}"
+            },
+            {
+              "fieldId": "Description",
+              "value": "={{ $json.message }}\n\nAI Score: {{ $json.leadScore }}\nQuality: {{ $json.leadQuality }}\nPriority: {{ $json.priority }}\nPotential Value: {{ $json.potentialValue }}\n\nAI Insights:\n{{ $json.aiInsights.join('\\n') }}\n\nSuggested Action: {{ $json.suggestedNextAction }}"
+            },
+            {
+              "fieldId": "Rating",
+              "value": "={{ $json.leadQuality === 'Hot' ? 'Hot' : $json.leadQuality === 'Warm' ? 'Warm' : 'Cold' }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.salesforce",
+      "typeVersion": 1,
+      "position": [1560, -300],
+      "id": "create-salesforce-lead",
+      "name": "Create Salesforce Lead",
+      "credentials": {
+        "salesforceOAuth2Api": {
+          "id": "salesforce-credentials",
+          "name": "Salesforce OAuth2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "properties": [
+          {
+            "property": "firstname",
+            "value": "={{ $json.firstName }}"
+          },
+          {
+            "property": "lastname",
+            "value": "={{ $json.lastName }}"
+          },
+          {
+            "property": "email",
+            "value": "={{ $json.email }}"
+          },
+          {
+            "property": "phone",
+            "value": "={{ $json.phone }}"
+          },
+          {
+            "property": "company",
+            "value": "={{ $json.company }}"
+          },
+          {
+            "property": "jobtitle",
+            "value": "={{ $json.jobTitle }}"
+          },
+          {
+            "property": "industry",
+            "value": "={{ $json.industry }}"
+          },
+          {
+            "property": "hs_lead_status",
+            "value": "NEW"
+          },
+          {
+            "property": "lifecyclestage",
+            "value": "lead"
+          },
+          {
+            "property": "message",
+            "value": "={{ $json.message }}"
+          }
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.hubspot",
+      "typeVersion": 2,
+      "position": [1560, -100],
+      "id": "create-hubspot-contact",
+      "name": "Create HubSpot Contact",
+      "credentials": {
+        "hubspotOAuth2Api": {
+          "id": "hubspot-credentials",
+          "name": "HubSpot OAuth2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "name": "={{ $json.fullName }}",
+        "additionalFields": {
+          "email": "={{ $json.email }}",
+          "phone": "={{ $json.phone }}",
+          "org_id": "={{ $json.company }}"
+        }
+      },
+      "type": "n8n-nodes-base.pipedrive",
+      "typeVersion": 1,
+      "position": [1560, 100],
+      "id": "create-pipedrive-person",
+      "name": "Create Pipedrive Person",
+      "credentials": {
+        "pipedriveApi": {
+          "id": "pipedrive-credentials",
+          "name": "Pipedrive API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "resource": "lead",
+        "additionalFields": {
+          "firstname": "={{ $json.firstName }}",
+          "lastname": "={{ $json.lastName }}",
+          "emailaddress1": "={{ $json.email }}",
+          "telephone1": "={{ $json.phone }}",
+          "companyname": "={{ $json.company }}",
+          "jobtitle": "={{ $json.jobTitle }}",
+          "subject": "=Lead: {{ $json.fullName }} - {{ $json.company }}"
+        }
+      },
+      "type": "n8n-nodes-base.microsoftDynamicsCrm",
+      "typeVersion": 1,
+      "position": [1560, 300],
+      "id": "create-dynamics-lead",
+      "name": "Create Dynamics Lead",
+      "credentials": {
+        "microsoftDynamicsOAuth2Api": {
+          "id": "dynamics-credentials",
+          "name": "Microsoft Dynamics OAuth2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "module": "Leads",
+        "additionalFields": {
+          "First_Name": "={{ $json.firstName }}",
+          "Last_Name": "={{ $json.lastName }}",
+          "Email": "={{ $json.email }}",
+          "Phone": "={{ $json.phone }}",
+          "Company": "={{ $json.company }}",
+          "Designation": "={{ $json.jobTitle }}",
+          "Industry": "={{ $json.industry }}",
+          "Lead_Source": "={{ $json.source }}",
+          "Description": "={{ $json.message }}"
+        }
+      },
+      "type": "n8n-nodes-base.zohoCrm",
+      "typeVersion": 1,
+      "position": [1560, 500],
+      "id": "create-zoho-lead",
+      "name": "Create Zoho Lead",
+      "credentials": {
+        "zohoOAuth2Api": {
+          "id": "zoho-credentials",
+          "name": "Zoho OAuth2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Update existing lead instead of creating duplicate\nconst lead = $input.first().json;\n\n// In a real implementation, this would:\n// 1. Search for existing lead by email in the target CRM\n// 2. Update the existing record with new information\n// 3. Add a note about the new interaction\n\nreturn {\n  json: {\n    ...lead,\n    action: 'updated',\n    message: 'Lead already exists - updated with new information'\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1560, 700],
+      "id": "update-existing-lead",
+      "name": "Update Existing Lead"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "mergeByFields": {
+          "values": [
+            {
+              "field1": "email",
+              "field2": "email"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [1780, 100],
+      "id": "merge-crm-response",
+      "name": "Merge CRM Response"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Prepare lead for post-CRM actions\nconst lead = $input.first().json;\n\n// Add CRM record info\nconst enrichedLead = {\n  ...lead,\n  crmRecordCreated: true,\n  crmRecordId: lead.id || lead.Id || lead.contactId || 'unknown',\n  processedAt: new Date().toISOString()\n};\n\nreturn {\n  json: enrichedLead\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [2000, 100],
+      "id": "post-crm-actions",
+      "name": "Post-CRM Actions"
+    },
+    {
+      "parameters": {
+        "operation": "add",
+        "list": "your-list-id",
+        "email": "={{ $json.email }}",
+        "additionalFields": {
+          "firstName": "={{ $json.firstName }}",
+          "lastName": "={{ $json.lastName }}",
+          "status": "subscribed"
+        }
+      },
+      "type": "n8n-nodes-base.mailchimp",
+      "typeVersion": 1,
+      "position": [2220, -100],
+      "id": "add-to-email-list",
+      "name": "Add to Email List",
+      "disabled": true,
+      "credentials": {
+        "mailchimpApi": {
+          "id": "mailchimp-credentials",
+          "name": "Mailchimp API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "your-spreadsheet-id"
+        },
+        "sheetName": "Leads",
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Date": "={{ $json.capturedAt }}",
+            "Name": "={{ $json.fullName }}",
+            "Email": "={{ $json.email }}",
+            "Phone": "={{ $json.phone }}",
+            "Company": "={{ $json.company }}",
+            "Title": "={{ $json.jobTitle }}",
+            "Source": "={{ $json.source }}",
+            "Lead Score": "={{ $json.leadScore }}",
+            "Quality": "={{ $json.leadQuality }}",
+            "Priority": "={{ $json.priority }}",
+            "CRM": "={{ $json.targetCRM }}",
+            "CRM Record ID": "={{ $json.crmRecordId }}"
+          }
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.2,
+      "position": [2220, 100],
+      "id": "log-to-spreadsheet",
+      "name": "Log to Spreadsheet",
+      "disabled": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "google-sheets-credentials",
+          "name": "Google Sheets OAuth2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "high-priority",
+              "leftValue": "={{ $json.isHighPriority }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [2220, 300],
+      "id": "check-lead-score",
+      "name": "Check Lead Score"
+    },
+    {
+      "parameters": {
+        "channel": "#sales-leads-hot",
+        "text": "=:fire: *HIGH PRIORITY LEAD*\n\n*Name:* {{ $json.fullName }}\n*Company:* {{ $json.company || 'Not provided' }}\n*Email:* {{ $json.email }}\n*Phone:* {{ $json.phone || 'Not provided' }}\n\n*Lead Score:* {{ $json.leadScore }}/100\n*Quality:* {{ $json.leadQuality }}\n*Potential Value:* {{ $json.potentialValue }}\n\n*Source:* {{ $json.source }}\n*CRM:* {{ $json.targetCRM }}\n\n*AI Insights:*\n{{ $json.aiInsights ? $json.aiInsights.map(i => '• ' + i).join('\\n') : 'None' }}\n\n*Suggested Next Action:*\n{{ $json.suggestedNextAction }}\n\n*Message:*\n{{ $json.message || 'No message provided' }}",
+        "otherOptions": {
+          "includeLinkToWorkflow": false
+        }
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.1,
+      "position": [2440, 200],
+      "id": "high-priority-alert",
+      "name": "High Priority Alert",
+      "credentials": {
+        "slackApi": {
+          "id": "slack-credentials",
+          "name": "Slack API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "channel": "#sales-leads",
+        "text": "=:inbox_tray: *New Lead Captured*\n\n*Name:* {{ $json.fullName }}\n*Company:* {{ $json.company || 'Not provided' }}\n*Email:* {{ $json.email }}\n\n*Lead Score:* {{ $json.leadScore }}/100\n*Quality:* {{ $json.leadQuality }}\n*Source:* {{ $json.source }}\n*CRM:* {{ $json.targetCRM }}",
+        "otherOptions": {
+          "includeLinkToWorkflow": false
+        }
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.1,
+      "position": [2440, 400],
+      "id": "standard-notification",
+      "name": "Standard Notification",
+      "credentials": {
+        "slackApi": {
+          "id": "slack-credentials",
+          "name": "Slack API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fromEmail": "sales@company.com",
+        "toEmail": "={{ $json.email }}",
+        "subject": "=Thanks for your interest, {{ $json.firstName }}!",
+        "html": "=<html>\n<body style=\"font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;\">\n  <h2>Hi {{ $json.firstName }},</h2>\n  \n  <p>Thank you for reaching out to us! We've received your information and a member of our team will be in touch shortly.</p>\n  \n  <p>In the meantime, here are some resources you might find helpful:</p>\n  \n  <ul>\n    <li><a href=\"https://yourcompany.com/resources\">Resource Center</a></li>\n    <li><a href=\"https://yourcompany.com/case-studies\">Customer Success Stories</a></li>\n    <li><a href=\"https://yourcompany.com/demo\">Schedule a Demo</a></li>\n  </ul>\n  \n  <p>If you have any immediate questions, feel free to reply to this email.</p>\n  \n  <p>Best regards,<br>\n  The Sales Team</p>\n</body>\n</html>"
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [2660, 300],
+      "id": "send-welcome-email",
+      "name": "Send Welcome Email",
+      "disabled": true,
+      "credentials": {
+        "smtp": {
+          "id": "smtp-credentials",
+          "name": "SMTP"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "name": "error",
+              "value": "Invalid lead data",
+              "type": "string"
+            },
+            {
+              "name": "reason",
+              "value": "Missing required fields (email or name) or invalid email format",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [680, 300],
+      "id": "invalid-lead-handler",
+      "name": "Invalid Lead Handler"
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "shared": [],
+  "staticData": null,
+  "tags": [
+    {
+      "name": "Sales"
+    },
+    {
+      "name": "CRM"
+    },
+    {
+      "name": "Lead Management"
+    }
+  ],
+  "triggerCount": 0,
+  "updatedAt": "2026-01-06T00:00:00.000Z",
+  "versionId": "lead-capture-v1"
+}
