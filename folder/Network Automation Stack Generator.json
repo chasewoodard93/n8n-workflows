@@ -1,0 +1,882 @@
+{
+  "active": false,
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Parse Form Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Form Data": {
+      "main": [
+        [
+          {
+            "node": "Validate Input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Input": {
+      "main": [
+        [
+          {
+            "node": "Generate Documentation Content",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Validation Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Documentation Content": {
+      "main": [
+        [
+          {
+            "node": "Generate Project Structure",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Project Structure": {
+      "main": [
+        [
+          {
+            "node": "Generate IaC Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate IaC Code": {
+      "main": [
+        [
+          {
+            "node": "Generate Config Management Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Config Management Code": {
+      "main": [
+        [
+          {
+            "node": "Generate CI/CD Pipelines",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate CI/CD Pipelines": {
+      "main": [
+        [
+          {
+            "node": "Select Delivery Target",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Select Delivery Target": {
+      "main": [
+        [
+          {
+            "node": "Create GitHub Repo",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Create GitLab Repo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create GitHub Repo": {
+      "main": [
+        [
+          {
+            "node": "Push Files to GitHub",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create GitLab Repo": {
+      "main": [
+        [
+          {
+            "node": "Push Files to GitLab",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Push Files to GitHub": {
+      "main": [
+        [
+          {
+            "node": "Upload Docs to Box",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Push Files to GitLab": {
+      "main": [
+        [
+          {
+            "node": "Upload Docs to Box",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload Docs to Box": {
+      "main": [
+        [
+          {
+            "node": "Check Notification Preferences",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Notification Preferences": {
+      "main": [
+        [
+          {
+            "node": "Send Slack Notification",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send Email Notification",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send Both Notifications",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Complete - No Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Both Notifications": {
+      "main": [
+        [
+          {
+            "node": "Slack Notification",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Email Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2025-10-28T06:23:35.629Z",
+  "id": "SuG5Wsb0h63bzX4K",
+  "isArchived": false,
+  "meta": {
+    "instanceId": "network-automation-generator"
+  },
+  "name": "Network Automation Stack Generator",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "Network Automation Stack Generator",
+        "formDescription": "Generate a complete network automation project for your client. This will create documentation, infrastructure-as-code, configuration management, and CI/CD pipelines delivered to a Git repository.",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Client/Project Name",
+              "placeholder": "acme-corp",
+              "requiredField": true,
+              "fieldType": "text"
+            },
+            {
+              "fieldLabel": "Company Name",
+              "placeholder": "Acme Corporation",
+              "requiredField": true,
+              "fieldType": "text"
+            },
+            {
+              "fieldLabel": "Client Contact Email",
+              "placeholder": "contact@acme.com",
+              "requiredField": true,
+              "fieldType": "email"
+            },
+            {
+              "fieldLabel": "Company Logo URL",
+              "placeholder": "https://example.com/logo.png",
+              "requiredField": false,
+              "fieldType": "text"
+            },
+            {
+              "fieldLabel": "Network Devices (JSON)",
+              "placeholder": "[{\"type\":\"switch\",\"vendor\":\"cisco\",\"model\":\"catalyst-9300\",\"platform\":\"ios-xe\",\"quantity\":10,\"ip_range\":\"192.168.1.10-192.168.1.20\",\"site\":\"datacenter-1\",\"role\":\"access\"}]",
+              "requiredField": true,
+              "fieldType": "textarea"
+            },
+            {
+              "fieldLabel": "Source of Truth",
+              "requiredField": true,
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {"option": "NetBox"},
+                  {"option": "Nautobot"},
+                  {"option": "Infrahub"},
+                  {"option": "None"}
+                ]
+              }
+            },
+            {
+              "fieldLabel": "Infrastructure as Code Tool",
+              "requiredField": true,
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {"option": "Terraform"},
+                  {"option": "Pulumi"},
+                  {"option": "None"}
+                ]
+              }
+            },
+            {
+              "fieldLabel": "Configuration Management Tool",
+              "requiredField": true,
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {"option": "Ansible + AWX"},
+                  {"option": "Nornir"},
+                  {"option": "Both"},
+                  {"option": "None"}
+                ]
+              }
+            },
+            {
+              "fieldLabel": "Network Vendors",
+              "requiredField": true,
+              "fieldType": "multiSelect",
+              "multiselect": true,
+              "fieldOptions": {
+                "values": [
+                  {"option": "Cisco IOS"},
+                  {"option": "Cisco IOS-XE"},
+                  {"option": "Cisco NX-OS"},
+                  {"option": "Juniper Junos"},
+                  {"option": "Arista EOS"},
+                  {"option": "Palo Alto"},
+                  {"option": "Fortinet"},
+                  {"option": "Cisco ASA/Firepower"},
+                  {"option": "Check Point"},
+                  {"option": "F5 BIG-IP"},
+                  {"option": "Citrix NetScaler"},
+                  {"option": "HAProxy"}
+                ]
+              }
+            },
+            {
+              "fieldLabel": "Cloud Environments",
+              "requiredField": true,
+              "fieldType": "multiSelect",
+              "multiselect": true,
+              "fieldOptions": {
+                "values": [
+                  {"option": "On-Premises"},
+                  {"option": "AWS"},
+                  {"option": "Azure"},
+                  {"option": "GCP"},
+                  {"option": "Private Cloud (VMware)"},
+                  {"option": "Private Cloud (OpenStack)"}
+                ]
+              }
+            },
+            {
+              "fieldLabel": "Documentation Formats",
+              "requiredField": true,
+              "fieldType": "multiSelect",
+              "multiselect": true,
+              "fieldOptions": {
+                "values": [
+                  {"option": "PDF"},
+                  {"option": "Markdown"},
+                  {"option": "Notion"},
+                  {"option": "Confluence"},
+                  {"option": "Miro Board"}
+                ]
+              }
+            },
+            {
+              "fieldLabel": "Delivery Target",
+              "requiredField": true,
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {"option": "GitHub"},
+                  {"option": "GitLab"}
+                ]
+              }
+            },
+            {
+              "fieldLabel": "Git Organization/Group Name",
+              "placeholder": "acme-corp-automation",
+              "requiredField": true,
+              "fieldType": "text"
+            },
+            {
+              "fieldLabel": "Box Folder ID (for documentation)",
+              "placeholder": "123456789",
+              "requiredField": false,
+              "fieldType": "text"
+            },
+            {
+              "fieldLabel": "Miro Board ID (if using Miro)",
+              "placeholder": "board-id",
+              "requiredField": false,
+              "fieldType": "text"
+            },
+            {
+              "fieldLabel": "Notification Preference",
+              "requiredField": true,
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {"option": "Slack"},
+                  {"option": "Email"},
+                  {"option": "Both"},
+                  {"option": "None"}
+                ]
+              }
+            },
+            {
+              "fieldLabel": "Slack Channel (if using Slack)",
+              "placeholder": "#network-automation",
+              "requiredField": false,
+              "fieldType": "text"
+            },
+            {
+              "fieldLabel": "Notification Email (if using Email)",
+              "placeholder": "team@company.com",
+              "requiredField": false,
+              "fieldType": "email"
+            }
+          ]
+        },
+        "options": {
+          "responseMode": "onReceived",
+          "formSubmittedText": "Your network automation project is being generated. You will receive a notification when complete."
+        }
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.3,
+      "position": [0, 0],
+      "id": "c0ccac04-e9f3-4769-bf07-5fa191defdcc",
+      "name": "On form submission",
+      "webhookId": "4ad07832-2e7d-4484-9702-8201e1585638"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Parse and organize all form data\nconst formData = $input.first().json;\n\n// Parse network devices JSON\nlet networkDevices = [];\ntry {\n  networkDevices = JSON.parse(formData['Network Devices (JSON)'] || '[]');\n} catch (e) {\n  networkDevices = { error: 'Invalid JSON', raw: formData['Network Devices (JSON)'] };\n}\n\n// Parse multi-select fields (come as comma-separated strings)\nconst parseMultiSelect = (field) => {\n  if (!field) return [];\n  if (Array.isArray(field)) return field;\n  return field.split(',').map(s => s.trim());\n};\n\nconst clientData = {\n  projectName: formData['Client/Project Name']?.toLowerCase().replace(/[^a-z0-9]/g, '-') || 'unnamed-project',\n  companyName: formData['Company Name'] || 'Unknown Company',\n  contactEmail: formData['Client Contact Email'] || '',\n  logoUrl: formData['Company Logo URL'] || '',\n  repoName: `${formData['Client/Project Name']?.toLowerCase().replace(/[^a-z0-9]/g, '-')}-network-automation`\n};\n\nconst infrastructure = {\n  networkDevices: networkDevices,\n  sourceOfTruth: formData['Source of Truth'] || 'None',\n  iacTool: formData['Infrastructure as Code Tool'] || 'None',\n  configMgmtTool: formData['Configuration Management Tool'] || 'None',\n  vendors: parseMultiSelect(formData['Network Vendors']),\n  cloudEnvironments: parseMultiSelect(formData['Cloud Environments'])\n};\n\nconst documentation = {\n  formats: parseMultiSelect(formData['Documentation Formats']),\n  boxFolderId: formData['Box Folder ID (for documentation)'] || '',\n  miroBoardId: formData['Miro Board ID (if using Miro)'] || ''\n};\n\nconst delivery = {\n  target: formData['Delivery Target'] || 'GitHub',\n  orgName: formData['Git Organization/Group Name'] || 'default-org'\n};\n\nconst notifications = {\n  preference: formData['Notification Preference'] || 'None',\n  slackChannel: formData['Slack Channel (if using Slack)'] || '',\n  email: formData['Notification Email (if using Email)'] || formData['Client Contact Email'] || ''\n};\n\nreturn {\n  json: {\n    clientData,\n    infrastructure,\n    documentation,\n    delivery,\n    notifications,\n    generatedAt: new Date().toISOString()\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [220, 0],
+      "id": "parse-form-data",
+      "name": "Parse Form Data"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "valid-devices",
+              "leftValue": "={{ !$json.infrastructure.networkDevices.error }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "has-project-name",
+              "leftValue": "={{ $json.clientData.projectName.length > 0 }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [440, 0],
+      "id": "validate-input",
+      "name": "Validate Input"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Generate comprehensive documentation content\nconst data = $input.first().json;\nconst { clientData, infrastructure, documentation } = data;\n\n// Generate Network Inventory Documentation\nconst generateNetworkInventory = () => {\n  let md = `# Network Inventory Documentation\\n\\n`;\n  md += `**Client:** ${clientData.companyName}\\n`;\n  md += `**Project:** ${clientData.projectName}\\n`;\n  md += `**Generated:** ${data.generatedAt}\\n\\n`;\n  \n  md += `## Executive Summary\\n\\n`;\n  md += `This document provides a comprehensive inventory of network infrastructure for ${clientData.companyName}.\\n\\n`;\n  \n  md += `## Network Devices\\n\\n`;\n  md += `| Type | Vendor | Model | Platform | Quantity | IP Range | Site | Role |\\n`;\n  md += `|------|--------|-------|----------|----------|----------|------|------|\\n`;\n  \n  if (Array.isArray(infrastructure.networkDevices)) {\n    infrastructure.networkDevices.forEach(device => {\n      md += `| ${device.type || '-'} | ${device.vendor || '-'} | ${device.model || '-'} | ${device.platform || '-'} | ${device.quantity || '-'} | ${device.ip_range || '-'} | ${device.site || '-'} | ${device.role || '-'} |\\n`;\n    });\n  }\n  \n  md += `\\n## Vendor Summary\\n\\n`;\n  infrastructure.vendors.forEach(vendor => {\n    md += `- ${vendor}\\n`;\n  });\n  \n  md += `\\n## Cloud Environments\\n\\n`;\n  infrastructure.cloudEnvironments.forEach(env => {\n    md += `- ${env}\\n`;\n  });\n  \n  md += `\\n## Automation Stack\\n\\n`;\n  md += `- **Source of Truth:** ${infrastructure.sourceOfTruth}\\n`;\n  md += `- **Infrastructure as Code:** ${infrastructure.iacTool}\\n`;\n  md += `- **Configuration Management:** ${infrastructure.configMgmtTool}\\n`;\n  \n  return md;\n};\n\n// Generate Architecture Documentation\nconst generateArchitectureDoc = () => {\n  let md = `# Network Automation Architecture\\n\\n`;\n  md += `## Overview\\n\\n`;\n  md += `This document describes the automation architecture for ${clientData.companyName}.\\n\\n`;\n  \n  md += `## Components\\n\\n`;\n  md += `### Source of Truth\\n`;\n  if (infrastructure.sourceOfTruth !== 'None') {\n    md += `- **Platform:** ${infrastructure.sourceOfTruth}\\n`;\n    md += `- **Purpose:** Central repository for network device inventory, IP addressing, and configuration data\\n\\n`;\n  } else {\n    md += `- No dedicated source of truth configured\\n\\n`;\n  }\n  \n  md += `### Infrastructure as Code\\n`;\n  if (infrastructure.iacTool !== 'None') {\n    md += `- **Tool:** ${infrastructure.iacTool}\\n`;\n    md += `- **Purpose:** Declarative infrastructure provisioning and management\\n`;\n    if (infrastructure.cloudEnvironments.includes('AWS')) md += `- AWS Provider configured\\n`;\n    if (infrastructure.cloudEnvironments.includes('Azure')) md += `- Azure Provider configured\\n`;\n    if (infrastructure.cloudEnvironments.includes('GCP')) md += `- GCP Provider configured\\n`;\n    md += `\\n`;\n  } else {\n    md += `- No IaC tool configured\\n\\n`;\n  }\n  \n  md += `### Configuration Management\\n`;\n  if (infrastructure.configMgmtTool !== 'None') {\n    md += `- **Tool:** ${infrastructure.configMgmtTool}\\n`;\n    md += `- **Purpose:** Network device configuration deployment and compliance\\n\\n`;\n  } else {\n    md += `- No configuration management tool configured\\n\\n`;\n  }\n  \n  md += `## Supported Platforms\\n\\n`;\n  infrastructure.vendors.forEach(vendor => {\n    md += `### ${vendor}\\n`;\n    md += `- Configuration templates included\\n`;\n    md += `- Backup and restore playbooks\\n`;\n    md += `- Compliance validation rules\\n\\n`;\n  });\n  \n  return md;\n};\n\n// Generate Runbook Documentation\nconst generateRunbook = () => {\n  let md = `# Operations Runbook\\n\\n`;\n  md += `## ${clientData.companyName} - Network Operations\\n\\n`;\n  \n  md += `## Quick Reference\\n\\n`;\n  md += `| Task | Command | Description |\\n`;\n  md += `|------|---------|-------------|\\n`;\n  \n  if (infrastructure.configMgmtTool.includes('Ansible')) {\n    md += `| Deploy Config | \\`ansible-playbook deploy.yml\\` | Deploy configurations to devices |\\n`;\n    md += `| Backup Configs | \\`ansible-playbook backup.yml\\` | Backup all device configurations |\\n`;\n    md += `| Compliance Check | \\`ansible-playbook compliance.yml\\` | Run compliance validation |\\n`;\n  }\n  \n  if (infrastructure.configMgmtTool.includes('Nornir')) {\n    md += `| Deploy Config | \\`python deploy.py\\` | Deploy configurations via Nornir |\\n`;\n    md += `| Backup Configs | \\`python backup.py\\` | Backup all device configurations |\\n`;\n    md += `| Inventory Report | \\`python inventory.py\\` | Generate inventory report |\\n`;\n  }\n  \n  if (infrastructure.iacTool === 'Terraform') {\n    md += `| Plan Changes | \\`terraform plan\\` | Preview infrastructure changes |\\n`;\n    md += `| Apply Changes | \\`terraform apply\\` | Apply infrastructure changes |\\n`;\n    md += `| Destroy | \\`terraform destroy\\` | Destroy managed infrastructure |\\n`;\n  }\n  \n  if (infrastructure.iacTool === 'Pulumi') {\n    md += `| Preview Changes | \\`pulumi preview\\` | Preview infrastructure changes |\\n`;\n    md += `| Deploy | \\`pulumi up\\` | Deploy infrastructure changes |\\n`;\n    md += `| Destroy | \\`pulumi destroy\\` | Destroy managed infrastructure |\\n`;\n  }\n  \n  md += `\\n## Troubleshooting\\n\\n`;\n  md += `### Common Issues\\n\\n`;\n  md += `1. **Connection Timeout**\\n`;\n  md += `   - Verify network connectivity to device\\n`;\n  md += `   - Check firewall rules\\n`;\n  md += `   - Validate credentials\\n\\n`;\n  md += `2. **Authentication Failed**\\n`;\n  md += `   - Verify credentials in vault/secrets manager\\n`;\n  md += `   - Check user permissions on device\\n\\n`;\n  md += `3. **Configuration Conflict**\\n`;\n  md += `   - Review pending changes\\n`;\n  md += `   - Check for manual changes on device\\n`;\n  \n  return md;\n};\n\nconst networkInventory = generateNetworkInventory();\nconst architectureDoc = generateArchitectureDoc();\nconst runbook = generateRunbook();\n\nreturn {\n  json: {\n    ...data,\n    docs: {\n      networkInventory,\n      architectureDoc,\n      runbook,\n      formats: documentation.formats\n    }\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [660, 0],
+      "id": "generate-docs",
+      "name": "Generate Documentation Content"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Generate the complete project structure\nconst data = $input.first().json;\nconst { clientData, infrastructure, docs } = data;\n\nconst files = [];\n\n// README.md\nconst readme = `# ${clientData.companyName} - Network Automation\n\nAutomated network infrastructure management for ${clientData.companyName}.\n\n## Project Structure\n\n\\`\\`\\`\n${clientData.repoName}/\n├── docs/                    # Documentation\n├── source-of-truth/         # ${infrastructure.sourceOfTruth} configuration\n├── iac/                     # Infrastructure as Code (${infrastructure.iacTool})\n├── config-management/       # ${infrastructure.configMgmtTool}\n├── templates/               # Device configuration templates\n└── .gitlab-ci.yml or .github/workflows/  # CI/CD pipelines\n\\`\\`\\`\n\n## Quick Start\n\n1. Clone this repository\n2. Configure credentials (see docs/setup.md)\n3. Run initial inventory sync\n4. Deploy configurations\n\n## Documentation\n\n- [Network Inventory](docs/network-inventory.md)\n- [Architecture](docs/architecture.md)\n- [Runbook](docs/runbook.md)\n\n## Support\n\nContact: ${clientData.contactEmail}\n`;\n\nfiles.push({ path: 'README.md', content: readme });\n\n// Documentation files\nfiles.push({ path: 'docs/network-inventory.md', content: docs.networkInventory });\nfiles.push({ path: 'docs/architecture.md', content: docs.architectureDoc });\nfiles.push({ path: 'docs/runbook.md', content: docs.runbook });\n\n// Setup documentation\nconst setupDoc = `# Setup Guide\n\n## Prerequisites\n\n- Python 3.9+\n- Git\n${infrastructure.iacTool === 'Terraform' ? '- Terraform 1.0+\\n' : ''}\n${infrastructure.iacTool === 'Pulumi' ? '- Pulumi 3.0+\\n' : ''}\n${infrastructure.configMgmtTool.includes('Ansible') ? '- Ansible 2.12+\\n' : ''}\n\n## Installation\n\n\\`\\`\\`bash\n# Clone repository\ngit clone <repo-url>\ncd ${clientData.repoName}\n\n# Install Python dependencies\npip install -r requirements.txt\n\n# Configure credentials\ncp .env.example .env\n# Edit .env with your credentials\n\\`\\`\\`\n\n## Credential Configuration\n\n### Network Devices\nStore device credentials securely using environment variables or a secrets manager.\n\n### Cloud Providers\n${infrastructure.cloudEnvironments.includes('AWS') ? '- AWS: Configure AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY\\n' : ''}\n${infrastructure.cloudEnvironments.includes('Azure') ? '- Azure: Configure ARM_CLIENT_ID, ARM_CLIENT_SECRET, ARM_SUBSCRIPTION_ID, ARM_TENANT_ID\\n' : ''}\n${infrastructure.cloudEnvironments.includes('GCP') ? '- GCP: Configure GOOGLE_CREDENTIALS\\n' : ''}\n`;\n\nfiles.push({ path: 'docs/setup.md', content: setupDoc });\n\n// Requirements file\nconst requirements = `# Python dependencies\nnetmiko>=4.0.0\nparamiko>=2.9.0\npynetbox>=6.0.0\npyyaml>=6.0\njinja2>=3.0.0\nrich>=12.0.0\npython-dotenv>=0.19.0\n${infrastructure.configMgmtTool.includes('Nornir') ? 'nornir>=3.3.0\\nnornir-netmiko>=0.2.0\\nnornir-utils>=0.2.0\\nnornir-jinja2>=0.2.0\\n' : ''}\n${infrastructure.configMgmtTool.includes('Ansible') ? 'ansible>=6.0.0\\nansible-lint>=6.0.0\\n' : ''}\n`;\n\nfiles.push({ path: 'requirements.txt', content: requirements });\n\n// .env.example\nconst envExample = `# Environment Configuration\n# Copy this file to .env and fill in your values\n\n# Network Device Credentials\nNETWORK_USERNAME=\nNETWORK_PASSWORD=\nNETWORK_ENABLE_SECRET=\n\n# Source of Truth\n${infrastructure.sourceOfTruth === 'NetBox' ? 'NETBOX_URL=\\nNETBOX_TOKEN=' : ''}\n${infrastructure.sourceOfTruth === 'Nautobot' ? 'NAUTOBOT_URL=\\nNAUTOBOT_TOKEN=' : ''}\n${infrastructure.sourceOfTruth === 'Infrahub' ? 'INFRAHUB_URL=\\nINFRAHUB_TOKEN=' : ''}\n\n# Cloud Credentials\n${infrastructure.cloudEnvironments.includes('AWS') ? 'AWS_ACCESS_KEY_ID=\\nAWS_SECRET_ACCESS_KEY=\\nAWS_DEFAULT_REGION=us-east-1' : ''}\n${infrastructure.cloudEnvironments.includes('Azure') ? 'ARM_CLIENT_ID=\\nARM_CLIENT_SECRET=\\nARM_SUBSCRIPTION_ID=\\nARM_TENANT_ID=' : ''}\n${infrastructure.cloudEnvironments.includes('GCP') ? 'GOOGLE_CREDENTIALS=\\nGCP_PROJECT=' : ''}\n`;\n\nfiles.push({ path: '.env.example', content: envExample });\n\n// .gitignore\nconst gitignore = `# Environment\n.env\n*.env.local\n\n# Python\n__pycache__/\n*.py[cod]\n*$py.class\nvenv/\n.venv/\n\n# Terraform\n.terraform/\n*.tfstate\n*.tfstate.*\n*.tfplan\n\n# Pulumi\n.pulumi/\n\n# Ansible\n*.retry\n\n# IDE\n.vscode/\n.idea/\n\n# Secrets\nsecrets/\n*.pem\n*.key\n`;\n\nfiles.push({ path: '.gitignore', content: gitignore });\n\nreturn {\n  json: {\n    ...data,\n    files\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [880, 0],
+      "id": "generate-project",
+      "name": "Generate Project Structure"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Generate Infrastructure as Code files\nconst data = $input.first().json;\nconst { clientData, infrastructure, files } = data;\n\nconst iacTool = infrastructure.iacTool;\nconst cloudEnvs = infrastructure.cloudEnvironments;\n\nif (iacTool === 'Terraform') {\n  // Main Terraform configuration\n  let mainTf = `# Terraform Configuration for ${clientData.companyName}\\n\\nterraform {\\n  required_version = \">= 1.0.0\"\\n  required_providers {\\n`;\n  \n  if (cloudEnvs.includes('AWS')) {\n    mainTf += `    aws = {\\n      source  = \"hashicorp/aws\"\\n      version = \"~> 5.0\"\\n    }\\n`;\n  }\n  if (cloudEnvs.includes('Azure')) {\n    mainTf += `    azurerm = {\\n      source  = \"hashicorp/azurerm\"\\n      version = \"~> 3.0\"\\n    }\\n`;\n  }\n  if (cloudEnvs.includes('GCP')) {\n    mainTf += `    google = {\\n      source  = \"hashicorp/google\"\\n      version = \"~> 5.0\"\\n    }\\n`;\n  }\n  \n  mainTf += `  }\\n}\\n`;\n  \n  if (cloudEnvs.includes('AWS')) {\n    mainTf += `\\nprovider \"aws\" {\\n  region = var.aws_region\\n}\\n`;\n  }\n  if (cloudEnvs.includes('Azure')) {\n    mainTf += `\\nprovider \"azurerm\" {\\n  features {}\\n}\\n`;\n  }\n  if (cloudEnvs.includes('GCP')) {\n    mainTf += `\\nprovider \"google\" {\\n  project = var.gcp_project\\n  region  = var.gcp_region\\n}\\n`;\n  }\n  \n  files.push({ path: 'iac/terraform/main.tf', content: mainTf });\n  \n  // Variables\n  let variablesTf = `# Variables for ${clientData.companyName}\\n\\n`;\n  if (cloudEnvs.includes('AWS')) {\n    variablesTf += `variable \"aws_region\" {\\n  description = \"AWS region\"\\n  type        = string\\n  default     = \"us-east-1\"\\n}\\n\\n`;\n  }\n  if (cloudEnvs.includes('Azure')) {\n    variablesTf += `variable \"azure_location\" {\\n  description = \"Azure location\"\\n  type        = string\\n  default     = \"eastus\"\\n}\\n\\n`;\n  }\n  if (cloudEnvs.includes('GCP')) {\n    variablesTf += `variable \"gcp_project\" {\\n  description = \"GCP project ID\"\\n  type        = string\\n}\\n\\nvariable \"gcp_region\" {\\n  description = \"GCP region\"\\n  type        = string\\n  default     = \"us-central1\"\\n}\\n\\n`;\n  }\n  \n  files.push({ path: 'iac/terraform/variables.tf', content: variablesTf });\n  \n  // Outputs\n  const outputsTf = `# Outputs for ${clientData.companyName}\\n\\n# Add outputs as needed\\n`;\n  files.push({ path: 'iac/terraform/outputs.tf', content: outputsTf });\n  \n  // Terraform README\n  const tfReadme = `# Terraform Infrastructure\\n\\n## Usage\\n\\n\\`\\`\\`bash\\ncd iac/terraform\\nterraform init\\nterraform plan\\nterraform apply\\n\\`\\`\\`\\n`;\n  files.push({ path: 'iac/terraform/README.md', content: tfReadme });\n  \n} else if (iacTool === 'Pulumi') {\n  // Pulumi configuration\n  const pulumiYaml = `name: ${clientData.repoName}\\nruntime: python\\ndescription: Network infrastructure for ${clientData.companyName}\\n`;\n  files.push({ path: 'iac/pulumi/Pulumi.yaml', content: pulumiYaml });\n  \n  // Main Pulumi program\n  let mainPy = `\"\"\"Network infrastructure for ${clientData.companyName}\"\"\"\\nimport pulumi\\n`;\n  \n  if (cloudEnvs.includes('AWS')) {\n    mainPy += `import pulumi_aws as aws\\n`;\n  }\n  if (cloudEnvs.includes('Azure')) {\n    mainPy += `import pulumi_azure_native as azure\\n`;\n  }\n  if (cloudEnvs.includes('GCP')) {\n    mainPy += `import pulumi_gcp as gcp\\n`;\n  }\n  \n  mainPy += `\\n# Configuration\\nconfig = pulumi.Config()\\n\\n# Add your infrastructure resources here\\n`;\n  \n  files.push({ path: 'iac/pulumi/__main__.py', content: mainPy });\n  \n  // Pulumi requirements\n  let pulumiReqs = `pulumi>=3.0.0\\n`;\n  if (cloudEnvs.includes('AWS')) pulumiReqs += `pulumi-aws>=6.0.0\\n`;\n  if (cloudEnvs.includes('Azure')) pulumiReqs += `pulumi-azure-native>=2.0.0\\n`;\n  if (cloudEnvs.includes('GCP')) pulumiReqs += `pulumi-gcp>=7.0.0\\n`;\n  \n  files.push({ path: 'iac/pulumi/requirements.txt', content: pulumiReqs });\n  \n  // Pulumi README\n  const pulumiReadme = `# Pulumi Infrastructure\\n\\n## Usage\\n\\n\\`\\`\\`bash\\ncd iac/pulumi\\npulumi login\\npulumi stack init dev\\npulumi up\\n\\`\\`\\`\\n`;\n  files.push({ path: 'iac/pulumi/README.md', content: pulumiReadme });\n}\n\n// Add placeholder if no IaC\nif (iacTool === 'None') {\n  files.push({ \n    path: 'iac/README.md', \n    content: `# Infrastructure as Code\\n\\nNo IaC tool configured for this project.\\n` \n  });\n}\n\nreturn {\n  json: {\n    ...data,\n    files\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1100, 0],
+      "id": "generate-iac",
+      "name": "Generate IaC Code"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Generate Configuration Management files\nconst data = $input.first().json;\nconst { clientData, infrastructure, files } = data;\n\nconst configMgmtTool = infrastructure.configMgmtTool;\nconst vendors = infrastructure.vendors;\nconst devices = infrastructure.networkDevices;\n\n// Helper to get platform type from vendor\nconst getPlatform = (vendor) => {\n  const mapping = {\n    'Cisco IOS': 'cisco_ios',\n    'Cisco IOS-XE': 'cisco_xe',\n    'Cisco NX-OS': 'cisco_nxos',\n    'Juniper Junos': 'juniper_junos',\n    'Arista EOS': 'arista_eos',\n    'Palo Alto': 'paloalto_panos',\n    'Fortinet': 'fortinet',\n    'Cisco ASA/Firepower': 'cisco_asa',\n    'Check Point': 'checkpoint',\n    'F5 BIG-IP': 'f5_bigip',\n    'Citrix NetScaler': 'citrix_netscaler',\n    'HAProxy': 'linux'\n  };\n  return mapping[vendor] || 'unknown';\n};\n\nif (configMgmtTool.includes('Ansible')) {\n  // Ansible inventory\n  let inventory = `# Ansible Inventory for ${clientData.companyName}\\nall:\\n  children:\\n`;\n  \n  // Group by vendor\n  const vendorGroups = {};\n  vendors.forEach(v => {\n    const platform = getPlatform(v);\n    vendorGroups[platform] = vendorGroups[platform] || [];\n  });\n  \n  Object.keys(vendorGroups).forEach(platform => {\n    inventory += `    ${platform}:\\n      hosts:\\n`;\n    inventory += `        # Add hosts here\\n`;\n  });\n  \n  inventory += `  vars:\\n    ansible_user: \"{{ lookup('env', 'NETWORK_USERNAME') }}\"\\n    ansible_password: \"{{ lookup('env', 'NETWORK_PASSWORD') }}\"\\n`;\n  \n  files.push({ path: 'config-management/ansible/inventory/hosts.yml', content: inventory });\n  \n  // Ansible.cfg\n  const ansibleCfg = `[defaults]\\ninventory = inventory/hosts.yml\\nhost_key_checking = False\\nretry_files_enabled = False\\ngathering = smart\\nfact_caching = jsonfile\\nfact_caching_connection = /tmp/ansible_facts\\nfact_caching_timeout = 86400\\n\\n[persistent_connection]\\nconnect_timeout = 30\\ncommand_timeout = 30\\n`;\n  files.push({ path: 'config-management/ansible/ansible.cfg', content: ansibleCfg });\n  \n  // Deploy playbook\n  const deployPlaybook = `---\\n# Deploy configurations to network devices\\n- name: Deploy Network Configurations\\n  hosts: all\\n  gather_facts: no\\n  \\n  tasks:\\n    - name: Load device-specific variables\\n      include_vars:\\n        file: \"host_vars/{{ inventory_hostname }}.yml\"\\n      ignore_errors: yes\\n\\n    - name: Deploy configuration\\n      ansible.netcommon.cli_config:\\n        config: \"{{ lookup('template', 'templates/{{ ansible_network_os }}/base.j2') }}\"\\n      when: config_deploy | default(true)\\n`;\n  files.push({ path: 'config-management/ansible/playbooks/deploy.yml', content: deployPlaybook });\n  \n  // Backup playbook\n  const backupPlaybook = `---\\n# Backup configurations from network devices\\n- name: Backup Network Configurations\\n  hosts: all\\n  gather_facts: no\\n  \\n  tasks:\\n    - name: Backup running configuration\\n      ansible.netcommon.cli_command:\\n        command: show running-config\\n      register: config_output\\n\\n    - name: Save configuration to file\\n      copy:\\n        content: \"{{ config_output.stdout }}\"\\n        dest: \"backups/{{ inventory_hostname }}_{{ ansible_date_time.date }}.cfg\"\\n      delegate_to: localhost\\n`;\n  files.push({ path: 'config-management/ansible/playbooks/backup.yml', content: backupPlaybook });\n  \n  // Compliance playbook\n  const compliancePlaybook = `---\\n# Run compliance checks on network devices\\n- name: Network Compliance Validation\\n  hosts: all\\n  gather_facts: no\\n  \\n  tasks:\\n    - name: Check NTP configuration\\n      ansible.netcommon.cli_command:\\n        command: show ntp status\\n      register: ntp_status\\n      ignore_errors: yes\\n\\n    - name: Validate NTP is configured\\n      assert:\\n        that:\\n          - ntp_status.stdout is defined\\n        fail_msg: \"NTP is not configured on {{ inventory_hostname }}\"\\n        success_msg: \"NTP is properly configured\"\\n`;\n  files.push({ path: 'config-management/ansible/playbooks/compliance.yml', content: compliancePlaybook });\n  \n  // Create templates for each vendor\n  vendors.forEach(vendor => {\n    const platform = getPlatform(vendor);\n    const template = `{# Base configuration template for ${vendor} #}\\n{# Variables: hostname, domain_name, ntp_servers, dns_servers #}\\n\\n! Hostname\\nhostname {{ hostname }}\\n\\n! Domain\\nip domain-name {{ domain_name | default('local') }}\\n\\n! NTP\\n{% for ntp in ntp_servers | default(['pool.ntp.org']) %}\\nntp server {{ ntp }}\\n{% endfor %}\\n\\n! DNS\\n{% for dns in dns_servers | default(['8.8.8.8', '8.8.4.4']) %}\\nip name-server {{ dns }}\\n{% endfor %}\\n`;\n    files.push({ path: `config-management/ansible/templates/${platform}/base.j2`, content: template });\n  });\n  \n  // Ansible README\n  const ansibleReadme = `# Ansible Configuration Management\\n\\n## Structure\\n\\n\\`\\`\\`\\nansible/\\n├── ansible.cfg\\n├── inventory/\\n│   └── hosts.yml\\n├── playbooks/\\n│   ├── deploy.yml\\n│   ├── backup.yml\\n│   └── compliance.yml\\n├── templates/\\n│   └── <platform>/\\n└── host_vars/\\n\\`\\`\\`\\n\\n## Usage\\n\\n\\`\\`\\`bash\\n# Deploy configurations\\nansible-playbook playbooks/deploy.yml\\n\\n# Backup configurations\\nansible-playbook playbooks/backup.yml\\n\\n# Run compliance checks\\nansible-playbook playbooks/compliance.yml\\n\\`\\`\\`\\n`;\n  files.push({ path: 'config-management/ansible/README.md', content: ansibleReadme });\n}\n\nif (configMgmtTool.includes('Nornir')) {\n  // Nornir config\n  const nornirConfig = `---\\ninventory:\\n  plugin: SimpleInventory\\n  options:\\n    host_file: \"inventory/hosts.yml\"\\n    group_file: \"inventory/groups.yml\"\\n    defaults_file: \"inventory/defaults.yml\"\\n\\nrunner:\\n  plugin: threaded\\n  options:\\n    num_workers: 10\\n`;\n  files.push({ path: 'config-management/nornir/config.yml', content: nornirConfig });\n  \n  // Nornir hosts inventory\n  const nornirHosts = `---\\n# Add hosts here\\n# Example:\\n# router1:\\n#   hostname: 192.168.1.1\\n#   groups:\\n#     - cisco_ios\\n`;\n  files.push({ path: 'config-management/nornir/inventory/hosts.yml', content: nornirHosts });\n  \n  // Nornir groups\n  let nornirGroups = `---\\n`;\n  vendors.forEach(vendor => {\n    const platform = getPlatform(vendor);\n    nornirGroups += `${platform}:\\n  platform: ${platform}\\n  connection_options:\\n    netmiko:\\n      platform: ${platform}\\n\\n`;\n  });\n  files.push({ path: 'config-management/nornir/inventory/groups.yml', content: nornirGroups });\n  \n  // Nornir defaults\n  const nornirDefaults = `---\\nusername: \"{{ env 'NETWORK_USERNAME' }}\"\\npassword: \"{{ env 'NETWORK_PASSWORD' }}\"\\n`;\n  files.push({ path: 'config-management/nornir/inventory/defaults.yml', content: nornirDefaults });\n  \n  // Deploy script\n  const deployPy = `#!/usr/bin/env python3\\n\"\"\"Deploy configurations to network devices using Nornir.\"\"\"\\nfrom nornir import InitNornir\\nfrom nornir_netmiko import netmiko_send_config\\nfrom nornir_utils.plugins.functions import print_result\\nfrom nornir_jinja2.plugins.tasks import template_file\\nimport os\\n\\ndef deploy_config(task):\\n    \"\"\"Deploy configuration to a device.\"\"\"\\n    # Render template\\n    r = task.run(\\n        task=template_file,\\n        template=\"base.j2\",\\n        path=f\"templates/{task.host.platform}/\"\\n    )\\n    \\n    # Deploy configuration\\n    task.run(\\n        task=netmiko_send_config,\\n        config_commands=r.result.splitlines()\\n    )\\n\\ndef main():\\n    nr = InitNornir(config_file=\"config.yml\")\\n    result = nr.run(task=deploy_config)\\n    print_result(result)\\n\\nif __name__ == \"__main__\":\\n    main()\\n`;\n  files.push({ path: 'config-management/nornir/deploy.py', content: deployPy });\n  \n  // Backup script\n  const backupPy = `#!/usr/bin/env python3\\n\"\"\"Backup configurations from network devices using Nornir.\"\"\"\\nfrom nornir import InitNornir\\nfrom nornir_netmiko import netmiko_send_command\\nfrom nornir_utils.plugins.functions import print_result\\nfrom datetime import datetime\\nimport os\\n\\ndef backup_config(task):\\n    \"\"\"Backup configuration from a device.\"\"\"\\n    r = task.run(\\n        task=netmiko_send_command,\\n        command_string=\"show running-config\"\\n    )\\n    \\n    # Save to file\\n    os.makedirs(\"backups\", exist_ok=True)\\n    filename = f\"backups/{task.host.name}_{datetime.now().strftime('%Y%m%d')}.cfg\"\\n    with open(filename, \"w\") as f:\\n        f.write(r.result)\\n\\ndef main():\\n    nr = InitNornir(config_file=\"config.yml\")\\n    result = nr.run(task=backup_config)\\n    print_result(result)\\n\\nif __name__ == \"__main__\":\\n    main()\\n`;\n  files.push({ path: 'config-management/nornir/backup.py', content: backupPy });\n  \n  // Nornir README\n  const nornirReadme = `# Nornir Configuration Management\\n\\n## Structure\\n\\n\\`\\`\\`\\nnornir/\\n├── config.yml\\n├── inventory/\\n│   ├── hosts.yml\\n│   ├── groups.yml\\n│   └── defaults.yml\\n├── templates/\\n│   └── <platform>/\\n├── deploy.py\\n└── backup.py\\n\\`\\`\\`\\n\\n## Usage\\n\\n\\`\\`\\`bash\\n# Deploy configurations\\npython deploy.py\\n\\n# Backup configurations\\npython backup.py\\n\\`\\`\\`\\n`;\n  files.push({ path: 'config-management/nornir/README.md', content: nornirReadme });\n  \n  // Create templates for each vendor (Nornir uses same Jinja2 templates)\n  vendors.forEach(vendor => {\n    const platform = getPlatform(vendor);\n    const template = `{# Base configuration template for ${vendor} #}\\n{# Variables: hostname, domain_name, ntp_servers, dns_servers #}\\n\\n! Hostname\\nhostname {{ host.name }}\\n\\n! Domain\\nip domain-name {{ host.data.domain_name | default('local') }}\\n\\n! NTP\\n{% for ntp in host.data.ntp_servers | default(['pool.ntp.org']) %}\\nntp server {{ ntp }}\\n{% endfor %}\\n`;\n    files.push({ path: `config-management/nornir/templates/${platform}/base.j2`, content: template });\n  });\n}\n\n// Add placeholder if no config management\nif (configMgmtTool === 'None') {\n  files.push({ \n    path: 'config-management/README.md', \n    content: `# Configuration Management\\n\\nNo configuration management tool configured for this project.\\n` \n  });\n}\n\nreturn {\n  json: {\n    ...data,\n    files\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1320, 0],
+      "id": "generate-config-mgmt",
+      "name": "Generate Config Management Code"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Generate CI/CD Pipeline files\nconst data = $input.first().json;\nconst { clientData, infrastructure, delivery, files } = data;\n\nconst target = delivery.target;\nconst configMgmtTool = infrastructure.configMgmtTool;\nconst iacTool = infrastructure.iacTool;\n\nif (target === 'GitLab') {\n  // GitLab CI/CD Pipeline\n  let gitlabCi = `# GitLab CI/CD Pipeline for ${clientData.companyName}\\n\\nstages:\\n  - validate\\n  - plan\\n  - deploy\\n  - backup\\n\\nvariables:\\n  NETWORK_USERNAME: $NETWORK_USERNAME\\n  NETWORK_PASSWORD: $NETWORK_PASSWORD\\n\\n# Validation Stage\\n`;\n\n  if (configMgmtTool.includes('Ansible')) {\n    gitlabCi += `ansible-lint:\\n  stage: validate\\n  image: cytopia/ansible-lint:latest\\n  script:\\n    - ansible-lint config-management/ansible/playbooks/*.yml\\n  only:\\n    changes:\\n      - config-management/ansible/**/*\\n\\n`;\n  }\n\n  if (iacTool === 'Terraform') {\n    gitlabCi += `terraform-validate:\\n  stage: validate\\n  image: hashicorp/terraform:latest\\n  script:\\n    - cd iac/terraform\\n    - terraform init -backend=false\\n    - terraform validate\\n  only:\\n    changes:\\n      - iac/terraform/**/*\\n\\nterraform-plan:\\n  stage: plan\\n  image: hashicorp/terraform:latest\\n  script:\\n    - cd iac/terraform\\n    - terraform init\\n    - terraform plan -out=tfplan\\n  artifacts:\\n    paths:\\n      - iac/terraform/tfplan\\n  only:\\n    - merge_requests\\n\\nterraform-apply:\\n  stage: deploy\\n  image: hashicorp/terraform:latest\\n  script:\\n    - cd iac/terraform\\n    - terraform init\\n    - terraform apply -auto-approve\\n  when: manual\\n  only:\\n    - main\\n\\n`;\n  }\n\n  if (iacTool === 'Pulumi') {\n    gitlabCi += `pulumi-preview:\\n  stage: plan\\n  image: pulumi/pulumi-python:latest\\n  script:\\n    - cd iac/pulumi\\n    - pip install -r requirements.txt\\n    - pulumi preview\\n  only:\\n    - merge_requests\\n\\npulumi-up:\\n  stage: deploy\\n  image: pulumi/pulumi-python:latest\\n  script:\\n    - cd iac/pulumi\\n    - pip install -r requirements.txt\\n    - pulumi up --yes\\n  when: manual\\n  only:\\n    - main\\n\\n`;\n  }\n\n  if (configMgmtTool.includes('Ansible')) {\n    gitlabCi += `ansible-deploy:\\n  stage: deploy\\n  image: cytopia/ansible:latest\\n  script:\\n    - cd config-management/ansible\\n    - ansible-playbook playbooks/deploy.yml\\n  when: manual\\n  only:\\n    - main\\n\\nansible-backup:\\n  stage: backup\\n  image: cytopia/ansible:latest\\n  script:\\n    - cd config-management/ansible\\n    - ansible-playbook playbooks/backup.yml\\n  rules:\\n    - if: $CI_PIPELINE_SOURCE == \"schedule\"\\n\\n`;\n  }\n\n  if (configMgmtTool.includes('Nornir')) {\n    gitlabCi += `nornir-deploy:\\n  stage: deploy\\n  image: python:3.11\\n  before_script:\\n    - pip install -r requirements.txt\\n  script:\\n    - cd config-management/nornir\\n    - python deploy.py\\n  when: manual\\n  only:\\n    - main\\n\\nnornir-backup:\\n  stage: backup\\n  image: python:3.11\\n  before_script:\\n    - pip install -r requirements.txt\\n  script:\\n    - cd config-management/nornir\\n    - python backup.py\\n  rules:\\n    - if: $CI_PIPELINE_SOURCE == \"schedule\"\\n\\n`;\n  }\n\n  files.push({ path: '.gitlab-ci.yml', content: gitlabCi });\n\n} else if (target === 'GitHub') {\n  // GitHub Actions Workflows\n  \n  // Validation workflow\n  let validateWorkflow = `name: Validate\\n\\non:\\n  pull_request:\\n    branches: [main]\\n  push:\\n    branches: [main]\\n\\njobs:\\n`;\n\n  if (configMgmtTool.includes('Ansible')) {\n    validateWorkflow += `  ansible-lint:\\n    runs-on: ubuntu-latest\\n    steps:\\n      - uses: actions/checkout@v4\\n      - name: Run ansible-lint\\n        uses: ansible/ansible-lint@main\\n        with:\\n          targets: config-management/ansible/playbooks/\\n\\n`;\n  }\n\n  if (iacTool === 'Terraform') {\n    validateWorkflow += `  terraform-validate:\\n    runs-on: ubuntu-latest\\n    steps:\\n      - uses: actions/checkout@v4\\n      - uses: hashicorp/setup-terraform@v3\\n      - name: Terraform Init\\n        working-directory: iac/terraform\\n        run: terraform init -backend=false\\n      - name: Terraform Validate\\n        working-directory: iac/terraform\\n        run: terraform validate\\n\\n`;\n  }\n\n  files.push({ path: '.github/workflows/validate.yml', content: validateWorkflow });\n\n  // Deploy workflow\n  let deployWorkflow = `name: Deploy\\n\\non:\\n  workflow_dispatch:\\n    inputs:\\n      target:\\n        description: 'Deployment target'\\n        required: true\\n        default: 'all'\\n        type: choice\\n        options:\\n          - all\\n          - infrastructure\\n          - config\\n\\nenv:\\n  NETWORK_USERNAME: \\${{ secrets.NETWORK_USERNAME }}\\n  NETWORK_PASSWORD: \\${{ secrets.NETWORK_PASSWORD }}\\n\\njobs:\\n`;\n\n  if (iacTool === 'Terraform') {\n    deployWorkflow += `  terraform:\\n    if: \\${{ inputs.target == 'all' || inputs.target == 'infrastructure' }}\\n    runs-on: ubuntu-latest\\n    steps:\\n      - uses: actions/checkout@v4\\n      - uses: hashicorp/setup-terraform@v3\\n      - name: Terraform Init\\n        working-directory: iac/terraform\\n        run: terraform init\\n      - name: Terraform Apply\\n        working-directory: iac/terraform\\n        run: terraform apply -auto-approve\\n\\n`;\n  }\n\n  if (iacTool === 'Pulumi') {\n    deployWorkflow += `  pulumi:\\n    if: \\${{ inputs.target == 'all' || inputs.target == 'infrastructure' }}\\n    runs-on: ubuntu-latest\\n    steps:\\n      - uses: actions/checkout@v4\\n      - uses: actions/setup-python@v5\\n        with:\\n          python-version: '3.11'\\n      - name: Install dependencies\\n        working-directory: iac/pulumi\\n        run: pip install -r requirements.txt\\n      - uses: pulumi/actions@v5\\n        with:\\n          command: up\\n          stack-name: prod\\n          work-dir: iac/pulumi\\n\\n`;\n  }\n\n  if (configMgmtTool.includes('Ansible')) {\n    deployWorkflow += `  ansible:\\n    if: \\${{ inputs.target == 'all' || inputs.target == 'config' }}\\n    runs-on: ubuntu-latest\\n    steps:\\n      - uses: actions/checkout@v4\\n      - name: Set up Python\\n        uses: actions/setup-python@v5\\n        with:\\n          python-version: '3.11'\\n      - name: Install Ansible\\n        run: pip install ansible\\n      - name: Run Ansible Playbook\\n        working-directory: config-management/ansible\\n        run: ansible-playbook playbooks/deploy.yml\\n\\n`;\n  }\n\n  if (configMgmtTool.includes('Nornir')) {\n    deployWorkflow += `  nornir:\\n    if: \\${{ inputs.target == 'all' || inputs.target == 'config' }}\\n    runs-on: ubuntu-latest\\n    steps:\\n      - uses: actions/checkout@v4\\n      - name: Set up Python\\n        uses: actions/setup-python@v5\\n        with:\\n          python-version: '3.11'\\n      - name: Install dependencies\\n        run: pip install -r requirements.txt\\n      - name: Run Nornir Deploy\\n        working-directory: config-management/nornir\\n        run: python deploy.py\\n\\n`;\n  }\n\n  files.push({ path: '.github/workflows/deploy.yml', content: deployWorkflow });\n\n  // Backup workflow (scheduled)\n  let backupWorkflow = `name: Backup\\n\\non:\\n  schedule:\\n    - cron: '0 2 * * *'  # Daily at 2 AM\\n  workflow_dispatch:\\n\\nenv:\\n  NETWORK_USERNAME: \\${{ secrets.NETWORK_USERNAME }}\\n  NETWORK_PASSWORD: \\${{ secrets.NETWORK_PASSWORD }}\\n\\njobs:\\n  backup:\\n    runs-on: ubuntu-latest\\n    steps:\\n      - uses: actions/checkout@v4\\n      - name: Set up Python\\n        uses: actions/setup-python@v5\\n        with:\\n          python-version: '3.11'\\n`;\n\n  if (configMgmtTool.includes('Ansible')) {\n    backupWorkflow += `      - name: Install Ansible\\n        run: pip install ansible\\n      - name: Run Backup Playbook\\n        working-directory: config-management/ansible\\n        run: ansible-playbook playbooks/backup.yml\\n`;\n  } else if (configMgmtTool.includes('Nornir')) {\n    backupWorkflow += `      - name: Install dependencies\\n        run: pip install -r requirements.txt\\n      - name: Run Nornir Backup\\n        working-directory: config-management/nornir\\n        run: python backup.py\\n`;\n  }\n\n  backupWorkflow += `      - name: Commit backups\\n        run: |\\n          git config user.name github-actions\\n          git config user.email github-actions@github.com\\n          git add .\\n          git diff --staged --quiet || git commit -m \"Automated backup \\$(date +%Y-%m-%d)\"\\n          git push\\n`;\n\n  files.push({ path: '.github/workflows/backup.yml', content: backupWorkflow });\n}\n\nreturn {\n  json: {\n    ...data,\n    files\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1540, 0],
+      "id": "generate-pipelines",
+      "name": "Generate CI/CD Pipelines"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.delivery.target }}",
+                    "rightValue": "GitHub",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "GitHub"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.delivery.target }}",
+                    "rightValue": "GitLab",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "GitLab"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [1760, 0],
+      "id": "select-delivery",
+      "name": "Select Delivery Target"
+    },
+    {
+      "parameters": {
+        "resource": "repository",
+        "operation": "create",
+        "name": "={{ $json.clientData.repoName }}",
+        "description": "=Network automation for {{ $json.clientData.companyName }}",
+        "owner": "={{ $json.delivery.orgName }}",
+        "private": true,
+        "additionalFields": {
+          "auto_init": true
+        }
+      },
+      "type": "n8n-nodes-base.github",
+      "typeVersion": 1,
+      "position": [1980, -100],
+      "id": "create-github-repo",
+      "name": "Create GitHub Repo",
+      "credentials": {
+        "githubApi": {
+          "id": "github-credentials",
+          "name": "GitHub API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "createProject",
+        "projectName": "={{ $json.clientData.repoName }}",
+        "groupId": "={{ $json.delivery.orgName }}"
+      },
+      "type": "n8n-nodes-base.gitlab",
+      "typeVersion": 1,
+      "position": [1980, 100],
+      "id": "create-gitlab-repo",
+      "name": "Create GitLab Repo",
+      "credentials": {
+        "gitlabApi": {
+          "id": "gitlab-credentials",
+          "name": "GitLab API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Push all files to GitHub repository\nconst data = $input.first().json;\nconst { clientData, delivery, files } = data;\n\n// This node prepares the file content for GitHub API\n// In a real implementation, you would use the GitHub API to create/update files\n// or use a Git client to push all files at once\n\nconst repoInfo = {\n  owner: delivery.orgName,\n  repo: clientData.repoName,\n  branch: 'main'\n};\n\n// Prepare files for GitHub API\nconst fileOperations = files.map(file => ({\n  path: file.path,\n  content: Buffer.from(file.content).toString('base64'),\n  message: `Add ${file.path}`\n}));\n\nreturn {\n  json: {\n    ...data,\n    repoInfo,\n    fileOperations,\n    repoUrl: `https://github.com/${delivery.orgName}/${clientData.repoName}`\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [2200, -100],
+      "id": "push-github",
+      "name": "Push Files to GitHub"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Push all files to GitLab repository\nconst data = $input.first().json;\nconst { clientData, delivery, files } = data;\n\n// This node prepares the file content for GitLab API\n// In a real implementation, you would use the GitLab API to create/update files\n\nconst repoInfo = {\n  projectId: `${delivery.orgName}/${clientData.repoName}`,\n  branch: 'main'\n};\n\n// Prepare files for GitLab API\nconst fileOperations = files.map(file => ({\n  path: file.path,\n  content: Buffer.from(file.content).toString('base64'),\n  message: `Add ${file.path}`\n}));\n\nreturn {\n  json: {\n    ...data,\n    repoInfo,\n    fileOperations,\n    repoUrl: `https://gitlab.com/${delivery.orgName}/${clientData.repoName}`\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [2200, 100],
+      "id": "push-gitlab",
+      "name": "Push Files to GitLab"
+    },
+    {
+      "parameters": {
+        "operation": "upload",
+        "fileId": "={{ $json.documentation.boxFolderId }}",
+        "fileName": "={{ $json.clientData.repoName }}-documentation.pdf",
+        "binaryPropertyName": "data"
+      },
+      "type": "n8n-nodes-base.box",
+      "typeVersion": 1,
+      "position": [2420, 0],
+      "id": "upload-box",
+      "name": "Upload Docs to Box",
+      "credentials": {
+        "boxOAuth2Api": {
+          "id": "box-credentials",
+          "name": "Box OAuth2"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.notifications.preference }}",
+                    "rightValue": "Slack",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "Slack Only"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.notifications.preference }}",
+                    "rightValue": "Email",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "Email Only"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.notifications.preference }}",
+                    "rightValue": "Both",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "Both"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.notifications.preference }}",
+                    "rightValue": "None",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "None"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [2640, 0],
+      "id": "check-notifications",
+      "name": "Check Notification Preferences"
+    },
+    {
+      "parameters": {
+        "channel": "={{ $json.notifications.slackChannel }}",
+        "text": "=:white_check_mark: *Network Automation Project Generated*\n\n*Client:* {{ $json.clientData.companyName }}\n*Project:* {{ $json.clientData.repoName }}\n*Repository:* {{ $json.repoUrl }}\n\n*Stack:*\n• Source of Truth: {{ $json.infrastructure.sourceOfTruth }}\n• IaC: {{ $json.infrastructure.iacTool }}\n• Config Management: {{ $json.infrastructure.configMgmtTool }}\n\nDocumentation and automation code have been generated successfully.",
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.1,
+      "position": [2860, -200],
+      "id": "send-slack",
+      "name": "Send Slack Notification",
+      "credentials": {
+        "slackApi": {
+          "id": "slack-credentials",
+          "name": "Slack API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fromEmail": "automation@company.com",
+        "toEmail": "={{ $json.notifications.email }}",
+        "subject": "=Network Automation Project Generated: {{ $json.clientData.companyName }}",
+        "text": "=Network Automation Project Generated\n\nClient: {{ $json.clientData.companyName }}\nProject: {{ $json.clientData.repoName }}\nRepository: {{ $json.repoUrl }}\n\nStack:\n- Source of Truth: {{ $json.infrastructure.sourceOfTruth }}\n- IaC: {{ $json.infrastructure.iacTool }}\n- Config Management: {{ $json.infrastructure.configMgmtTool }}\n\nDocumentation and automation code have been generated successfully.\n\nNext Steps:\n1. Clone the repository\n2. Configure credentials (see docs/setup.md)\n3. Update inventory with actual device information\n4. Run initial deployment\n\nBest regards,\nNetwork Automation Team"
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [2860, -50],
+      "id": "send-email",
+      "name": "Send Email Notification"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [2860, 100],
+      "id": "send-both",
+      "name": "Send Both Notifications"
+    },
+    {
+      "parameters": {
+        "channel": "={{ $json.notifications.slackChannel }}",
+        "text": "=:white_check_mark: *Network Automation Project Generated*\n\n*Client:* {{ $json.clientData.companyName }}\n*Project:* {{ $json.clientData.repoName }}\n*Repository:* {{ $json.repoUrl }}\n\n*Stack:*\n• Source of Truth: {{ $json.infrastructure.sourceOfTruth }}\n• IaC: {{ $json.infrastructure.iacTool }}\n• Config Management: {{ $json.infrastructure.configMgmtTool }}\n\nDocumentation and automation code have been generated successfully.",
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.1,
+      "position": [3080, 50],
+      "id": "slack-both",
+      "name": "Slack Notification",
+      "credentials": {
+        "slackApi": {
+          "id": "slack-credentials",
+          "name": "Slack API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fromEmail": "automation@company.com",
+        "toEmail": "={{ $json.notifications.email }}",
+        "subject": "=Network Automation Project Generated: {{ $json.clientData.companyName }}",
+        "text": "=Network Automation Project Generated\n\nClient: {{ $json.clientData.companyName }}\nProject: {{ $json.clientData.repoName }}\nRepository: {{ $json.repoUrl }}\n\nStack:\n- Source of Truth: {{ $json.infrastructure.sourceOfTruth }}\n- IaC: {{ $json.infrastructure.iacTool }}\n- Config Management: {{ $json.infrastructure.configMgmtTool }}\n\nDocumentation and automation code have been generated successfully."
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [3080, 150],
+      "id": "email-both",
+      "name": "Email Notification"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [2860, 250],
+      "id": "no-notification",
+      "name": "Complete - No Notification"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "name": "error",
+              "value": "Validation failed. Please check your input.",
+              "type": "string"
+            },
+            {
+              "name": "details",
+              "value": "={{ $json.infrastructure.networkDevices.error || 'Invalid project configuration' }}",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [660, 200],
+      "id": "validation-error",
+      "name": "Validation Error"
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "shared": [
+    {
+      "createdAt": "2025-10-28T06:23:35.636Z",
+      "updatedAt": "2025-10-28T06:23:35.636Z",
+      "role": "workflow:owner",
+      "workflowId": "SuG5Wsb0h63bzX4K",
+      "projectId": "O4Y1BiKG2lGdIwOF"
+    }
+  ],
+  "staticData": null,
+  "tags": [
+    {
+      "name": "Network Automation"
+    },
+    {
+      "name": "Client Onboarding"
+    }
+  ],
+  "triggerCount": 0,
+  "updatedAt": "2026-01-06T00:00:00.000Z",
+  "versionId": "network-automation-v1"
+}
