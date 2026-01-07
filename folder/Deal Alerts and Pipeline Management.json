@@ -1,0 +1,795 @@
+{
+  "active": false,
+  "connections": {
+    "Daily Pipeline Check": {
+      "main": [
+        [
+          {
+            "node": "Fetch All Deals",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CRM Deal Update Webhook": {
+      "main": [
+        [
+          {
+            "node": "Parse Deal Update",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch All Deals": {
+      "main": [
+        [
+          {
+            "node": "Analyze Pipeline",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyze Pipeline": {
+      "main": [
+        [
+          {
+            "node": "Check Stale Deals",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Check Closing Soon",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Check At Risk",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Calculate Pipeline Metrics",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Stale Deals": {
+      "main": [
+        [
+          {
+            "node": "Stale Deal Alerts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Closing Soon": {
+      "main": [
+        [
+          {
+            "node": "Closing Soon Alerts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check At Risk": {
+      "main": [
+        [
+          {
+            "node": "At Risk Alerts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calculate Pipeline Metrics": {
+      "main": [
+        [
+          {
+            "node": "Daily Pipeline Summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Deal Update": {
+      "main": [
+        [
+          {
+            "node": "Determine Update Type",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Determine Update Type": {
+      "main": [
+        [
+          {
+            "node": "Handle Stage Change",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Handle Deal Won",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Handle Deal Lost",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Handle Amount Change",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Handle Close Date Change",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Handle Stage Change": {
+      "main": [
+        [
+          {
+            "node": "Stage Change Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Handle Deal Won": {
+      "main": [
+        [
+          {
+            "node": "Deal Won Celebration",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Handle Deal Lost": {
+      "main": [
+        [
+          {
+            "node": "Deal Lost Analysis",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Handle Amount Change": {
+      "main": [
+        [
+          {
+            "node": "Amount Change Alert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Handle Close Date Change": {
+      "main": [
+        [
+          {
+            "node": "Close Date Change Alert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Deal Won Celebration": {
+      "main": [
+        [
+          {
+            "node": "Update Win Tracking",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Deal Lost Analysis": {
+      "main": [
+        [
+          {
+            "node": "Update Loss Tracking",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-01-06T00:00:00.000Z",
+  "id": "deal-alerts-pipeline",
+  "isArchived": false,
+  "meta": {
+    "instanceId": "sales-workflows"
+  },
+  "name": "Deal Alerts and Pipeline Management",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "triggerAtHour": 8
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [-400, 0],
+      "id": "daily-pipeline-check",
+      "name": "Daily Pipeline Check"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "deals/update",
+        "options": {
+          "responseMode": "onReceived"
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [-400, 400],
+      "id": "crm-deal-update-webhook",
+      "name": "CRM Deal Update Webhook",
+      "webhookId": "crm-deal-update"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Fetch all active deals from CRM\n// In production, this would call CRM API\n\n// Example deal structure\nconst deals = [\n  /*\n  {\n    id: 'deal_001',\n    name: 'Acme Corp - Enterprise License',\n    company: 'Acme Corporation',\n    contactName: 'John Smith',\n    contactEmail: 'john@acme.com',\n    amount: 150000,\n    currency: 'USD',\n    stage: 'Negotiation',\n    stageOrder: 4,\n    probability: 60,\n    expectedCloseDate: '2026-01-15',\n    createdAt: '2025-11-01',\n    lastActivityDate: '2026-01-02',\n    lastActivityType: 'Email',\n    owner: 'Sarah Johnson',\n    ownerEmail: 'sarah@company.com',\n    daysInStage: 14,\n    daysOpen: 67,\n    nextStep: 'Send final proposal',\n    lossReason: null,\n    competitors: ['Competitor A', 'Competitor B'],\n    notes: 'Large enterprise deal, multi-year contract'\n  }\n  */\n];\n\n// Add calculated fields\nconst today = new Date();\nconst enrichedDeals = deals.map(deal => {\n  const closeDate = new Date(deal.expectedCloseDate);\n  const lastActivity = new Date(deal.lastActivityDate);\n  const daysToClose = Math.ceil((closeDate - today) / (1000 * 60 * 60 * 24));\n  const daysSinceActivity = Math.ceil((today - lastActivity) / (1000 * 60 * 60 * 24));\n  \n  return {\n    ...deal,\n    daysToClose,\n    daysSinceActivity,\n    isStale: daysSinceActivity > 7,\n    isClosingSoon: daysToClose <= 7 && daysToClose > 0,\n    isOverdue: daysToClose < 0,\n    isAtRisk: deal.probability < 40 || daysSinceActivity > 14\n  };\n});\n\nreturn { json: { deals: enrichedDeals, fetchedAt: today.toISOString() } };"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [-180, 0],
+      "id": "fetch-all-deals",
+      "name": "Fetch All Deals"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Analyze pipeline and categorize deals\nconst data = $input.first().json;\nconst deals = data.deals || [];\n\n// Define stage order for pipeline\nconst stageOrder = {\n  'Qualification': 1,\n  'Discovery': 2,\n  'Proposal': 3,\n  'Negotiation': 4,\n  'Closed Won': 5,\n  'Closed Lost': 6\n};\n\n// Categorize deals\nconst staleDeals = deals.filter(d => d.isStale && !['Closed Won', 'Closed Lost'].includes(d.stage));\nconst closingSoon = deals.filter(d => d.isClosingSoon && !['Closed Won', 'Closed Lost'].includes(d.stage));\nconst atRiskDeals = deals.filter(d => d.isAtRisk && !['Closed Won', 'Closed Lost'].includes(d.stage));\nconst overdueDeals = deals.filter(d => d.isOverdue && !['Closed Won', 'Closed Lost'].includes(d.stage));\n\n// Active pipeline (exclude closed)\nconst activePipeline = deals.filter(d => !['Closed Won', 'Closed Lost'].includes(d.stage));\n\n// Pipeline by stage\nconst byStage = {};\nactivePipeline.forEach(deal => {\n  if (!byStage[deal.stage]) {\n    byStage[deal.stage] = { count: 0, value: 0, deals: [] };\n  }\n  byStage[deal.stage].count++;\n  byStage[deal.stage].value += deal.amount;\n  byStage[deal.stage].deals.push(deal);\n});\n\n// Pipeline by owner\nconst byOwner = {};\nactivePipeline.forEach(deal => {\n  if (!byOwner[deal.owner]) {\n    byOwner[deal.owner] = { count: 0, value: 0, deals: [] };\n  }\n  byOwner[deal.owner].count++;\n  byOwner[deal.owner].value += deal.amount;\n  byOwner[deal.owner].deals.push(deal);\n});\n\nconst analysis = {\n  timestamp: new Date().toISOString(),\n  totalDeals: activePipeline.length,\n  totalValue: activePipeline.reduce((sum, d) => sum + d.amount, 0),\n  weightedValue: activePipeline.reduce((sum, d) => sum + (d.amount * d.probability / 100), 0),\n  \n  staleDeals,\n  staleCount: staleDeals.length,\n  staleValue: staleDeals.reduce((sum, d) => sum + d.amount, 0),\n  \n  closingSoon,\n  closingSoonCount: closingSoon.length,\n  closingSoonValue: closingSoon.reduce((sum, d) => sum + d.amount, 0),\n  \n  atRiskDeals,\n  atRiskCount: atRiskDeals.length,\n  atRiskValue: atRiskDeals.reduce((sum, d) => sum + d.amount, 0),\n  \n  overdueDeals,\n  overdueCount: overdueDeals.length,\n  overdueValue: overdueDeals.reduce((sum, d) => sum + d.amount, 0),\n  \n  byStage,\n  byOwner\n};\n\nreturn { json: analysis };"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [40, 0],
+      "id": "analyze-pipeline",
+      "name": "Analyze Pipeline"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Check for stale deals (no activity in 7+ days)\nconst data = $input.first().json;\nconst staleDeals = data.staleDeals || [];\n\nif (staleDeals.length === 0) {\n  return { json: { hasStaleDeals: false, message: 'No stale deals found' } };\n}\n\n// Group by owner\nconst byOwner = {};\nstaleDeals.forEach(deal => {\n  if (!byOwner[deal.owner]) {\n    byOwner[deal.owner] = [];\n  }\n  byOwner[deal.owner].push(deal);\n});\n\nreturn {\n  json: {\n    hasStaleDeals: true,\n    count: staleDeals.length,\n    totalValue: data.staleValue,\n    byOwner,\n    deals: staleDeals\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [260, -200],
+      "id": "check-stale-deals",
+      "name": "Check Stale Deals"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Check for deals closing soon (within 7 days)\nconst data = $input.first().json;\nconst closingSoon = data.closingSoon || [];\n\nif (closingSoon.length === 0) {\n  return { json: { hasClosingSoon: false, message: 'No deals closing soon' } };\n}\n\n// Group by owner\nconst byOwner = {};\nclosingSoon.forEach(deal => {\n  if (!byOwner[deal.owner]) {\n    byOwner[deal.owner] = [];\n  }\n  byOwner[deal.owner].push(deal);\n});\n\nreturn {\n  json: {\n    hasClosingSoon: true,\n    count: closingSoon.length,\n    totalValue: data.closingSoonValue,\n    byOwner,\n    deals: closingSoon\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [260, 0],
+      "id": "check-closing-soon",
+      "name": "Check Closing Soon"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Check for at-risk deals\nconst data = $input.first().json;\nconst atRiskDeals = data.atRiskDeals || [];\n\nif (atRiskDeals.length === 0) {\n  return { json: { hasAtRisk: false, message: 'No at-risk deals found' } };\n}\n\n// Group by owner\nconst byOwner = {};\natRiskDeals.forEach(deal => {\n  if (!byOwner[deal.owner]) {\n    byOwner[deal.owner] = [];\n  }\n  byOwner[deal.owner].push(deal);\n});\n\nreturn {\n  json: {\n    hasAtRisk: true,\n    count: atRiskDeals.length,\n    totalValue: data.atRiskValue,\n    byOwner,\n    deals: atRiskDeals\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [260, 200],
+      "id": "check-at-risk",
+      "name": "Check At Risk"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Calculate pipeline metrics\nconst data = $input.first().json;\n\nconst formatCurrency = (amount) => {\n  return '$' + amount.toFixed(0).replace(/\\B(?=(\\d{3})+(?!\\d))/g, ',');\n};\n\nconst metrics = {\n  timestamp: data.timestamp,\n  \n  // Overall metrics\n  totalPipeline: formatCurrency(data.totalValue),\n  totalPipelineRaw: data.totalValue,\n  weightedPipeline: formatCurrency(data.weightedValue),\n  weightedPipelineRaw: data.weightedValue,\n  dealCount: data.totalDeals,\n  averageDealSize: data.totalDeals > 0 ? formatCurrency(data.totalValue / data.totalDeals) : '$0',\n  \n  // Health indicators\n  staleDeals: data.staleCount,\n  staleValue: formatCurrency(data.staleValue),\n  atRiskDeals: data.atRiskCount,\n  atRiskValue: formatCurrency(data.atRiskValue),\n  overdueDeals: data.overdueCount,\n  overdueValue: formatCurrency(data.overdueValue),\n  closingSoon: data.closingSoonCount,\n  closingSoonValue: formatCurrency(data.closingSoonValue),\n  \n  // By stage\n  byStage: Object.entries(data.byStage).map(([stage, info]) => ({\n    stage,\n    count: info.count,\n    value: formatCurrency(info.value)\n  })),\n  \n  // By owner\n  byOwner: Object.entries(data.byOwner).map(([owner, info]) => ({\n    owner,\n    count: info.count,\n    value: formatCurrency(info.value)\n  })),\n  \n  // Health score (0-100)\n  healthScore: Math.max(0, 100 - (data.staleCount * 5) - (data.atRiskCount * 10) - (data.overdueCount * 15))\n};\n\nreturn { json: metrics };"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [260, 400],
+      "id": "calculate-pipeline-metrics",
+      "name": "Calculate Pipeline Metrics"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "has-stale",
+              "leftValue": "={{ $json.hasStaleDeals }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [480, -200],
+      "id": "stale-deal-alerts-if",
+      "name": "Stale Deal Alerts"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "has-closing",
+              "leftValue": "={{ $json.hasClosingSoon }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [480, 0],
+      "id": "closing-soon-alerts-if",
+      "name": "Closing Soon Alerts"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "has-risk",
+              "leftValue": "={{ $json.hasAtRisk }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [480, 200],
+      "id": "at-risk-alerts-if",
+      "name": "At Risk Alerts"
+    },
+    {
+      "parameters": {
+        "channel": "#sales-pipeline",
+        "text": "=:chart_with_upwards_trend: *Daily Pipeline Summary*\n\n*Pipeline Value:* {{ $json.totalPipeline }}\n*Weighted Pipeline:* {{ $json.weightedPipeline }}\n*Active Deals:* {{ $json.dealCount }}\n*Avg Deal Size:* {{ $json.averageDealSize }}\n*Health Score:* {{ $json.healthScore }}/100\n\n*:warning: Attention Needed:*\n• Stale Deals (7+ days): {{ $json.staleDeals }} ({{ $json.staleValue }})\n• At Risk: {{ $json.atRiskDeals }} ({{ $json.atRiskValue }})\n• Overdue: {{ $json.overdueDeals }} ({{ $json.overdueValue }})\n• Closing This Week: {{ $json.closingSoon }} ({{ $json.closingSoonValue }})\n\n*By Stage:*\n{{ $json.byStage.map(s => '• ' + s.stage + ': ' + s.count + ' deals (' + s.value + ')').join('\\n') }}\n\n*By Rep:*\n{{ $json.byOwner.map(o => '• ' + o.owner + ': ' + o.count + ' deals (' + o.value + ')').join('\\n') }}",
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.1,
+      "position": [480, 400],
+      "id": "daily-pipeline-summary",
+      "name": "Daily Pipeline Summary",
+      "credentials": {
+        "slackApi": {
+          "id": "slack-credentials",
+          "name": "Slack API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Parse deal update from CRM webhook\nconst update = $input.first().json;\n\nconst dealUpdate = {\n  dealId: update.id || update.dealId,\n  dealName: update.name || update.dealName,\n  company: update.company || update.account,\n  amount: update.amount || update.value,\n  previousAmount: update.previous_amount || update.previousAmount,\n  currency: update.currency || 'USD',\n  stage: update.stage || update.current_stage,\n  previousStage: update.previous_stage || update.previousStage,\n  owner: update.owner || update.owner_name,\n  ownerEmail: update.owner_email || update.ownerEmail,\n  expectedCloseDate: update.close_date || update.expectedCloseDate,\n  previousCloseDate: update.previous_close_date || update.previousCloseDate,\n  lossReason: update.loss_reason || update.lossReason,\n  competitor: update.competitor,\n  notes: update.notes,\n  updatedAt: new Date().toISOString(),\n  \n  // Determine update type\n  isStageChange: update.stage !== update.previous_stage,\n  isWon: update.stage === 'Closed Won',\n  isLost: update.stage === 'Closed Lost',\n  isAmountChange: update.amount !== update.previous_amount,\n  isCloseDateChange: update.close_date !== update.previous_close_date\n};\n\nreturn { json: dealUpdate };"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [-180, 400],
+      "id": "parse-deal-update",
+      "name": "Parse Deal Update"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.isStageChange && !$json.isWon && !$json.isLost }}",
+                    "rightValue": true,
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "Stage Change"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.isWon }}",
+                    "rightValue": true,
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "Won"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.isLost }}",
+                    "rightValue": true,
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "Lost"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.isAmountChange }}",
+                    "rightValue": true,
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "Amount Change"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.isCloseDateChange }}",
+                    "rightValue": true,
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "Close Date Change"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [40, 400],
+      "id": "determine-update-type",
+      "name": "Determine Update Type"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Handle stage change\nconst deal = $input.first().json;\n\nconst stageEmojis = {\n  'Qualification': ':mag:',\n  'Discovery': ':bulb:',\n  'Proposal': ':page_facing_up:',\n  'Negotiation': ':handshake:'\n};\n\nconst formatCurrency = (amount) => {\n  return '$' + (amount || 0).toFixed(0).replace(/\\B(?=(\\d{3})+(?!\\d))/g, ',');\n};\n\nreturn {\n  json: {\n    ...deal,\n    emoji: stageEmojis[deal.stage] || ':arrow_right:',\n    formattedAmount: formatCurrency(deal.amount),\n    notification: `Deal moved from ${deal.previousStage} to ${deal.stage}`\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [260, 500],
+      "id": "handle-stage-change",
+      "name": "Handle Stage Change"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Handle deal won\nconst deal = $input.first().json;\n\nconst formatCurrency = (amount) => {\n  return '$' + (amount || 0).toFixed(0).replace(/\\B(?=(\\d{3})+(?!\\d))/g, ',');\n};\n\nreturn {\n  json: {\n    ...deal,\n    formattedAmount: formatCurrency(deal.amount),\n    celebration: true,\n    notification: `🎉 DEAL WON: ${deal.dealName} - ${formatCurrency(deal.amount)}`\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [260, 700],
+      "id": "handle-deal-won",
+      "name": "Handle Deal Won"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Handle deal lost\nconst deal = $input.first().json;\n\nconst formatCurrency = (amount) => {\n  return '$' + (amount || 0).toFixed(0).replace(/\\B(?=(\\d{3})+(?!\\d))/g, ',');\n};\n\nreturn {\n  json: {\n    ...deal,\n    formattedAmount: formatCurrency(deal.amount),\n    notification: `Deal Lost: ${deal.dealName} - ${formatCurrency(deal.amount)}`,\n    analysis: {\n      lossReason: deal.lossReason || 'Not specified',\n      competitor: deal.competitor || 'Not specified',\n      stageAtLoss: deal.previousStage,\n      notes: deal.notes\n    }\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [260, 900],
+      "id": "handle-deal-lost",
+      "name": "Handle Deal Lost"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Handle amount change\nconst deal = $input.first().json;\n\nconst formatCurrency = (amount) => {\n  return '$' + (amount || 0).toFixed(0).replace(/\\B(?=(\\d{3})+(?!\\d))/g, ',');\n};\n\nconst change = deal.amount - (deal.previousAmount || 0);\nconst changePercent = deal.previousAmount ? ((change / deal.previousAmount) * 100).toFixed(1) : 0;\n\nreturn {\n  json: {\n    ...deal,\n    formattedAmount: formatCurrency(deal.amount),\n    formattedPreviousAmount: formatCurrency(deal.previousAmount),\n    formattedChange: formatCurrency(Math.abs(change)),\n    changePercent,\n    isIncrease: change > 0,\n    notification: `Deal amount ${change > 0 ? 'increased' : 'decreased'} by ${formatCurrency(Math.abs(change))} (${changePercent}%)`\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [260, 1100],
+      "id": "handle-amount-change",
+      "name": "Handle Amount Change"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Handle close date change\nconst deal = $input.first().json;\n\nconst formatCurrency = (amount) => {\n  return '$' + (amount || 0).toFixed(0).replace(/\\B(?=(\\d{3})+(?!\\d))/g, ',');\n};\n\nconst newDate = new Date(deal.expectedCloseDate);\nconst oldDate = new Date(deal.previousCloseDate);\nconst daysDiff = Math.ceil((newDate - oldDate) / (1000 * 60 * 60 * 24));\n\nreturn {\n  json: {\n    ...deal,\n    formattedAmount: formatCurrency(deal.amount),\n    formattedNewDate: newDate.toLocaleDateString(),\n    formattedOldDate: oldDate.toLocaleDateString(),\n    daysDiff,\n    isPushed: daysDiff > 0,\n    notification: `Close date ${daysDiff > 0 ? 'pushed' : 'pulled in'} by ${Math.abs(daysDiff)} days`\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [260, 1300],
+      "id": "handle-close-date-change",
+      "name": "Handle Close Date Change"
+    },
+    {
+      "parameters": {
+        "channel": "#sales-pipeline",
+        "text": "={{ $json.emoji }} *Deal Stage Change*\n\n*Deal:* {{ $json.dealName }}\n*Company:* {{ $json.company }}\n*Amount:* {{ $json.formattedAmount }}\n*Owner:* {{ $json.owner }}\n\n*Stage:* {{ $json.previousStage }} → {{ $json.stage }}",
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.1,
+      "position": [480, 500],
+      "id": "stage-change-notification",
+      "name": "Stage Change Notification",
+      "credentials": {
+        "slackApi": {
+          "id": "slack-credentials",
+          "name": "Slack API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "channel": "#sales-wins",
+        "text": "=:tada: :trophy: *DEAL WON!* :trophy: :tada:\n\n*{{ $json.dealName }}*\n*Company:* {{ $json.company }}\n*Amount:* {{ $json.formattedAmount }}\n*Owner:* {{ $json.owner }}\n\nCongratulations to {{ $json.owner }} on closing this deal! :clap:",
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.1,
+      "position": [480, 700],
+      "id": "deal-won-celebration",
+      "name": "Deal Won Celebration",
+      "credentials": {
+        "slackApi": {
+          "id": "slack-credentials",
+          "name": "Slack API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "channel": "#sales-pipeline",
+        "text": "=:x: *Deal Lost*\n\n*Deal:* {{ $json.dealName }}\n*Company:* {{ $json.company }}\n*Amount:* {{ $json.formattedAmount }}\n*Owner:* {{ $json.owner }}\n\n*Loss Analysis:*\n• Reason: {{ $json.analysis.lossReason }}\n• Competitor: {{ $json.analysis.competitor }}\n• Stage at Loss: {{ $json.analysis.stageAtLoss }}\n\n_Review this loss to improve our process._",
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.1,
+      "position": [480, 900],
+      "id": "deal-lost-analysis",
+      "name": "Deal Lost Analysis",
+      "credentials": {
+        "slackApi": {
+          "id": "slack-credentials",
+          "name": "Slack API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "channel": "#sales-pipeline",
+        "text": "=:{{ $json.isIncrease ? 'chart_with_upwards_trend' : 'chart_with_downwards_trend' }}: *Deal Amount Change*\n\n*Deal:* {{ $json.dealName }}\n*Company:* {{ $json.company }}\n*Owner:* {{ $json.owner }}\n\n*Amount:* {{ $json.formattedPreviousAmount }} → {{ $json.formattedAmount }}\n*Change:* {{ $json.isIncrease ? '+' : '-' }}{{ $json.formattedChange }} ({{ $json.changePercent }}%)",
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.1,
+      "position": [480, 1100],
+      "id": "amount-change-alert",
+      "name": "Amount Change Alert",
+      "credentials": {
+        "slackApi": {
+          "id": "slack-credentials",
+          "name": "Slack API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "channel": "#sales-pipeline",
+        "text": "=:calendar: *Close Date Change*\n\n*Deal:* {{ $json.dealName }}\n*Company:* {{ $json.company }}\n*Amount:* {{ $json.formattedAmount }}\n*Owner:* {{ $json.owner }}\n\n*Close Date:* {{ $json.formattedOldDate }} → {{ $json.formattedNewDate }}\n*{{ $json.isPushed ? ':warning: Pushed' : ':rocket: Pulled in' }}* by {{ Math.abs($json.daysDiff) }} days",
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.1,
+      "position": [480, 1300],
+      "id": "close-date-change-alert",
+      "name": "Close Date Change Alert",
+      "credentials": {
+        "slackApi": {
+          "id": "slack-credentials",
+          "name": "Slack API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "wins-tracking-spreadsheet-id"
+        },
+        "sheetName": "Wins",
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Date": "={{ $json.updatedAt }}",
+            "Deal Name": "={{ $json.dealName }}",
+            "Company": "={{ $json.company }}",
+            "Amount": "={{ $json.amount }}",
+            "Owner": "={{ $json.owner }}"
+          }
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.2,
+      "position": [700, 700],
+      "id": "update-win-tracking",
+      "name": "Update Win Tracking",
+      "disabled": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "google-sheets-credentials",
+          "name": "Google Sheets OAuth2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "losses-tracking-spreadsheet-id"
+        },
+        "sheetName": "Losses",
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Date": "={{ $json.updatedAt }}",
+            "Deal Name": "={{ $json.dealName }}",
+            "Company": "={{ $json.company }}",
+            "Amount": "={{ $json.amount }}",
+            "Owner": "={{ $json.owner }}",
+            "Loss Reason": "={{ $json.analysis.lossReason }}",
+            "Competitor": "={{ $json.analysis.competitor }}",
+            "Stage at Loss": "={{ $json.analysis.stageAtLoss }}"
+          }
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.2,
+      "position": [700, 900],
+      "id": "update-loss-tracking",
+      "name": "Update Loss Tracking",
+      "disabled": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "google-sheets-credentials",
+          "name": "Google Sheets OAuth2"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "shared": [],
+  "staticData": null,
+  "tags": [
+    {
+      "name": "Sales"
+    },
+    {
+      "name": "Pipeline"
+    },
+    {
+      "name": "Alerts"
+    }
+  ],
+  "triggerCount": 0,
+  "updatedAt": "2026-01-06T00:00:00.000Z",
+  "versionId": "deal-alerts-v1"
+}

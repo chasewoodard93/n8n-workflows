@@ -1,0 +1,741 @@
+{
+  "active": false,
+  "connections": {
+    "Quote Request Form": {
+      "main": [
+        [
+          {
+            "node": "Parse Quote Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Quote Request Webhook": {
+      "main": [
+        [
+          {
+            "node": "Parse Quote Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CRM Deal Trigger": {
+      "main": [
+        [
+          {
+            "node": "Fetch Deal Details",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Deal Details": {
+      "main": [
+        [
+          {
+            "node": "Parse Quote Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Quote Request": {
+      "main": [
+        [
+          {
+            "node": "Get Pricing Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Pricing Data": {
+      "main": [
+        [
+          {
+            "node": "Calculate Quote",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calculate Quote": {
+      "main": [
+        [
+          {
+            "node": "AI Generate Proposal",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Generate Proposal": {
+      "main": [
+        [
+          {
+            "node": "Generate PDF",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Anthropic Claude": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Generate Proposal",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate PDF": {
+      "main": [
+        [
+          {
+            "node": "Select Delivery Method",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Select Delivery Method": {
+      "main": [
+        [
+          {
+            "node": "Upload to Google Drive",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Upload to Box",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Upload to SharePoint",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload to Google Drive": {
+      "main": [
+        [
+          {
+            "node": "Create E-Sign Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload to Box": {
+      "main": [
+        [
+          {
+            "node": "Create E-Sign Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload to SharePoint": {
+      "main": [
+        [
+          {
+            "node": "Create E-Sign Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create E-Sign Request": {
+      "main": [
+        [
+          {
+            "node": "Update CRM Deal",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update CRM Deal": {
+      "main": [
+        [
+          {
+            "node": "Send to Customer",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Notify Sales Rep",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send to Customer": {
+      "main": [
+        [
+          {
+            "node": "Log Quote Activity",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-01-06T00:00:00.000Z",
+  "id": "quote-proposal-generation",
+  "isArchived": false,
+  "meta": {
+    "instanceId": "sales-workflows"
+  },
+  "name": "Quote and Proposal Generation",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "Generate Quote/Proposal",
+        "formDescription": "Create a professional quote or proposal for a customer",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Customer Company Name",
+              "requiredField": true,
+              "fieldType": "text"
+            },
+            {
+              "fieldLabel": "Customer Contact Name",
+              "requiredField": true,
+              "fieldType": "text"
+            },
+            {
+              "fieldLabel": "Customer Email",
+              "requiredField": true,
+              "fieldType": "email"
+            },
+            {
+              "fieldLabel": "Customer Phone",
+              "requiredField": false,
+              "fieldType": "text"
+            },
+            {
+              "fieldLabel": "Customer Address",
+              "requiredField": false,
+              "fieldType": "textarea"
+            },
+            {
+              "fieldLabel": "Document Type",
+              "requiredField": true,
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {"option": "Quote"},
+                  {"option": "Proposal"},
+                  {"option": "Statement of Work"},
+                  {"option": "Service Agreement"}
+                ]
+              }
+            },
+            {
+              "fieldLabel": "Products/Services (JSON)",
+              "placeholder": "[{\"name\": \"Product A\", \"quantity\": 10, \"unit_price\": 100, \"description\": \"Description here\"}]",
+              "requiredField": true,
+              "fieldType": "textarea"
+            },
+            {
+              "fieldLabel": "Discount Percentage",
+              "placeholder": "0",
+              "requiredField": false,
+              "fieldType": "number"
+            },
+            {
+              "fieldLabel": "Valid For (Days)",
+              "placeholder": "30",
+              "requiredField": true,
+              "fieldType": "number"
+            },
+            {
+              "fieldLabel": "Payment Terms",
+              "requiredField": true,
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {"option": "Due on Receipt"},
+                  {"option": "Net 15"},
+                  {"option": "Net 30"},
+                  {"option": "Net 45"},
+                  {"option": "Net 60"},
+                  {"option": "50% Upfront, 50% on Completion"},
+                  {"option": "Monthly Subscription"}
+                ]
+              }
+            },
+            {
+              "fieldLabel": "Currency",
+              "requiredField": true,
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {"option": "USD"},
+                  {"option": "EUR"},
+                  {"option": "GBP"},
+                  {"option": "CAD"},
+                  {"option": "AUD"}
+                ]
+              }
+            },
+            {
+              "fieldLabel": "Include E-Signature",
+              "requiredField": true,
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {"option": "Yes - DocuSign"},
+                  {"option": "Yes - Adobe Sign"},
+                  {"option": "Yes - PandaDoc"},
+                  {"option": "No"}
+                ]
+              }
+            },
+            {
+              "fieldLabel": "Storage Location",
+              "requiredField": true,
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {"option": "Google Drive"},
+                  {"option": "Box"},
+                  {"option": "SharePoint"}
+                ]
+              }
+            },
+            {
+              "fieldLabel": "CRM Deal ID (optional)",
+              "requiredField": false,
+              "fieldType": "text"
+            },
+            {
+              "fieldLabel": "Sales Rep Name",
+              "requiredField": true,
+              "fieldType": "text"
+            },
+            {
+              "fieldLabel": "Sales Rep Email",
+              "requiredField": true,
+              "fieldType": "email"
+            },
+            {
+              "fieldLabel": "Additional Notes",
+              "requiredField": false,
+              "fieldType": "textarea"
+            }
+          ]
+        },
+        "options": {
+          "responseMode": "onReceived",
+          "formSubmittedText": "Your quote/proposal is being generated. You will receive an email shortly."
+        }
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.3,
+      "position": [-400, 0],
+      "id": "quote-request-form",
+      "name": "Quote Request Form",
+      "webhookId": "quote-request-form"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "quote/generate",
+        "options": {
+          "responseMode": "onReceived"
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [-400, -200],
+      "id": "quote-request-webhook",
+      "name": "Quote Request Webhook",
+      "webhookId": "quote-request-webhook"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "quote/from-crm",
+        "options": {
+          "responseMode": "onReceived"
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [-400, 200],
+      "id": "crm-deal-trigger",
+      "name": "CRM Deal Trigger",
+      "webhookId": "crm-deal-trigger"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Fetch deal details from CRM when triggered from deal\nconst input = $input.first().json;\n\n// This would fetch from CRM API\nconst dealDetails = {\n  dealId: input.dealId || input.id,\n  customerCompany: input.company || input.account_name,\n  customerContact: input.contact_name,\n  customerEmail: input.contact_email,\n  customerPhone: input.contact_phone || '',\n  products: input.products || input.line_items || [],\n  dealValue: input.amount || input.value,\n  stage: input.stage,\n  salesRep: input.owner_name,\n  salesRepEmail: input.owner_email\n};\n\nreturn { json: dealDetails };"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [-180, 200],
+      "id": "fetch-deal-details",
+      "name": "Fetch Deal Details"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Parse and normalize quote request data\nconst input = $input.first().json;\n\n// Parse products/services JSON if string\nlet products = [];\ntry {\n  products = typeof input['Products/Services (JSON)'] === 'string' \n    ? JSON.parse(input['Products/Services (JSON)']) \n    : (input['Products/Services (JSON)'] || input.products || []);\n} catch (e) {\n  products = [];\n}\n\nconst quoteData = {\n  quoteId: `Q-${Date.now()}`,\n  createdAt: new Date().toISOString(),\n  \n  // Customer info\n  customer: {\n    company: input['Customer Company Name'] || input.customerCompany || '',\n    contactName: input['Customer Contact Name'] || input.customerContact || '',\n    email: input['Customer Email'] || input.customerEmail || '',\n    phone: input['Customer Phone'] || input.customerPhone || '',\n    address: input['Customer Address'] || input.customerAddress || ''\n  },\n  \n  // Document settings\n  documentType: input['Document Type'] || 'Quote',\n  validForDays: parseInt(input['Valid For (Days)']) || 30,\n  validUntil: new Date(Date.now() + (parseInt(input['Valid For (Days)']) || 30) * 24 * 60 * 60 * 1000).toISOString(),\n  paymentTerms: input['Payment Terms'] || 'Net 30',\n  currency: input['Currency'] || 'USD',\n  \n  // Products\n  products: products,\n  discount: parseFloat(input['Discount Percentage']) || 0,\n  \n  // Delivery options\n  includeESign: input['Include E-Signature'] || 'No',\n  storageLocation: input['Storage Location'] || 'Google Drive',\n  \n  // CRM reference\n  crmDealId: input['CRM Deal ID (optional)'] || input.dealId || '',\n  \n  // Sales rep\n  salesRep: {\n    name: input['Sales Rep Name'] || input.salesRep || '',\n    email: input['Sales Rep Email'] || input.salesRepEmail || ''\n  },\n  \n  notes: input['Additional Notes'] || input.notes || ''\n};\n\nreturn { json: quoteData };"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [40, 0],
+      "id": "parse-quote-request",
+      "name": "Parse Quote Request"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get pricing data from pricing database/sheet\n// In production, this would query a pricing database or Google Sheet\n\nconst quoteData = $input.first().json;\n\n// Pricing catalog (would come from database)\nconst pricingCatalog = {\n  // Example pricing tiers\n  standardMarkup: 1.0,\n  volumeDiscounts: {\n    10: 0.05,   // 5% off for 10+ units\n    25: 0.10,   // 10% off for 25+ units\n    50: 0.15,   // 15% off for 50+ units\n    100: 0.20   // 20% off for 100+ units\n  },\n  taxRate: 0.0,  // Will be calculated based on location\n  shippingRates: {\n    standard: 0,\n    express: 25,\n    overnight: 75\n  }\n};\n\n// Enrich products with current pricing if not provided\nconst enrichedProducts = quoteData.products.map((product, index) => {\n  const quantity = product.quantity || 1;\n  const unitPrice = product.unit_price || product.unitPrice || product.price || 0;\n  \n  // Calculate volume discount\n  let volumeDiscount = 0;\n  for (const [threshold, discount] of Object.entries(pricingCatalog.volumeDiscounts)) {\n    if (quantity >= parseInt(threshold)) {\n      volumeDiscount = discount;\n    }\n  }\n  \n  const subtotal = quantity * unitPrice;\n  const discountAmount = subtotal * volumeDiscount;\n  const lineTotal = subtotal - discountAmount;\n  \n  return {\n    lineNumber: index + 1,\n    name: product.name || `Item ${index + 1}`,\n    description: product.description || '',\n    quantity: quantity,\n    unitPrice: unitPrice,\n    subtotal: subtotal,\n    volumeDiscount: volumeDiscount * 100,\n    discountAmount: discountAmount,\n    lineTotal: lineTotal\n  };\n});\n\nreturn {\n  json: {\n    ...quoteData,\n    products: enrichedProducts,\n    pricingData: pricingCatalog\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [260, 0],
+      "id": "get-pricing-data",
+      "name": "Get Pricing Data"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Calculate final quote totals\nconst data = $input.first().json;\n\n// Calculate subtotals\nconst subtotal = data.products.reduce((sum, p) => sum + p.lineTotal, 0);\n\n// Apply overall discount\nconst discountPercent = data.discount || 0;\nconst discountAmount = subtotal * (discountPercent / 100);\nconst afterDiscount = subtotal - discountAmount;\n\n// Calculate tax (if applicable)\nconst taxRate = data.pricingData?.taxRate || 0;\nconst taxAmount = afterDiscount * taxRate;\n\n// Final total\nconst total = afterDiscount + taxAmount;\n\n// Currency formatting\nconst currencySymbols = {\n  'USD': '$',\n  'EUR': '€',\n  'GBP': '£',\n  'CAD': 'C$',\n  'AUD': 'A$'\n};\nconst symbol = currencySymbols[data.currency] || '$';\n\nconst formatCurrency = (amount) => {\n  return `${symbol}${amount.toFixed(2).replace(/\\B(?=(\\d{3})+(?!\\d))/g, ',')}`;\n};\n\nconst quote = {\n  ...data,\n  \n  // Calculated totals\n  totals: {\n    subtotal: subtotal,\n    subtotalFormatted: formatCurrency(subtotal),\n    discountPercent: discountPercent,\n    discountAmount: discountAmount,\n    discountFormatted: formatCurrency(discountAmount),\n    afterDiscount: afterDiscount,\n    afterDiscountFormatted: formatCurrency(afterDiscount),\n    taxRate: taxRate * 100,\n    taxAmount: taxAmount,\n    taxFormatted: formatCurrency(taxAmount),\n    total: total,\n    totalFormatted: formatCurrency(total)\n  },\n  \n  // Format products for display\n  formattedProducts: data.products.map(p => ({\n    ...p,\n    unitPriceFormatted: formatCurrency(p.unitPrice),\n    subtotalFormatted: formatCurrency(p.subtotal),\n    lineTotalFormatted: formatCurrency(p.lineTotal)\n  }))\n};\n\nreturn { json: quote };"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [480, 0],
+      "id": "calculate-quote",
+      "name": "Calculate Quote"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Generate a professional {{ $json.documentType }} document content for the following:\n\n**Customer:**\n- Company: {{ $json.customer.company }}\n- Contact: {{ $json.customer.contactName }}\n- Email: {{ $json.customer.email }}\n\n**{{ $json.documentType }} Details:**\n- {{ $json.documentType }} Number: {{ $json.quoteId }}\n- Valid Until: {{ $json.validUntil }}\n- Payment Terms: {{ $json.paymentTerms }}\n- Currency: {{ $json.currency }}\n\n**Products/Services:**\n{{ $json.formattedProducts.map(p => `- ${p.name} (Qty: ${p.quantity}) - ${p.lineTotalFormatted}`).join('\\n') }}\n\n**Totals:**\n- Subtotal: {{ $json.totals.subtotalFormatted }}\n{{ $json.totals.discountPercent > 0 ? '- Discount (' + $json.totals.discountPercent + '%): -' + $json.totals.discountFormatted : '' }}\n- Total: {{ $json.totals.totalFormatted }}\n\n**Additional Notes:** {{ $json.notes || 'None' }}\n\n**Generate:**\n1. A compelling executive summary (2-3 sentences)\n2. A professional cover letter paragraph\n3. Terms and conditions summary (3-5 bullet points)\n4. A closing statement with call-to-action\n\nRespond in JSON format:\n```json\n{\n  \"executiveSummary\": \"...\",\n  \"coverLetter\": \"...\",\n  \"termsAndConditions\": [\"term 1\", \"term 2\", \"term 3\"],\n  \"closingStatement\": \"...\"\n}\n```",
+        "options": {
+          "systemMessage": "You are an expert business proposal writer. Create professional, compelling content that builds trust and encourages action. Use formal but approachable language."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [700, 0],
+      "id": "ai-generate-proposal",
+      "name": "AI Generate Proposal"
+    },
+    {
+      "parameters": {
+        "model": "claude-sonnet-4-20250514",
+        "options": {
+          "temperature": 0.5,
+          "maxTokensToSample": 2048
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatAnthropic",
+      "typeVersion": 1.2,
+      "position": [720, 220],
+      "id": "anthropic-claude",
+      "name": "Anthropic Claude",
+      "credentials": {
+        "anthropicApi": {
+          "id": "anthropic-credentials",
+          "name": "Anthropic API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Parse AI response and generate PDF content\nconst data = $input.first().json;\n\n// Parse AI generated content\nlet aiContent = {\n  executiveSummary: 'We are pleased to present this proposal for your consideration.',\n  coverLetter: 'Thank you for the opportunity to work with your organization.',\n  termsAndConditions: [\n    'Payment due according to agreed terms',\n    'Prices valid for the period specified',\n    'Subject to our standard terms of service'\n  ],\n  closingStatement: 'We look forward to working with you.'\n};\n\ntry {\n  const aiOutput = data.output || data.text || '';\n  const jsonMatch = aiOutput.match(/```json\\n?([\\s\\S]*?)\\n?```/) || aiOutput.match(/\\{[\\s\\S]*\\}/);\n  if (jsonMatch) {\n    aiContent = { ...aiContent, ...JSON.parse(jsonMatch[1] || jsonMatch[0]) };\n  }\n} catch (e) {\n  console.log('Using default AI content');\n}\n\n// Generate HTML for PDF\nconst html = `\n<!DOCTYPE html>\n<html>\n<head>\n  <style>\n    body { font-family: Arial, sans-serif; margin: 40px; color: #333; }\n    .header { border-bottom: 3px solid #2c5aa0; padding-bottom: 20px; margin-bottom: 30px; }\n    .logo { font-size: 28px; font-weight: bold; color: #2c5aa0; }\n    .document-title { font-size: 24px; color: #666; margin-top: 10px; }\n    .quote-info { background: #f5f5f5; padding: 20px; border-radius: 5px; margin-bottom: 30px; }\n    .quote-info table { width: 100%; }\n    .quote-info td { padding: 5px 0; }\n    .quote-info .label { font-weight: bold; width: 150px; }\n    .summary { margin-bottom: 30px; font-style: italic; color: #555; }\n    table.products { width: 100%; border-collapse: collapse; margin-bottom: 30px; }\n    table.products th { background: #2c5aa0; color: white; padding: 12px; text-align: left; }\n    table.products td { padding: 12px; border-bottom: 1px solid #ddd; }\n    table.products tr:nth-child(even) { background: #f9f9f9; }\n    .totals { text-align: right; margin-bottom: 30px; }\n    .totals table { margin-left: auto; }\n    .totals td { padding: 8px 15px; }\n    .totals .total-row { font-size: 18px; font-weight: bold; background: #2c5aa0; color: white; }\n    .terms { background: #f9f9f9; padding: 20px; border-radius: 5px; margin-bottom: 30px; }\n    .terms h3 { margin-top: 0; color: #2c5aa0; }\n    .terms ul { margin: 0; padding-left: 20px; }\n    .closing { margin-top: 40px; }\n    .signature-block { margin-top: 60px; display: flex; justify-content: space-between; }\n    .signature { width: 45%; }\n    .signature-line { border-top: 1px solid #333; margin-top: 50px; padding-top: 10px; }\n    .footer { margin-top: 60px; text-align: center; color: #999; font-size: 12px; }\n  </style>\n</head>\n<body>\n  <div class=\"header\">\n    <div class=\"logo\">Your Company Name</div>\n    <div class=\"document-title\">${data.documentType} #${data.quoteId}</div>\n  </div>\n  \n  <div class=\"quote-info\">\n    <table>\n      <tr>\n        <td class=\"label\">Prepared For:</td>\n        <td>${data.customer.company}<br>${data.customer.contactName}<br>${data.customer.email}</td>\n        <td class=\"label\">Date:</td>\n        <td>${new Date(data.createdAt).toLocaleDateString()}</td>\n      </tr>\n      <tr>\n        <td class=\"label\">Valid Until:</td>\n        <td>${new Date(data.validUntil).toLocaleDateString()}</td>\n        <td class=\"label\">Prepared By:</td>\n        <td>${data.salesRep.name}<br>${data.salesRep.email}</td>\n      </tr>\n      <tr>\n        <td class=\"label\">Payment Terms:</td>\n        <td>${data.paymentTerms}</td>\n        <td></td>\n        <td></td>\n      </tr>\n    </table>\n  </div>\n  \n  <div class=\"summary\">\n    <p>${aiContent.executiveSummary}</p>\n  </div>\n  \n  <h3>Products & Services</h3>\n  <table class=\"products\">\n    <thead>\n      <tr>\n        <th>#</th>\n        <th>Description</th>\n        <th>Qty</th>\n        <th>Unit Price</th>\n        <th>Total</th>\n      </tr>\n    </thead>\n    <tbody>\n      ${data.formattedProducts.map(p => `\n        <tr>\n          <td>${p.lineNumber}</td>\n          <td><strong>${p.name}</strong><br><small>${p.description || ''}</small></td>\n          <td>${p.quantity}</td>\n          <td>${p.unitPriceFormatted}</td>\n          <td>${p.lineTotalFormatted}</td>\n        </tr>\n      `).join('')}\n    </tbody>\n  </table>\n  \n  <div class=\"totals\">\n    <table>\n      <tr>\n        <td>Subtotal:</td>\n        <td>${data.totals.subtotalFormatted}</td>\n      </tr>\n      ${data.totals.discountPercent > 0 ? `\n      <tr>\n        <td>Discount (${data.totals.discountPercent}%):</td>\n        <td>-${data.totals.discountFormatted}</td>\n      </tr>\n      ` : ''}\n      ${data.totals.taxRate > 0 ? `\n      <tr>\n        <td>Tax (${data.totals.taxRate}%):</td>\n        <td>${data.totals.taxFormatted}</td>\n      </tr>\n      ` : ''}\n      <tr class=\"total-row\">\n        <td>Total (${data.currency}):</td>\n        <td>${data.totals.totalFormatted}</td>\n      </tr>\n    </table>\n  </div>\n  \n  <div class=\"terms\">\n    <h3>Terms & Conditions</h3>\n    <ul>\n      ${aiContent.termsAndConditions.map(t => `<li>${t}</li>`).join('')}\n    </ul>\n  </div>\n  \n  <div class=\"closing\">\n    <p>${aiContent.closingStatement}</p>\n  </div>\n  \n  <div class=\"signature-block\">\n    <div class=\"signature\">\n      <div class=\"signature-line\">\n        <strong>Customer Signature</strong><br>\n        ${data.customer.contactName}<br>\n        Date: _______________\n      </div>\n    </div>\n    <div class=\"signature\">\n      <div class=\"signature-line\">\n        <strong>Company Representative</strong><br>\n        ${data.salesRep.name}<br>\n        Date: ${new Date().toLocaleDateString()}\n      </div>\n    </div>\n  </div>\n  \n  <div class=\"footer\">\n    <p>Thank you for your business!</p>\n    <p>Questions? Contact ${data.salesRep.email}</p>\n  </div>\n</body>\n</html>\n`;\n\nreturn {\n  json: {\n    ...data,\n    aiContent,\n    pdfHtml: html,\n    fileName: `${data.documentType.replace(/\\s+/g, '_')}_${data.quoteId}.pdf`\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [920, 0],
+      "id": "generate-pdf",
+      "name": "Generate PDF"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.storageLocation }}",
+                    "rightValue": "Google Drive",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "Google Drive"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.storageLocation }}",
+                    "rightValue": "Box",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "Box"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.storageLocation }}",
+                    "rightValue": "SharePoint",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "SharePoint"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [1140, 0],
+      "id": "select-delivery-method",
+      "name": "Select Delivery Method"
+    },
+    {
+      "parameters": {
+        "operation": "upload",
+        "folderId": "quotes-folder-id",
+        "name": "={{ $json.fileName }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [1360, -100],
+      "id": "upload-google-drive",
+      "name": "Upload to Google Drive",
+      "disabled": true,
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "google-drive-credentials",
+          "name": "Google Drive OAuth2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "upload",
+        "parentId": "quotes-folder-id",
+        "fileName": "={{ $json.fileName }}"
+      },
+      "type": "n8n-nodes-base.box",
+      "typeVersion": 1,
+      "position": [1360, 100],
+      "id": "upload-box",
+      "name": "Upload to Box",
+      "disabled": true,
+      "credentials": {
+        "boxOAuth2Api": {
+          "id": "box-credentials",
+          "name": "Box OAuth2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "upload",
+        "siteId": "your-site-id",
+        "driveId": "your-drive-id",
+        "folderId": "quotes-folder-id",
+        "fileName": "={{ $json.fileName }}"
+      },
+      "type": "n8n-nodes-base.microsoftOneDrive",
+      "typeVersion": 1,
+      "position": [1360, 300],
+      "id": "upload-sharepoint",
+      "name": "Upload to SharePoint",
+      "disabled": true,
+      "credentials": {
+        "microsoftOneDriveOAuth2Api": {
+          "id": "sharepoint-credentials",
+          "name": "SharePoint OAuth2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Create e-signature request if enabled\nconst data = $input.first().json;\n\nconst eSignProvider = data.includeESign;\nlet eSignRequest = null;\n\nif (eSignProvider && eSignProvider !== 'No') {\n  eSignRequest = {\n    provider: eSignProvider.replace('Yes - ', ''),\n    documentName: data.fileName,\n    signers: [\n      {\n        name: data.customer.contactName,\n        email: data.customer.email,\n        role: 'Customer'\n      }\n    ],\n    ccRecipients: [\n      {\n        name: data.salesRep.name,\n        email: data.salesRep.email\n      }\n    ],\n    subject: `Please sign: ${data.documentType} #${data.quoteId}`,\n    message: `Please review and sign the attached ${data.documentType.toLowerCase()} from ${data.salesRep.name}.`,\n    expirationDays: data.validForDays\n  };\n}\n\nreturn {\n  json: {\n    ...data,\n    eSignRequest,\n    eSignEnabled: eSignProvider !== 'No'\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1580, 100],
+      "id": "create-esign-request",
+      "name": "Create E-Sign Request"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Update CRM deal with quote information\nconst data = $input.first().json;\n\nconst crmUpdate = {\n  dealId: data.crmDealId,\n  updates: {\n    quoteId: data.quoteId,\n    quoteAmount: data.totals.total,\n    quoteCurrency: data.currency,\n    quoteDate: data.createdAt,\n    quoteValidUntil: data.validUntil,\n    quoteStatus: 'Sent',\n    lastActivity: new Date().toISOString(),\n    lastActivityType: 'Quote Sent'\n  }\n};\n\nreturn {\n  json: {\n    ...data,\n    crmUpdate\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1800, 100],
+      "id": "update-crm-deal",
+      "name": "Update CRM Deal"
+    },
+    {
+      "parameters": {
+        "fromEmail": "sales@company.com",
+        "toEmail": "={{ $json.customer.email }}",
+        "subject": "={{ $json.documentType }} #{{ $json.quoteId }} from {{ $json.salesRep.name }}",
+        "html": "=<html>\n<body style=\"font-family: Arial, sans-serif;\">\n  <h2>{{ $json.documentType }} for {{ $json.customer.company }}</h2>\n  \n  <p>Dear {{ $json.customer.contactName }},</p>\n  \n  <p>{{ $json.aiContent.coverLetter }}</p>\n  \n  <div style=\"background: #f5f5f5; padding: 20px; border-radius: 5px; margin: 20px 0;\">\n    <h3 style=\"margin-top: 0;\">{{ $json.documentType }} Summary</h3>\n    <p><strong>{{ $json.documentType }} #:</strong> {{ $json.quoteId }}</p>\n    <p><strong>Total:</strong> {{ $json.totals.totalFormatted }}</p>\n    <p><strong>Valid Until:</strong> {{ new Date($json.validUntil).toLocaleDateString() }}</p>\n    <p><strong>Payment Terms:</strong> {{ $json.paymentTerms }}</p>\n  </div>\n  \n  {{ $json.eSignEnabled ? '<p><strong>Please click the link below to review and sign the document:</strong></p><p>[E-Signature link will be provided separately]</p>' : '<p>Please find the attached document for your review.</p>' }}\n  \n  <p>If you have any questions, please don't hesitate to reach out.</p>\n  \n  <p>Best regards,<br>\n  {{ $json.salesRep.name }}<br>\n  {{ $json.salesRep.email }}</p>\n</body>\n</html>"
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [2020, 0],
+      "id": "send-to-customer",
+      "name": "Send to Customer",
+      "disabled": true,
+      "credentials": {
+        "smtp": {
+          "id": "smtp-credentials",
+          "name": "SMTP"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "channel": "#sales-quotes",
+        "text": "=:page_facing_up: *{{ $json.documentType }} Generated*\n\n*{{ $json.documentType }} #:* {{ $json.quoteId }}\n*Customer:* {{ $json.customer.company }}\n*Contact:* {{ $json.customer.contactName }}\n*Amount:* {{ $json.totals.totalFormatted }}\n*Valid Until:* {{ new Date($json.validUntil).toLocaleDateString() }}\n\n*Sales Rep:* {{ $json.salesRep.name }}\n*E-Signature:* {{ $json.eSignEnabled ? 'Enabled (' + $json.eSignRequest.provider + ')' : 'Disabled' }}\n*Storage:* {{ $json.storageLocation }}\n\n{{ $json.crmDealId ? ':link: CRM Deal: ' + $json.crmDealId : '' }}",
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.1,
+      "position": [2020, 200],
+      "id": "notify-sales-rep",
+      "name": "Notify Sales Rep",
+      "credentials": {
+        "slackApi": {
+          "id": "slack-credentials",
+          "name": "Slack API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "quotes-log-spreadsheet-id"
+        },
+        "sheetName": "Quote Log",
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Quote ID": "={{ $json.quoteId }}",
+            "Date": "={{ $json.createdAt }}",
+            "Customer": "={{ $json.customer.company }}",
+            "Contact": "={{ $json.customer.contactName }}",
+            "Email": "={{ $json.customer.email }}",
+            "Document Type": "={{ $json.documentType }}",
+            "Amount": "={{ $json.totals.total }}",
+            "Currency": "={{ $json.currency }}",
+            "Valid Until": "={{ $json.validUntil }}",
+            "Payment Terms": "={{ $json.paymentTerms }}",
+            "E-Sign": "={{ $json.eSignEnabled ? 'Yes' : 'No' }}",
+            "Sales Rep": "={{ $json.salesRep.name }}",
+            "CRM Deal ID": "={{ $json.crmDealId }}",
+            "Status": "=Sent"
+          }
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.2,
+      "position": [2240, 0],
+      "id": "log-quote-activity",
+      "name": "Log Quote Activity",
+      "disabled": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "google-sheets-credentials",
+          "name": "Google Sheets OAuth2"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "shared": [],
+  "staticData": null,
+  "tags": [
+    {
+      "name": "Sales"
+    },
+    {
+      "name": "Quotes"
+    },
+    {
+      "name": "Documents"
+    }
+  ],
+  "triggerCount": 0,
+  "updatedAt": "2026-01-06T00:00:00.000Z",
+  "versionId": "quote-proposal-v1"
+}
