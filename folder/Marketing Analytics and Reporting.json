@@ -1,0 +1,607 @@
+{
+  "active": false,
+  "connections": {
+    "Weekly Report Trigger": {
+      "main": [
+        [
+          {
+            "node": "Set Weekly Config",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Monthly Report Trigger": {
+      "main": [
+        [
+          {
+            "node": "Set Monthly Config",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Manual Report Form": {
+      "main": [
+        [
+          {
+            "node": "Parse Report Config",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Weekly Config": {
+      "main": [
+        [
+          {
+            "node": "Fetch All Analytics",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Monthly Config": {
+      "main": [
+        [
+          {
+            "node": "Fetch All Analytics",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Report Config": {
+      "main": [
+        [
+          {
+            "node": "Fetch All Analytics",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch All Analytics": {
+      "main": [
+        [
+          {
+            "node": "Fetch Website Analytics",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Fetch Social Media Metrics",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Fetch Email Metrics",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Fetch Ad Performance",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Website Analytics": {
+      "main": [
+        [
+          {
+            "node": "Merge All Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Social Media Metrics": {
+      "main": [
+        [
+          {
+            "node": "Merge All Data",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Fetch Email Metrics": {
+      "main": [
+        [
+          {
+            "node": "Merge All Data",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "Fetch Ad Performance": {
+      "main": [
+        [
+          {
+            "node": "Merge All Data",
+            "type": "main",
+            "index": 3
+          }
+        ]
+      ]
+    },
+    "Merge All Data": {
+      "main": [
+        [
+          {
+            "node": "Calculate Marketing KPIs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calculate Marketing KPIs": {
+      "main": [
+        [
+          {
+            "node": "AI Generate Insights",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Generate Insights": {
+      "main": [
+        [
+          {
+            "node": "Generate Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Anthropic Claude": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Generate Insights",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Report": {
+      "main": [
+        [
+          {
+            "node": "Send Email Report",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Post Slack Summary",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Update Dashboard Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-01-06T00:00:00.000Z",
+  "id": "marketing-analytics-reporting",
+  "isArchived": false,
+  "meta": {
+    "instanceId": "marketing-workflows"
+  },
+  "name": "Marketing Analytics and Reporting",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "weeks",
+              "triggerAtDay": 1,
+              "triggerAtHour": 9
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [-400, -100],
+      "id": "weekly-report-trigger",
+      "name": "Weekly Report Trigger"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "months",
+              "triggerAtDayOfMonth": 1,
+              "triggerAtHour": 9
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [-400, 100],
+      "id": "monthly-report-trigger",
+      "name": "Monthly Report Trigger"
+    },
+    {
+      "parameters": {
+        "formTitle": "Generate Marketing Report",
+        "formDescription": "Create a custom marketing performance report",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Report Type",
+              "requiredField": true,
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {"option": "Weekly"},
+                  {"option": "Monthly"},
+                  {"option": "Quarterly"},
+                  {"option": "Campaign Specific"},
+                  {"option": "Custom Range"}
+                ]
+              }
+            },
+            {
+              "fieldLabel": "Start Date",
+              "requiredField": false,
+              "fieldType": "date"
+            },
+            {
+              "fieldLabel": "End Date",
+              "requiredField": false,
+              "fieldType": "date"
+            },
+            {
+              "fieldLabel": "Include Channels",
+              "requiredField": true,
+              "fieldType": "multiSelect",
+              "multiselect": true,
+              "fieldOptions": {
+                "values": [
+                  {"option": "Website/Google Analytics"},
+                  {"option": "Social Media"},
+                  {"option": "Email Marketing"},
+                  {"option": "Paid Advertising"},
+                  {"option": "SEO"},
+                  {"option": "Content Performance"}
+                ]
+              }
+            },
+            {
+              "fieldLabel": "Campaign Name (if specific)",
+              "requiredField": false,
+              "fieldType": "text"
+            },
+            {
+              "fieldLabel": "Email Recipients",
+              "placeholder": "marketing@company.com",
+              "requiredField": false,
+              "fieldType": "text"
+            }
+          ]
+        },
+        "options": {
+          "responseMode": "onReceived",
+          "formSubmittedText": "Your report is being generated!"
+        }
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.3,
+      "position": [-400, 300],
+      "id": "manual-report-form",
+      "name": "Manual Report Form",
+      "webhookId": "marketing-report-form"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "name": "reportType",
+              "value": "Weekly",
+              "type": "string"
+            },
+            {
+              "name": "startDate",
+              "value": "={{ $now.minus({days: 7}).toISODate() }}",
+              "type": "string"
+            },
+            {
+              "name": "endDate",
+              "value": "={{ $now.toISODate() }}",
+              "type": "string"
+            },
+            {
+              "name": "channels",
+              "value": "[\"Website/Google Analytics\", \"Social Media\", \"Email Marketing\", \"Paid Advertising\"]",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [-180, -100],
+      "id": "set-weekly-config",
+      "name": "Set Weekly Config"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "name": "reportType",
+              "value": "Monthly",
+              "type": "string"
+            },
+            {
+              "name": "startDate",
+              "value": "={{ $now.minus({months: 1}).startOf('month').toISODate() }}",
+              "type": "string"
+            },
+            {
+              "name": "endDate",
+              "value": "={{ $now.minus({months: 1}).endOf('month').toISODate() }}",
+              "type": "string"
+            },
+            {
+              "name": "channels",
+              "value": "[\"Website/Google Analytics\", \"Social Media\", \"Email Marketing\", \"Paid Advertising\", \"SEO\", \"Content Performance\"]",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [-180, 100],
+      "id": "set-monthly-config",
+      "name": "Set Monthly Config"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Parse report configuration\nconst input = $input.first().json;\n\nconst reportType = input['Report Type'] || 'Weekly';\nlet startDate, endDate;\n\nconst now = new Date();\n\nswitch (reportType) {\n  case 'Weekly':\n    startDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);\n    endDate = now;\n    break;\n  case 'Monthly':\n    startDate = new Date(now.getFullYear(), now.getMonth() - 1, 1);\n    endDate = new Date(now.getFullYear(), now.getMonth(), 0);\n    break;\n  case 'Quarterly':\n    const quarter = Math.floor(now.getMonth() / 3);\n    startDate = new Date(now.getFullYear(), (quarter - 1) * 3, 1);\n    endDate = new Date(now.getFullYear(), quarter * 3, 0);\n    break;\n  default:\n    startDate = input['Start Date'] ? new Date(input['Start Date']) : new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);\n    endDate = input['End Date'] ? new Date(input['End Date']) : now;\n}\n\nconst channels = input['Include Channels'] || 'Website/Google Analytics,Social Media,Email Marketing,Paid Advertising';\n\nreturn {\n  json: {\n    reportType,\n    startDate: startDate.toISOString().split('T')[0],\n    endDate: endDate.toISOString().split('T')[0],\n    channels: typeof channels === 'string' ? channels.split(',').map(c => c.trim()) : channels,\n    campaign: input['Campaign Name (if specific)'] || '',\n    recipients: input['Email Recipients'] || 'marketing@company.com'\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [-180, 300],
+      "id": "parse-report-config",
+      "name": "Parse Report Config"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Prepare config for parallel data fetching\nconst config = $input.first().json;\n\nreturn {\n  json: {\n    ...config,\n    fetchStarted: new Date().toISOString()\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [40, 100],
+      "id": "fetch-all-analytics",
+      "name": "Fetch All Analytics"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Fetch website analytics (Google Analytics)\nconst config = $input.first().json;\n\n// In production, this would use Google Analytics API\nconst websiteMetrics = {\n  source: 'Google Analytics',\n  period: { start: config.startDate, end: config.endDate },\n  \n  // Traffic metrics\n  sessions: Math.floor(Math.random() * 50000) + 10000,\n  users: Math.floor(Math.random() * 40000) + 8000,\n  newUsers: Math.floor(Math.random() * 20000) + 5000,\n  pageviews: Math.floor(Math.random() * 150000) + 30000,\n  \n  // Engagement\n  avgSessionDuration: Math.floor(Math.random() * 180) + 60, // seconds\n  bounceRate: (Math.random() * 40 + 30).toFixed(1), // 30-70%\n  pagesPerSession: (Math.random() * 3 + 1.5).toFixed(2),\n  \n  // Conversions\n  goalCompletions: Math.floor(Math.random() * 500) + 100,\n  conversionRate: (Math.random() * 3 + 1).toFixed(2), // 1-4%\n  \n  // Traffic sources\n  trafficSources: {\n    organic: Math.floor(Math.random() * 20000) + 5000,\n    direct: Math.floor(Math.random() * 10000) + 2000,\n    referral: Math.floor(Math.random() * 5000) + 1000,\n    social: Math.floor(Math.random() * 8000) + 2000,\n    email: Math.floor(Math.random() * 3000) + 500,\n    paid: Math.floor(Math.random() * 5000) + 1000\n  },\n  \n  // Top pages\n  topPages: [\n    { page: '/home', views: Math.floor(Math.random() * 20000) + 5000 },\n    { page: '/products', views: Math.floor(Math.random() * 10000) + 2000 },\n    { page: '/blog', views: Math.floor(Math.random() * 8000) + 1500 },\n    { page: '/pricing', views: Math.floor(Math.random() * 5000) + 1000 },\n    { page: '/contact', views: Math.floor(Math.random() * 3000) + 500 }\n  ]\n};\n\nreturn { json: { website: websiteMetrics } };"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [260, -100],
+      "id": "fetch-website-analytics",
+      "name": "Fetch Website Analytics"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Fetch social media metrics\nconst config = $input.first().json;\n\n// In production, this would use social platform APIs\nconst socialMetrics = {\n  source: 'Social Media',\n  period: { start: config.startDate, end: config.endDate },\n  \n  // Overall\n  totalFollowers: Math.floor(Math.random() * 50000) + 10000,\n  followerGrowth: Math.floor(Math.random() * 500) + 100,\n  totalEngagements: Math.floor(Math.random() * 10000) + 2000,\n  totalReach: Math.floor(Math.random() * 200000) + 50000,\n  totalImpressions: Math.floor(Math.random() * 500000) + 100000,\n  \n  // By platform\n  platforms: {\n    linkedin: {\n      followers: Math.floor(Math.random() * 15000) + 3000,\n      posts: Math.floor(Math.random() * 20) + 5,\n      engagements: Math.floor(Math.random() * 3000) + 500,\n      impressions: Math.floor(Math.random() * 50000) + 10000,\n      engagementRate: (Math.random() * 3 + 1).toFixed(2)\n    },\n    twitter: {\n      followers: Math.floor(Math.random() * 10000) + 2000,\n      tweets: Math.floor(Math.random() * 30) + 10,\n      engagements: Math.floor(Math.random() * 2000) + 300,\n      impressions: Math.floor(Math.random() * 100000) + 20000,\n      engagementRate: (Math.random() * 2 + 0.5).toFixed(2)\n    },\n    facebook: {\n      followers: Math.floor(Math.random() * 20000) + 5000,\n      posts: Math.floor(Math.random() * 15) + 3,\n      engagements: Math.floor(Math.random() * 4000) + 800,\n      reach: Math.floor(Math.random() * 80000) + 15000,\n      engagementRate: (Math.random() * 4 + 1).toFixed(2)\n    },\n    instagram: {\n      followers: Math.floor(Math.random() * 12000) + 2500,\n      posts: Math.floor(Math.random() * 10) + 2,\n      engagements: Math.floor(Math.random() * 2500) + 500,\n      reach: Math.floor(Math.random() * 40000) + 8000,\n      engagementRate: (Math.random() * 5 + 2).toFixed(2)\n    }\n  },\n  \n  // Top posts\n  topPosts: [\n    { platform: 'LinkedIn', content: 'Industry insight post...', engagements: 450 },\n    { platform: 'Instagram', content: 'Product showcase...', engagements: 380 },\n    { platform: 'Twitter', content: 'Quick tip thread...', engagements: 250 }\n  ]\n};\n\nreturn { json: { social: socialMetrics } };"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [260, 50],
+      "id": "fetch-social-media-metrics",
+      "name": "Fetch Social Media Metrics"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Fetch email marketing metrics\nconst config = $input.first().json;\n\n// In production, this would use ESP APIs\nconst emailMetrics = {\n  source: 'Email Marketing',\n  period: { start: config.startDate, end: config.endDate },\n  \n  // List metrics\n  totalSubscribers: Math.floor(Math.random() * 50000) + 15000,\n  newSubscribers: Math.floor(Math.random() * 500) + 100,\n  unsubscribes: Math.floor(Math.random() * 50) + 10,\n  listGrowthRate: (Math.random() * 2 + 0.5).toFixed(2),\n  \n  // Campaign metrics\n  campaignsSent: Math.floor(Math.random() * 10) + 2,\n  totalSent: Math.floor(Math.random() * 100000) + 20000,\n  delivered: Math.floor(Math.random() * 98000) + 19500,\n  deliveryRate: (Math.random() * 2 + 97).toFixed(1),\n  \n  // Engagement\n  opens: Math.floor(Math.random() * 25000) + 5000,\n  uniqueOpens: Math.floor(Math.random() * 20000) + 4000,\n  openRate: (Math.random() * 15 + 15).toFixed(1), // 15-30%\n  clicks: Math.floor(Math.random() * 3000) + 500,\n  uniqueClicks: Math.floor(Math.random() * 2500) + 400,\n  clickRate: (Math.random() * 3 + 2).toFixed(1), // 2-5%\n  clickToOpenRate: (Math.random() * 10 + 10).toFixed(1), // 10-20%\n  \n  // Negative metrics\n  bounces: Math.floor(Math.random() * 200) + 30,\n  bounceRate: (Math.random() * 1.5 + 0.5).toFixed(2),\n  spamComplaints: Math.floor(Math.random() * 10) + 1,\n  \n  // Revenue (if tracked)\n  emailRevenue: Math.floor(Math.random() * 50000) + 5000,\n  revenuePerEmail: (Math.random() * 0.5 + 0.1).toFixed(2),\n  \n  // Top campaigns\n  topCampaigns: [\n    { name: 'Product Launch', openRate: '32%', clickRate: '5.2%' },\n    { name: 'Weekly Newsletter', openRate: '28%', clickRate: '3.8%' },\n    { name: 'Promotional Offer', openRate: '35%', clickRate: '6.1%' }\n  ]\n};\n\nreturn { json: { email: emailMetrics } };"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [260, 200],
+      "id": "fetch-email-metrics",
+      "name": "Fetch Email Metrics"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Fetch paid advertising metrics\nconst config = $input.first().json;\n\n// In production, this would use Google Ads, Facebook Ads APIs\nconst adMetrics = {\n  source: 'Paid Advertising',\n  period: { start: config.startDate, end: config.endDate },\n  \n  // Overall spend\n  totalSpend: Math.floor(Math.random() * 20000) + 5000,\n  \n  // Performance\n  impressions: Math.floor(Math.random() * 500000) + 100000,\n  clicks: Math.floor(Math.random() * 10000) + 2000,\n  ctr: (Math.random() * 2 + 1).toFixed(2), // 1-3%\n  conversions: Math.floor(Math.random() * 500) + 100,\n  conversionRate: (Math.random() * 3 + 2).toFixed(2), // 2-5%\n  \n  // Cost metrics\n  cpc: (Math.random() * 2 + 0.5).toFixed(2),\n  cpm: (Math.random() * 10 + 3).toFixed(2),\n  cpa: (Math.random() * 50 + 20).toFixed(2),\n  \n  // ROI\n  revenue: Math.floor(Math.random() * 80000) + 15000,\n  roas: (Math.random() * 3 + 2).toFixed(2), // 2-5x\n  \n  // By platform\n  platforms: {\n    googleAds: {\n      spend: Math.floor(Math.random() * 10000) + 2000,\n      clicks: Math.floor(Math.random() * 5000) + 1000,\n      conversions: Math.floor(Math.random() * 200) + 50,\n      cpc: (Math.random() * 2 + 0.8).toFixed(2),\n      roas: (Math.random() * 3 + 2.5).toFixed(2)\n    },\n    facebookAds: {\n      spend: Math.floor(Math.random() * 8000) + 1500,\n      clicks: Math.floor(Math.random() * 4000) + 800,\n      conversions: Math.floor(Math.random() * 150) + 30,\n      cpc: (Math.random() * 1.5 + 0.4).toFixed(2),\n      roas: (Math.random() * 2.5 + 2).toFixed(2)\n    },\n    linkedInAds: {\n      spend: Math.floor(Math.random() * 5000) + 1000,\n      clicks: Math.floor(Math.random() * 1500) + 300,\n      conversions: Math.floor(Math.random() * 80) + 15,\n      cpc: (Math.random() * 5 + 3).toFixed(2),\n      roas: (Math.random() * 2 + 1.5).toFixed(2)\n    }\n  },\n  \n  // Top campaigns\n  topCampaigns: [\n    { name: 'Brand Awareness', platform: 'Facebook', roas: '3.2x' },\n    { name: 'Lead Gen', platform: 'Google', roas: '4.1x' },\n    { name: 'Retargeting', platform: 'Google', roas: '5.8x' }\n  ]\n};\n\nreturn { json: { advertising: adMetrics } };"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [260, 350],
+      "id": "fetch-ad-performance",
+      "name": "Fetch Ad Performance"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combinationMode": "multiplex",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [480, 100],
+      "id": "merge-all-data",
+      "name": "Merge All Data"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Calculate marketing KPIs from all sources\nconst items = $input.all();\n\n// Combine all metrics\nlet website = {}, social = {}, email = {}, advertising = {};\nitems.forEach(item => {\n  if (item.json.website) website = item.json.website;\n  if (item.json.social) social = item.json.social;\n  if (item.json.email) email = item.json.email;\n  if (item.json.advertising) advertising = item.json.advertising;\n});\n\nconst formatNumber = (n) => n.toString().replace(/\\B(?=(\\d{3})+(?!\\d))/g, ',');\nconst formatCurrency = (n) => '$' + n.toFixed(0).replace(/\\B(?=(\\d{3})+(?!\\d))/g, ',');\n\n// Calculate overall KPIs\nconst kpis = {\n  // Traffic\n  totalWebsiteVisits: website.sessions || 0,\n  totalReach: (website.sessions || 0) + (social.totalReach || 0) + (advertising.impressions || 0),\n  \n  // Engagement\n  totalEngagements: (social.totalEngagements || 0) + (email.clicks || 0) + (advertising.clicks || 0),\n  avgEngagementRate: ((parseFloat(social.platforms?.linkedin?.engagementRate || 0) + \n                       parseFloat(social.platforms?.facebook?.engagementRate || 0)) / 2).toFixed(2),\n  \n  // Leads & Conversions\n  totalConversions: (website.goalCompletions || 0) + (advertising.conversions || 0),\n  totalNewLeads: (email.newSubscribers || 0) + (advertising.conversions || 0),\n  avgConversionRate: (((parseFloat(website.conversionRate) || 0) + \n                       (parseFloat(advertising.conversionRate) || 0)) / 2).toFixed(2),\n  \n  // Email performance\n  emailOpenRate: email.openRate || 0,\n  emailClickRate: email.clickRate || 0,\n  \n  // Ad performance\n  adSpend: advertising.totalSpend || 0,\n  adRevenue: advertising.revenue || 0,\n  roas: advertising.roas || 0,\n  \n  // Social growth\n  followerGrowth: social.followerGrowth || 0,\n  \n  // Cost efficiency\n  costPerLead: advertising.totalSpend && advertising.conversions \n    ? (advertising.totalSpend / advertising.conversions).toFixed(2) \n    : 0\n};\n\n// Format for display\nconst formattedKpis = {\n  totalWebsiteVisits: formatNumber(kpis.totalWebsiteVisits),\n  totalReach: formatNumber(kpis.totalReach),\n  totalEngagements: formatNumber(kpis.totalEngagements),\n  avgEngagementRate: kpis.avgEngagementRate + '%',\n  totalConversions: formatNumber(kpis.totalConversions),\n  totalNewLeads: formatNumber(kpis.totalNewLeads),\n  avgConversionRate: kpis.avgConversionRate + '%',\n  emailOpenRate: kpis.emailOpenRate + '%',\n  emailClickRate: kpis.emailClickRate + '%',\n  adSpend: formatCurrency(kpis.adSpend),\n  adRevenue: formatCurrency(kpis.adRevenue),\n  roas: kpis.roas + 'x',\n  followerGrowth: '+' + formatNumber(kpis.followerGrowth),\n  costPerLead: formatCurrency(parseFloat(kpis.costPerLead) || 0)\n};\n\nreturn {\n  json: {\n    kpis,\n    formattedKpis,\n    website,\n    social,\n    email,\n    advertising\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [700, 100],
+      "id": "calculate-marketing-kpis",
+      "name": "Calculate Marketing KPIs"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Analyze this marketing performance data and provide strategic insights:\n\n**Key Metrics:**\n- Website Visits: {{ $json.formattedKpis.totalWebsiteVisits }}\n- Total Reach: {{ $json.formattedKpis.totalReach }}\n- Engagements: {{ $json.formattedKpis.totalEngagements }}\n- Conversions: {{ $json.formattedKpis.totalConversions }}\n- New Leads: {{ $json.formattedKpis.totalNewLeads }}\n\n**Email Performance:**\n- Open Rate: {{ $json.formattedKpis.emailOpenRate }}\n- Click Rate: {{ $json.formattedKpis.emailClickRate }}\n\n**Paid Advertising:**\n- Spend: {{ $json.formattedKpis.adSpend }}\n- Revenue: {{ $json.formattedKpis.adRevenue }}\n- ROAS: {{ $json.formattedKpis.roas }}\n- Cost Per Lead: {{ $json.formattedKpis.costPerLead }}\n\n**Social Media:**\n- Follower Growth: {{ $json.formattedKpis.followerGrowth }}\n- Engagement Rate: {{ $json.formattedKpis.avgEngagementRate }}\n\nProvide:\n1. Executive Summary (2-3 sentences)\n2. Top 3 Wins this period\n3. Top 3 Areas for Improvement\n4. Channel-specific recommendations\n5. Budget allocation suggestions\n\nJSON format:\n```json\n{\n  \"executiveSummary\": \"...\",\n  \"wins\": [\"win1\", \"win2\", \"win3\"],\n  \"improvements\": [\"area1\", \"area2\", \"area3\"],\n  \"channelRecommendations\": {\n    \"website\": \"...\",\n    \"social\": \"...\",\n    \"email\": \"...\",\n    \"advertising\": \"...\"\n  },\n  \"budgetSuggestions\": \"...\"\n}\n```",
+        "options": {
+          "systemMessage": "You are a senior marketing analytics expert. Provide actionable, data-driven insights. Be specific and practical."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [920, 100],
+      "id": "ai-generate-insights",
+      "name": "AI Generate Insights"
+    },
+    {
+      "parameters": {
+        "model": "claude-sonnet-4-20250514",
+        "options": {
+          "temperature": 0.5,
+          "maxTokensToSample": 2048
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatAnthropic",
+      "typeVersion": 1.2,
+      "position": [940, 320],
+      "id": "anthropic-claude",
+      "name": "Anthropic Claude",
+      "credentials": {
+        "anthropicApi": {
+          "id": "anthropic-credentials",
+          "name": "Anthropic API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Generate HTML report\nconst data = $input.first().json;\n\n// Parse AI insights\nlet insights = {\n  executiveSummary: 'Marketing performance report generated.',\n  wins: [],\n  improvements: [],\n  channelRecommendations: {},\n  budgetSuggestions: ''\n};\n\ntry {\n  const aiOutput = data.output || '';\n  const jsonMatch = aiOutput.match(/```json\\n?([\\s\\S]*?)\\n?```/);\n  if (jsonMatch) {\n    insights = { ...insights, ...JSON.parse(jsonMatch[1]) };\n  }\n} catch (e) {}\n\nconst report = {\n  title: 'Marketing Performance Report',\n  generatedAt: new Date().toISOString(),\n  kpis: data.formattedKpis,\n  insights,\n  website: data.website,\n  social: data.social,\n  email: data.email,\n  advertising: data.advertising\n};\n\nreturn { json: report };"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1140, 100],
+      "id": "generate-report",
+      "name": "Generate Report"
+    },
+    {
+      "parameters": {
+        "fromEmail": "marketing@company.com",
+        "toEmail": "={{ $json.recipients || 'marketing@company.com' }}",
+        "subject": "=Marketing Performance Report - {{ $json.title }}",
+        "text": "Marketing Performance Report attached."
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [1360, 0],
+      "id": "send-email-report",
+      "name": "Send Email Report",
+      "disabled": true,
+      "credentials": {
+        "smtp": {
+          "id": "smtp-credentials",
+          "name": "SMTP"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "channel": "#marketing-analytics",
+        "text": "=:bar_chart: *Marketing Performance Report*\n\n*Executive Summary:*\n{{ $json.insights.executiveSummary }}\n\n*Key Metrics:*\n• Website Visits: {{ $json.kpis.totalWebsiteVisits }}\n• Total Reach: {{ $json.kpis.totalReach }}\n• Conversions: {{ $json.kpis.totalConversions }}\n• Email Open Rate: {{ $json.kpis.emailOpenRate }}\n• Ad ROAS: {{ $json.kpis.roas }}\n\n*Top Wins:*\n{{ $json.insights.wins ? $json.insights.wins.map((w, i) => (i+1) + '. ' + w).join('\\n') : 'See full report' }}\n\n*Areas to Improve:*\n{{ $json.insights.improvements ? $json.insights.improvements.map((i, idx) => (idx+1) + '. ' + i).join('\\n') : 'See full report' }}\n\n_Full report sent via email._",
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.1,
+      "position": [1360, 200],
+      "id": "post-slack-summary",
+      "name": "Post Slack Summary",
+      "credentials": {
+        "slackApi": {
+          "id": "slack-credentials",
+          "name": "Slack API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "marketing-dashboard-spreadsheet"
+        },
+        "sheetName": "Metrics History",
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Date": "={{ $now.toISODate() }}",
+            "Website Visits": "={{ $json.website.sessions }}",
+            "Conversions": "={{ $json.kpis.totalConversions }}",
+            "Email Open Rate": "={{ $json.email.openRate }}",
+            "Ad Spend": "={{ $json.advertising.totalSpend }}",
+            "Ad Revenue": "={{ $json.advertising.revenue }}",
+            "ROAS": "={{ $json.advertising.roas }}"
+          }
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.2,
+      "position": [1360, 400],
+      "id": "update-dashboard-sheet",
+      "name": "Update Dashboard Sheet",
+      "disabled": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "google-sheets-credentials",
+          "name": "Google Sheets OAuth2"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "shared": [],
+  "staticData": null,
+  "tags": [
+    {
+      "name": "Marketing"
+    },
+    {
+      "name": "Analytics"
+    },
+    {
+      "name": "Reporting"
+    }
+  ],
+  "triggerCount": 0,
+  "updatedAt": "2026-01-06T00:00:00.000Z",
+  "versionId": "marketing-analytics-v1"
+}

@@ -1,0 +1,811 @@
+{
+  "active": false,
+  "connections": {
+    "Campaign Form": {
+      "main": [
+        [
+          {
+            "node": "Parse Campaign Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Campaign Webhook": {
+      "main": [
+        [
+          {
+            "node": "Parse Campaign Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Scheduled Send Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get Scheduled Campaigns",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Scheduled Campaigns": {
+      "main": [
+        [
+          {
+            "node": "Filter Due Campaigns",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter Due Campaigns": {
+      "main": [
+        [
+          {
+            "node": "Process Campaign",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Campaign Request": {
+      "main": [
+        [
+          {
+            "node": "Get Audience Segment",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Audience Segment": {
+      "main": [
+        [
+          {
+            "node": "AI Personalize Content",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Personalize Content": {
+      "main": [
+        [
+          {
+            "node": "Select ESP",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Anthropic Claude": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Personalize Content",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Process Campaign": {
+      "main": [
+        [
+          {
+            "node": "Select ESP",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Select ESP": {
+      "main": [
+        [
+          {
+            "node": "Send via Mailchimp",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send via SendGrid",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send via HubSpot",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send via ActiveCampaign",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send via Constant Contact",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send via Mailchimp": {
+      "main": [
+        [
+          {
+            "node": "Merge Send Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send via SendGrid": {
+      "main": [
+        [
+          {
+            "node": "Merge Send Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send via HubSpot": {
+      "main": [
+        [
+          {
+            "node": "Merge Send Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send via ActiveCampaign": {
+      "main": [
+        [
+          {
+            "node": "Merge Send Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send via Constant Contact": {
+      "main": [
+        [
+          {
+            "node": "Merge Send Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge Send Results": {
+      "main": [
+        [
+          {
+            "node": "Log Campaign",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log Campaign": {
+      "main": [
+        [
+          {
+            "node": "Notify Marketing Team",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Notify Marketing Team": {
+      "main": [
+        [
+          {
+            "node": "Schedule Follow-up Check",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-01-06T00:00:00.000Z",
+  "id": "email-campaign-management",
+  "isArchived": false,
+  "meta": {
+    "instanceId": "marketing-workflows"
+  },
+  "name": "Email Campaign Management",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "Create Email Campaign",
+        "formDescription": "Set up and schedule an email marketing campaign",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Campaign Name",
+              "requiredField": true,
+              "fieldType": "text"
+            },
+            {
+              "fieldLabel": "Email Subject",
+              "requiredField": true,
+              "fieldType": "text"
+            },
+            {
+              "fieldLabel": "Preview Text",
+              "placeholder": "Text that appears in inbox preview",
+              "requiredField": false,
+              "fieldType": "text"
+            },
+            {
+              "fieldLabel": "From Name",
+              "requiredField": true,
+              "fieldType": "text"
+            },
+            {
+              "fieldLabel": "From Email",
+              "requiredField": true,
+              "fieldType": "email"
+            },
+            {
+              "fieldLabel": "Reply-To Email",
+              "requiredField": false,
+              "fieldType": "email"
+            },
+            {
+              "fieldLabel": "Email Service Provider",
+              "requiredField": true,
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {"option": "Mailchimp"},
+                  {"option": "SendGrid"},
+                  {"option": "HubSpot"},
+                  {"option": "ActiveCampaign"},
+                  {"option": "Constant Contact"}
+                ]
+              }
+            },
+            {
+              "fieldLabel": "Audience/List",
+              "requiredField": true,
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {"option": "All Subscribers"},
+                  {"option": "Newsletter Subscribers"},
+                  {"option": "Customers"},
+                  {"option": "Prospects"},
+                  {"option": "Enterprise Leads"},
+                  {"option": "SMB Leads"},
+                  {"option": "Inactive Users"},
+                  {"option": "VIP Customers"},
+                  {"option": "Custom Segment"}
+                ]
+              }
+            },
+            {
+              "fieldLabel": "Custom Segment ID (if applicable)",
+              "requiredField": false,
+              "fieldType": "text"
+            },
+            {
+              "fieldLabel": "Campaign Type",
+              "requiredField": true,
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {"option": "Newsletter"},
+                  {"option": "Promotional"},
+                  {"option": "Product Announcement"},
+                  {"option": "Event Invitation"},
+                  {"option": "Webinar"},
+                  {"option": "Educational/How-to"},
+                  {"option": "Re-engagement"},
+                  {"option": "Transactional"},
+                  {"option": "Survey/Feedback"}
+                ]
+              }
+            },
+            {
+              "fieldLabel": "Email Body (HTML or Text)",
+              "placeholder": "Enter your email content here...",
+              "requiredField": true,
+              "fieldType": "textarea"
+            },
+            {
+              "fieldLabel": "Call to Action URL",
+              "placeholder": "https://yoursite.com/landing-page",
+              "requiredField": false,
+              "fieldType": "text"
+            },
+            {
+              "fieldLabel": "Send Time",
+              "requiredField": true,
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {"option": "Send Now"},
+                  {"option": "Schedule for Later"},
+                  {"option": "Best Time (AI Optimized)"}
+                ]
+              }
+            },
+            {
+              "fieldLabel": "Scheduled Date/Time",
+              "placeholder": "2026-01-15 09:00",
+              "requiredField": false,
+              "fieldType": "text"
+            },
+            {
+              "fieldLabel": "A/B Test",
+              "requiredField": true,
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {"option": "No A/B Test"},
+                  {"option": "Subject Line Test"},
+                  {"option": "Content Test"},
+                  {"option": "Send Time Test"}
+                ]
+              }
+            },
+            {
+              "fieldLabel": "A/B Variant (if testing)",
+              "placeholder": "Alternative subject or content",
+              "requiredField": false,
+              "fieldType": "textarea"
+            },
+            {
+              "fieldLabel": "AI Personalization",
+              "requiredField": true,
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {"option": "Full AI optimization"},
+                  {"option": "Subject line only"},
+                  {"option": "No AI - use as provided"}
+                ]
+              }
+            },
+            {
+              "fieldLabel": "UTM Campaign",
+              "requiredField": false,
+              "fieldType": "text"
+            },
+            {
+              "fieldLabel": "UTM Medium",
+              "requiredField": false,
+              "fieldType": "text",
+              "placeholder": "email"
+            }
+          ]
+        },
+        "options": {
+          "responseMode": "onReceived",
+          "formSubmittedText": "Your campaign has been created and scheduled!"
+        }
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.3,
+      "position": [-400, 0],
+      "id": "campaign-form",
+      "name": "Campaign Form",
+      "webhookId": "email-campaign-form"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "email/campaign",
+        "options": {
+          "responseMode": "onReceived"
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [-400, -200],
+      "id": "campaign-webhook",
+      "name": "Campaign Webhook",
+      "webhookId": "email-campaign-webhook"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 5
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [-400, 200],
+      "id": "scheduled-send-trigger",
+      "name": "Scheduled Send Trigger"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Parse campaign request\nconst input = $input.first().json;\n\nconst campaign = {\n  id: `camp_${Date.now()}`,\n  name: input['Campaign Name'] || input.name || 'Untitled Campaign',\n  subject: input['Email Subject'] || input.subject || '',\n  previewText: input['Preview Text'] || input.previewText || '',\n  fromName: input['From Name'] || input.fromName || 'Your Company',\n  fromEmail: input['From Email'] || input.fromEmail || 'hello@company.com',\n  replyTo: input['Reply-To Email'] || input.replyTo || '',\n  esp: input['Email Service Provider'] || input.esp || 'Mailchimp',\n  audience: input['Audience/List'] || input.audience || 'All Subscribers',\n  customSegmentId: input['Custom Segment ID (if applicable)'] || input.customSegmentId || '',\n  campaignType: input['Campaign Type'] || input.campaignType || 'Newsletter',\n  body: input['Email Body (HTML or Text)'] || input.body || '',\n  ctaUrl: input['Call to Action URL'] || input.ctaUrl || '',\n  sendTime: input['Send Time'] || 'Send Now',\n  scheduledTime: input['Scheduled Date/Time'] || input.scheduledTime || '',\n  abTest: input['A/B Test'] || 'No A/B Test',\n  abVariant: input['A/B Variant (if testing)'] || input.abVariant || '',\n  aiPersonalization: input['AI Personalization'] || 'No AI - use as provided',\n  utmCampaign: input['UTM Campaign'] || input.utmCampaign || '',\n  utmMedium: input['UTM Medium'] || 'email',\n  createdAt: new Date().toISOString(),\n  status: 'draft'\n};\n\n// Determine if immediate send\ncampaign.sendNow = campaign.sendTime === 'Send Now';\n\nreturn { json: campaign };"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [-180, -100],
+      "id": "parse-campaign-request",
+      "name": "Parse Campaign Request"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get scheduled campaigns due for sending\nconst now = new Date();\n\n// In production, this would query database/sheets\nconst scheduledCampaigns = [\n  // Example structure\n];\n\nreturn { json: { campaigns: scheduledCampaigns, checkedAt: now.toISOString() } };"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [-180, 200],
+      "id": "get-scheduled-campaigns",
+      "name": "Get Scheduled Campaigns"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Filter campaigns due for sending\nconst data = $input.first().json;\nconst campaigns = data.campaigns || [];\nconst now = new Date();\n\nconst dueCampaigns = campaigns.filter(c => {\n  if (c.status !== 'scheduled') return false;\n  const scheduled = new Date(c.scheduledTime);\n  return scheduled <= now;\n});\n\nif (dueCampaigns.length === 0) {\n  return { json: { hasCampaigns: false } };\n}\n\nreturn dueCampaigns.map(c => ({ json: { ...c, hasCampaigns: true } }));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [40, 200],
+      "id": "filter-due-campaigns",
+      "name": "Filter Due Campaigns"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get audience segment details\nconst campaign = $input.first().json;\n\n// Audience segment mapping\nconst segmentMap = {\n  'All Subscribers': { listId: 'main-list', filters: [] },\n  'Newsletter Subscribers': { listId: 'newsletter', filters: ['subscribed'] },\n  'Customers': { listId: 'main-list', filters: ['customer'] },\n  'Prospects': { listId: 'main-list', filters: ['prospect'] },\n  'Enterprise Leads': { listId: 'main-list', filters: ['enterprise', 'lead'] },\n  'SMB Leads': { listId: 'main-list', filters: ['smb', 'lead'] },\n  'Inactive Users': { listId: 'main-list', filters: ['inactive'] },\n  'VIP Customers': { listId: 'main-list', filters: ['vip'] },\n  'Custom Segment': { listId: campaign.customSegmentId, filters: [] }\n};\n\nconst segment = segmentMap[campaign.audience] || segmentMap['All Subscribers'];\n\n// Estimated audience size (would come from ESP API in production)\nconst audienceSize = Math.floor(Math.random() * 10000) + 1000;\n\nreturn {\n  json: {\n    ...campaign,\n    segment,\n    audienceSize,\n    listId: segment.listId\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [40, -100],
+      "id": "get-audience-segment",
+      "name": "Get Audience Segment"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Optimize this email campaign for maximum engagement:\n\n**Campaign Details:**\n- Name: {{ $json.name }}\n- Type: {{ $json.campaignType }}\n- Audience: {{ $json.audience }} ({{ $json.audienceSize }} subscribers)\n\n**Current Content:**\n- Subject: {{ $json.subject }}\n- Preview Text: {{ $json.previewText }}\n- Body: {{ $json.body }}\n- CTA URL: {{ $json.ctaUrl }}\n\n**AI Optimization Level:** {{ $json.aiPersonalization }}\n\n**Please provide:**\n1. Optimized subject line (if requested) - max 50 chars, compelling, creates urgency/curiosity\n2. Optimized preview text - max 100 chars, complements subject\n3. 3 alternative subject lines for A/B testing\n4. Suggested best send time based on campaign type\n5. Any content improvements (if full optimization requested)\n\nRespond in JSON:\n```json\n{\n  \"optimizedSubject\": \"...\",\n  \"optimizedPreviewText\": \"...\",\n  \"alternativeSubjects\": [\"alt1\", \"alt2\", \"alt3\"],\n  \"suggestedSendTime\": \"Tuesday 10 AM EST\",\n  \"contentImprovements\": \"...\",\n  \"engagementScore\": 85\n}\n```",
+        "options": {
+          "systemMessage": "You are an email marketing expert specializing in high-converting campaigns. Focus on subject lines that drive opens and content that drives clicks. Be data-driven and specific."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [260, -100],
+      "id": "ai-personalize-content",
+      "name": "AI Personalize Content"
+    },
+    {
+      "parameters": {
+        "model": "claude-sonnet-4-20250514",
+        "options": {
+          "temperature": 0.7,
+          "maxTokensToSample": 1536
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatAnthropic",
+      "typeVersion": 1.2,
+      "position": [280, 120],
+      "id": "anthropic-claude",
+      "name": "Anthropic Claude",
+      "credentials": {
+        "anthropicApi": {
+          "id": "anthropic-credentials",
+          "name": "Anthropic API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Process scheduled campaign for sending\nconst campaign = $input.first().json;\n\nif (!campaign.hasCampaigns) {\n  return { json: { skip: true, message: 'No campaigns to process' } };\n}\n\nreturn { json: { ...campaign, readyToSend: true } };"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [260, 200],
+      "id": "process-campaign",
+      "name": "Process Campaign"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.esp }}",
+                    "rightValue": "Mailchimp",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "Mailchimp"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.esp }}",
+                    "rightValue": "SendGrid",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "SendGrid"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.esp }}",
+                    "rightValue": "HubSpot",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "HubSpot"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.esp }}",
+                    "rightValue": "ActiveCampaign",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "ActiveCampaign"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.esp }}",
+                    "rightValue": "Constant Contact",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "Constant Contact"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [480, 0],
+      "id": "select-esp",
+      "name": "Select ESP"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Send via Mailchimp\nconst campaign = $input.first().json;\n\n// Parse AI optimization if available\nlet optimizedSubject = campaign.subject;\nlet optimizedPreview = campaign.previewText;\n\ntry {\n  const aiOutput = campaign.output || '';\n  const jsonMatch = aiOutput.match(/```json\\n?([\\s\\S]*?)\\n?```/) || aiOutput.match(/\\{[\\s\\S]*\\}/);\n  if (jsonMatch) {\n    const aiData = JSON.parse(jsonMatch[1] || jsonMatch[0]);\n    if (campaign.aiPersonalization !== 'No AI - use as provided') {\n      optimizedSubject = aiData.optimizedSubject || campaign.subject;\n      optimizedPreview = aiData.optimizedPreviewText || campaign.previewText;\n    }\n  }\n} catch (e) {}\n\n// Mailchimp campaign structure\nconst mailchimpCampaign = {\n  type: 'regular',\n  recipients: {\n    list_id: campaign.listId\n  },\n  settings: {\n    subject_line: optimizedSubject,\n    preview_text: optimizedPreview,\n    title: campaign.name,\n    from_name: campaign.fromName,\n    reply_to: campaign.replyTo || campaign.fromEmail\n  },\n  content: {\n    html: campaign.body\n  }\n};\n\nreturn {\n  json: {\n    ...campaign,\n    optimizedSubject,\n    optimizedPreview,\n    espPayload: mailchimpCampaign,\n    sent: true,\n    sentAt: new Date().toISOString(),\n    espCampaignId: `mc_${Date.now()}`\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [700, -200],
+      "id": "send-via-mailchimp",
+      "name": "Send via Mailchimp"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Send via SendGrid\nconst campaign = $input.first().json;\n\nlet optimizedSubject = campaign.subject;\ntry {\n  const aiOutput = campaign.output || '';\n  const jsonMatch = aiOutput.match(/```json\\n?([\\s\\S]*?)\\n?```/);\n  if (jsonMatch && campaign.aiPersonalization !== 'No AI - use as provided') {\n    const aiData = JSON.parse(jsonMatch[1]);\n    optimizedSubject = aiData.optimizedSubject || campaign.subject;\n  }\n} catch (e) {}\n\nconst sendGridPayload = {\n  personalizations: [{\n    to: [{ email: 'list@' + campaign.listId }]\n  }],\n  from: {\n    email: campaign.fromEmail,\n    name: campaign.fromName\n  },\n  subject: optimizedSubject,\n  content: [{\n    type: 'text/html',\n    value: campaign.body\n  }]\n};\n\nreturn {\n  json: {\n    ...campaign,\n    optimizedSubject,\n    espPayload: sendGridPayload,\n    sent: true,\n    sentAt: new Date().toISOString(),\n    espCampaignId: `sg_${Date.now()}`\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [700, -50],
+      "id": "send-via-sendgrid",
+      "name": "Send via SendGrid"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Send via HubSpot\nconst campaign = $input.first().json;\n\nlet optimizedSubject = campaign.subject;\ntry {\n  const aiOutput = campaign.output || '';\n  const jsonMatch = aiOutput.match(/```json\\n?([\\s\\S]*?)\\n?```/);\n  if (jsonMatch && campaign.aiPersonalization !== 'No AI - use as provided') {\n    const aiData = JSON.parse(jsonMatch[1]);\n    optimizedSubject = aiData.optimizedSubject || campaign.subject;\n  }\n} catch (e) {}\n\nconst hubspotPayload = {\n  name: campaign.name,\n  subject: optimizedSubject,\n  fromName: campaign.fromName,\n  replyTo: campaign.replyTo || campaign.fromEmail,\n  contentId: campaign.listId\n};\n\nreturn {\n  json: {\n    ...campaign,\n    optimizedSubject,\n    espPayload: hubspotPayload,\n    sent: true,\n    sentAt: new Date().toISOString(),\n    espCampaignId: `hs_${Date.now()}`\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [700, 100],
+      "id": "send-via-hubspot",
+      "name": "Send via HubSpot"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Send via ActiveCampaign\nconst campaign = $input.first().json;\n\nlet optimizedSubject = campaign.subject;\ntry {\n  const aiOutput = campaign.output || '';\n  const jsonMatch = aiOutput.match(/```json\\n?([\\s\\S]*?)\\n?```/);\n  if (jsonMatch && campaign.aiPersonalization !== 'No AI - use as provided') {\n    const aiData = JSON.parse(jsonMatch[1]);\n    optimizedSubject = aiData.optimizedSubject || campaign.subject;\n  }\n} catch (e) {}\n\nreturn {\n  json: {\n    ...campaign,\n    optimizedSubject,\n    sent: true,\n    sentAt: new Date().toISOString(),\n    espCampaignId: `ac_${Date.now()}`\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [700, 250],
+      "id": "send-via-activecampaign",
+      "name": "Send via ActiveCampaign"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Send via Constant Contact\nconst campaign = $input.first().json;\n\nlet optimizedSubject = campaign.subject;\ntry {\n  const aiOutput = campaign.output || '';\n  const jsonMatch = aiOutput.match(/```json\\n?([\\s\\S]*?)\\n?```/);\n  if (jsonMatch && campaign.aiPersonalization !== 'No AI - use as provided') {\n    const aiData = JSON.parse(jsonMatch[1]);\n    optimizedSubject = aiData.optimizedSubject || campaign.subject;\n  }\n} catch (e) {}\n\nreturn {\n  json: {\n    ...campaign,\n    optimizedSubject,\n    sent: true,\n    sentAt: new Date().toISOString(),\n    espCampaignId: `cc_${Date.now()}`\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [700, 400],
+      "id": "send-via-constant-contact",
+      "name": "Send via Constant Contact"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combinationMode": "mergeByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [920, 100],
+      "id": "merge-send-results",
+      "name": "Merge Send Results"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "email-campaigns-log"
+        },
+        "sheetName": "Campaign Log",
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Campaign ID": "={{ $json.id }}",
+            "Name": "={{ $json.name }}",
+            "Subject": "={{ $json.optimizedSubject || $json.subject }}",
+            "ESP": "={{ $json.esp }}",
+            "Audience": "={{ $json.audience }}",
+            "Audience Size": "={{ $json.audienceSize }}",
+            "Campaign Type": "={{ $json.campaignType }}",
+            "Sent At": "={{ $json.sentAt }}",
+            "ESP Campaign ID": "={{ $json.espCampaignId }}",
+            "Status": "={{ $json.sent ? 'Sent' : 'Failed' }}"
+          }
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.2,
+      "position": [1140, 100],
+      "id": "log-campaign",
+      "name": "Log Campaign",
+      "disabled": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "google-sheets-credentials",
+          "name": "Google Sheets OAuth2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "channel": "#marketing-campaigns",
+        "text": "=:email: *Email Campaign Sent*\n\n*Campaign:* {{ $json.name }}\n*Subject:* {{ $json.optimizedSubject || $json.subject }}\n*Type:* {{ $json.campaignType }}\n*ESP:* {{ $json.esp }}\n\n*Audience:* {{ $json.audience }}\n*Recipients:* ~{{ $json.audienceSize }} subscribers\n\n*Sent At:* {{ $json.sentAt }}\n*Campaign ID:* {{ $json.espCampaignId }}\n\n_Check {{ $json.esp }} dashboard for performance metrics in 24-48 hours._",
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.1,
+      "position": [1360, 100],
+      "id": "notify-marketing-team",
+      "name": "Notify Marketing Team",
+      "credentials": {
+        "slackApi": {
+          "id": "slack-credentials",
+          "name": "Slack API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Schedule follow-up performance check\nconst campaign = $input.first().json;\n\n// In production, this would create a scheduled task\n// to check campaign performance after 24-48 hours\n\nconst followUp = {\n  campaignId: campaign.id,\n  espCampaignId: campaign.espCampaignId,\n  esp: campaign.esp,\n  checkAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(), // 24 hours later\n  metricsToCheck: ['opens', 'clicks', 'bounces', 'unsubscribes']\n};\n\nreturn {\n  json: {\n    ...campaign,\n    followUpScheduled: true,\n    followUp\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1580, 100],
+      "id": "schedule-follow-up-check",
+      "name": "Schedule Follow-up Check"
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "shared": [],
+  "staticData": null,
+  "tags": [
+    {
+      "name": "Marketing"
+    },
+    {
+      "name": "Email"
+    },
+    {
+      "name": "Campaigns"
+    }
+  ],
+  "triggerCount": 0,
+  "updatedAt": "2026-01-06T00:00:00.000Z",
+  "versionId": "email-campaigns-v1"
+}

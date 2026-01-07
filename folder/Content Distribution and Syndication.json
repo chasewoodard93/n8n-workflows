@@ -1,0 +1,1047 @@
+{
+  "name": "Content Distribution and Syndication",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 9
+            }
+          ]
+        }
+      },
+      "id": "schedule-trigger",
+      "name": "Daily Content Check",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "content-publish",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-trigger",
+      "name": "Content Published Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [240, 520]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "manual-distribute",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "manual-webhook",
+      "name": "Manual Distribution Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [240, 740]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "source",
+              "name": "source",
+              "value": "scheduled",
+              "type": "string"
+            },
+            {
+              "id": "check_type",
+              "name": "check_type",
+              "value": "new_content",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "set-scheduled",
+      "name": "Set Scheduled Source",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "source",
+              "name": "source",
+              "value": "webhook",
+              "type": "string"
+            },
+            {
+              "id": "content_url",
+              "name": "content_url",
+              "value": "={{ $json.body.content_url }}",
+              "type": "string"
+            },
+            {
+              "id": "content_type",
+              "name": "content_type",
+              "value": "={{ $json.body.content_type }}",
+              "type": "string"
+            },
+            {
+              "id": "title",
+              "name": "title",
+              "value": "={{ $json.body.title }}",
+              "type": "string"
+            },
+            {
+              "id": "channels",
+              "name": "channels",
+              "value": "={{ $json.body.channels }}",
+              "type": "array"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "set-webhook",
+      "name": "Set Webhook Source",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [460, 520]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "source",
+              "name": "source",
+              "value": "manual",
+              "type": "string"
+            },
+            {
+              "id": "content_url",
+              "name": "content_url",
+              "value": "={{ $json.body.content_url }}",
+              "type": "string"
+            },
+            {
+              "id": "redistribute",
+              "name": "redistribute",
+              "value": "={{ $json.body.redistribute || false }}",
+              "type": "boolean"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "set-manual",
+      "name": "Set Manual Source",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [460, 740]
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "mergeByFields": {
+          "values": []
+        },
+        "options": {}
+      },
+      "id": "merge-sources",
+      "name": "Merge All Sources",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [680, 520]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.CMS_API_URL }}/api/content/recent",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $env.CMS_API_KEY }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "since_hours",
+              "value": "24"
+            },
+            {
+              "name": "status",
+              "value": "published"
+            },
+            {
+              "name": "not_distributed",
+              "value": "true"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "fetch-cms-content",
+      "name": "Fetch New CMS Content",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [900, 520]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "has-content",
+              "leftValue": "={{ $json.content_items }}",
+              "rightValue": "",
+              "operator": {
+                "type": "array",
+                "operation": "notEmpty"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "check-content",
+      "name": "Has Content to Distribute?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [1120, 520]
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "content_items",
+        "options": {}
+      },
+      "id": "split-content",
+      "name": "Split Content Items",
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [1340, 420]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "Analyze this content and create distribution-ready versions for multiple channels.\n\nOriginal Content:\nTitle: {{ $json.title }}\nType: {{ $json.content_type }}\nURL: {{ $json.url }}\nExcerpt: {{ $json.excerpt }}\nFull Content: {{ $json.content }}\nTarget Audience: {{ $json.target_audience }}\nKeywords: {{ $json.keywords }}\n\nCreate optimized versions for these distribution channels:\n1. LinkedIn Article/Post\n2. Medium Article\n3. Dev.to Post (if technical)\n4. Email Newsletter Snippet\n5. Partner Syndication Summary\n6. Press Release Format (if newsworthy)\n7. Podcast Show Notes (if applicable)\n8. Video Script Outline (for repurposing)\n\nFor each channel provide:\n- Adapted title\n- Optimized content/summary\n- Hashtags/tags\n- Call-to-action\n- Canonical URL reference\n- SEO considerations\n\nReturn as structured JSON with channel-specific content.",
+        "options": {
+          "systemMessage": "You are a content distribution specialist. Adapt content for each platform while maintaining the core message and SEO value. Always include canonical URL references to avoid duplicate content issues."
+        }
+      },
+      "id": "ai-content-adaptation",
+      "name": "AI Content Adaptation",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.4,
+      "position": [1560, 420]
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "claude-sonnet-4-20250514",
+          "mode": "list",
+          "cachedResultName": "claude-sonnet-4-20250514"
+        },
+        "options": {
+          "temperature": 0.5
+        }
+      },
+      "id": "anthropic-model",
+      "name": "Claude Sonnet",
+      "type": "@n8n/n8n-nodes-langchain.lmChatAnthropic",
+      "typeVersion": 1.2,
+      "position": [1580, 640]
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $input.all();\nconst results = [];\n\nfor (const item of input) {\n  try {\n    const aiResponse = JSON.parse(item.json.text || item.json.response);\n    const originalContent = item.json;\n    \n    // Create distribution items for each channel\n    const channels = ['linkedin', 'medium', 'devto', 'newsletter', 'syndication', 'press', 'podcast', 'video'];\n    \n    for (const channel of channels) {\n      if (aiResponse[channel] && aiResponse[channel].content) {\n        results.push({\n          json: {\n            channel: channel,\n            original_url: originalContent.url,\n            original_title: originalContent.title,\n            original_id: originalContent.id,\n            adapted_title: aiResponse[channel].title,\n            adapted_content: aiResponse[channel].content,\n            hashtags: aiResponse[channel].hashtags || [],\n            tags: aiResponse[channel].tags || [],\n            cta: aiResponse[channel].cta,\n            canonical_url: originalContent.url,\n            seo_notes: aiResponse[channel].seo_notes,\n            ready_to_publish: true\n          }\n        });\n      }\n    }\n  } catch (e) {\n    results.push({\n      json: {\n        error: 'Failed to parse AI response',\n        original: item.json\n      }\n    });\n  }\n}\n\nreturn results;"
+      },
+      "id": "parse-adaptations",
+      "name": "Parse Channel Adaptations",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1780, 420]
+    },
+    {
+      "parameters": {
+        "rules": {
+          "rules": [
+            {
+              "outputKey": "linkedin",
+              "conditions": {
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.channel }}",
+                    "rightValue": "linkedin",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "outputKey": "medium",
+              "conditions": {
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.channel }}",
+                    "rightValue": "medium",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "outputKey": "devto",
+              "conditions": {
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.channel }}",
+                    "rightValue": "devto",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "outputKey": "newsletter",
+              "conditions": {
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.channel }}",
+                    "rightValue": "newsletter",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "outputKey": "syndication",
+              "conditions": {
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.channel }}",
+                    "rightValue": "syndication",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "route-channels",
+      "name": "Route by Channel",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [2000, 420]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.linkedin.com/v2/ugcPosts",
+        "authentication": "oAuth2",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-Restli-Protocol-Version",
+              "value": "2.0.0"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"author\": \"urn:li:organization:{{ $env.LINKEDIN_ORG_ID }}\",\n  \"lifecycleState\": \"PUBLISHED\",\n  \"specificContent\": {\n    \"com.linkedin.ugc.ShareContent\": {\n      \"shareCommentary\": {\n        \"text\": \"{{ $json.adapted_content }}\\n\\n{{ $json.hashtags.join(' ') }}\\n\\nRead more: {{ $json.canonical_url }}\"\n      },\n      \"shareMediaCategory\": \"ARTICLE\",\n      \"media\": [\n        {\n          \"status\": \"READY\",\n          \"originalUrl\": \"{{ $json.canonical_url }}\"\n        }\n      ]\n    }\n  },\n  \"visibility\": {\n    \"com.linkedin.ugc.MemberNetworkVisibility\": \"PUBLIC\"\n  }\n}",
+        "options": {}
+      },
+      "id": "post-linkedin",
+      "name": "Post to LinkedIn",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [2240, 200],
+      "credentials": {
+        "oAuth2Api": {
+          "id": "linkedin-oauth",
+          "name": "LinkedIn OAuth2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.medium.com/v1/users/{{ $env.MEDIUM_USER_ID }}/posts",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"title\": \"{{ $json.adapted_title }}\",\n  \"contentFormat\": \"markdown\",\n  \"content\": \"{{ $json.adapted_content }}\\n\\n---\\n\\n*Originally published at [{{ $json.original_title }}]({{ $json.canonical_url }})*\",\n  \"canonicalUrl\": \"{{ $json.canonical_url }}\",\n  \"tags\": {{ JSON.stringify($json.tags.slice(0, 5)) }},\n  \"publishStatus\": \"draft\"\n}",
+        "options": {}
+      },
+      "id": "post-medium",
+      "name": "Post to Medium",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [2240, 360],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "medium-auth",
+          "name": "Medium API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://dev.to/api/articles",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "api-key",
+              "value": "={{ $env.DEVTO_API_KEY }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"article\": {\n    \"title\": \"{{ $json.adapted_title }}\",\n    \"body_markdown\": \"{{ $json.adapted_content }}\\n\\n---\\n\\n*Originally published at [{{ $json.original_title }}]({{ $json.canonical_url }})*\",\n    \"published\": false,\n    \"canonical_url\": \"{{ $json.canonical_url }}\",\n    \"tags\": {{ JSON.stringify($json.tags.slice(0, 4)) }}\n  }\n}",
+        "options": {}
+      },
+      "id": "post-devto",
+      "name": "Post to Dev.to",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [2240, 520]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.EMAIL_SERVICE_URL }}/api/content-queue",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $env.EMAIL_SERVICE_KEY }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"type\": \"newsletter_content\",\n  \"title\": \"{{ $json.adapted_title }}\",\n  \"content\": \"{{ $json.adapted_content }}\",\n  \"cta_text\": \"{{ $json.cta }}\",\n  \"cta_url\": \"{{ $json.canonical_url }}\",\n  \"original_url\": \"{{ $json.canonical_url }}\",\n  \"scheduled_for\": \"next_newsletter\"\n}",
+        "options": {}
+      },
+      "id": "queue-newsletter",
+      "name": "Queue for Newsletter",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [2240, 680]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.PARTNER_SYNDICATION_URL }}/api/content",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $env.PARTNER_API_KEY }}"
+            },
+            {
+              "name": "X-Source-Site",
+              "value": "={{ $env.SITE_DOMAIN }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"title\": \"{{ $json.adapted_title }}\",\n  \"summary\": \"{{ $json.adapted_content }}\",\n  \"canonical_url\": \"{{ $json.canonical_url }}\",\n  \"author\": \"{{ $env.COMPANY_NAME }}\",\n  \"category\": \"{{ $json.category || 'general' }}\",\n  \"tags\": {{ JSON.stringify($json.tags) }},\n  \"republish_terms\": \"canonical_required\"\n}",
+        "options": {}
+      },
+      "id": "syndicate-partners",
+      "name": "Syndicate to Partners",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [2240, 840]
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "mergeByFields": {
+          "values": []
+        },
+        "options": {}
+      },
+      "id": "collect-results",
+      "name": "Collect Distribution Results",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [2480, 520]
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\nconst summary = {\n  total_distributed: items.length,\n  channels: {},\n  successes: 0,\n  failures: 0,\n  content_items: []\n};\n\nfor (const item of items) {\n  const channel = item.json.channel;\n  const success = !item.json.error;\n  \n  if (!summary.channels[channel]) {\n    summary.channels[channel] = { success: 0, failed: 0 };\n  }\n  \n  if (success) {\n    summary.channels[channel].success++;\n    summary.successes++;\n  } else {\n    summary.channels[channel].failed++;\n    summary.failures++;\n  }\n  \n  summary.content_items.push({\n    original_title: item.json.original_title,\n    channel: channel,\n    status: success ? 'distributed' : 'failed',\n    url: item.json.published_url || item.json.canonical_url\n  });\n}\n\nreturn [{ json: summary }];"
+      },
+      "id": "summarize-distribution",
+      "name": "Summarize Distribution",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [2700, 520]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.CMS_API_URL }}/api/content/mark-distributed",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $env.CMS_API_KEY }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"content_ids\": {{ JSON.stringify($json.content_items.map(c => c.original_id)) }},\n  \"distribution_summary\": {{ JSON.stringify($json) }},\n  \"distributed_at\": \"{{ new Date().toISOString() }}\"\n}",
+        "options": {}
+      },
+      "id": "update-cms",
+      "name": "Update CMS Status",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [2920, 520]
+    },
+    {
+      "parameters": {
+        "channel": "={{ $env.SLACK_MARKETING_CHANNEL }}",
+        "text": "=📢 *Content Distribution Complete*",
+        "otherOptions": {
+          "includeLinkToWorkflow": false
+        },
+        "attachments": [
+          {
+            "color": "={{ $json.failures > 0 ? '#ff9800' : '#4caf50' }}",
+            "fields": {
+              "item": [
+                {
+                  "title": "Total Distributed",
+                  "value": "={{ $json.total_distributed }}",
+                  "short": true
+                },
+                {
+                  "title": "Successes",
+                  "value": "={{ $json.successes }}",
+                  "short": true
+                },
+                {
+                  "title": "Failures",
+                  "value": "={{ $json.failures }}",
+                  "short": true
+                },
+                {
+                  "title": "Channels",
+                  "value": "={{ Object.keys($json.channels).join(', ') }}",
+                  "short": true
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "id": "slack-notify",
+      "name": "Slack Distribution Notification",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.2,
+      "position": [3140, 420],
+      "credentials": {
+        "slackApi": {
+          "id": "slack-creds",
+          "name": "Slack API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $env.MARKETING_TEAM_EMAIL }}",
+        "subject": "=Content Distribution Report - {{ new Date().toLocaleDateString() }}",
+        "emailType": "html",
+        "message": "=<h2>Content Distribution Summary</h2>\n<p>The automated content distribution has completed.</p>\n\n<h3>Results</h3>\n<ul>\n<li><strong>Total Distributed:</strong> {{ $json.total_distributed }}</li>\n<li><strong>Successes:</strong> {{ $json.successes }}</li>\n<li><strong>Failures:</strong> {{ $json.failures }}</li>\n</ul>\n\n<h3>Channel Breakdown</h3>\n<table border=\"1\" cellpadding=\"8\">\n<tr><th>Channel</th><th>Success</th><th>Failed</th></tr>\n{{ Object.entries($json.channels).map(([ch, stats]) => `<tr><td>${ch}</td><td>${stats.success}</td><td>${stats.failed}</td></tr>`).join('') }}\n</table>\n\n<h3>Content Items</h3>\n<ul>\n{{ $json.content_items.map(c => `<li><strong>${c.original_title}</strong> → ${c.channel}: ${c.status}</li>`).join('') }}\n</ul>\n\n<p>Review the distribution dashboard for full details.</p>",
+        "options": {}
+      },
+      "id": "email-report",
+      "name": "Email Distribution Report",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [3140, 620],
+      "credentials": {
+        "smtp": {
+          "id": "smtp-creds",
+          "name": "SMTP"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ success: true, message: 'Distribution complete', summary: $json }) }}",
+        "options": {}
+      },
+      "id": "respond-webhook",
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [3360, 520]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "message",
+              "name": "message",
+              "value": "No new content to distribute",
+              "type": "string"
+            },
+            {
+              "id": "timestamp",
+              "name": "timestamp",
+              "value": "={{ new Date().toISOString() }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "no-content",
+      "name": "No Content Found",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [1340, 620]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.rss.app/v1/feeds/{{ $env.RSS_FEED_ID }}/items",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $env.RSS_APP_KEY }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"title\": \"{{ $json.original_title }}\",\n  \"link\": \"{{ $json.canonical_url }}\",\n  \"description\": \"{{ $json.adapted_content.substring(0, 500) }}...\",\n  \"pubDate\": \"{{ new Date().toISOString() }}\"\n}",
+        "options": {}
+      },
+      "id": "update-rss",
+      "name": "Update RSS Feed",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [2000, 100]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Track distribution analytics\nconst items = $input.all();\nconst analytics = [];\n\nfor (const item of items) {\n  analytics.push({\n    json: {\n      event: 'content_distributed',\n      content_id: item.json.original_id,\n      content_title: item.json.original_title,\n      channel: item.json.channel,\n      canonical_url: item.json.canonical_url,\n      distributed_at: new Date().toISOString(),\n      tracking_params: {\n        utm_source: item.json.channel,\n        utm_medium: 'syndication',\n        utm_campaign: 'content_distribution'\n      }\n    }\n  });\n}\n\nreturn analytics;"
+      },
+      "id": "track-analytics",
+      "name": "Track Distribution Analytics",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [2000, 700]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.ANALYTICS_ENDPOINT }}/api/events",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $env.ANALYTICS_API_KEY }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json) }}",
+        "options": {}
+      },
+      "id": "send-analytics",
+      "name": "Send to Analytics",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [2220, 700]
+    }
+  ],
+  "connections": {
+    "Daily Content Check": {
+      "main": [
+        [
+          {
+            "node": "Set Scheduled Source",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Content Published Webhook": {
+      "main": [
+        [
+          {
+            "node": "Set Webhook Source",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Manual Distribution Trigger": {
+      "main": [
+        [
+          {
+            "node": "Set Manual Source",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Scheduled Source": {
+      "main": [
+        [
+          {
+            "node": "Merge All Sources",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Webhook Source": {
+      "main": [
+        [
+          {
+            "node": "Merge All Sources",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Set Manual Source": {
+      "main": [
+        [
+          {
+            "node": "Merge All Sources",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "Merge All Sources": {
+      "main": [
+        [
+          {
+            "node": "Fetch New CMS Content",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch New CMS Content": {
+      "main": [
+        [
+          {
+            "node": "Has Content to Distribute?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Has Content to Distribute?": {
+      "main": [
+        [
+          {
+            "node": "Split Content Items",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "No Content Found",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Content Items": {
+      "main": [
+        [
+          {
+            "node": "AI Content Adaptation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Content Adaptation": {
+      "main": [
+        [
+          {
+            "node": "Parse Channel Adaptations",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Claude Sonnet": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Content Adaptation",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Channel Adaptations": {
+      "main": [
+        [
+          {
+            "node": "Route by Channel",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Update RSS Feed",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Track Distribution Analytics",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route by Channel": {
+      "main": [
+        [
+          {
+            "node": "Post to LinkedIn",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Post to Medium",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Post to Dev.to",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Queue for Newsletter",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Syndicate to Partners",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Post to LinkedIn": {
+      "main": [
+        [
+          {
+            "node": "Collect Distribution Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Post to Medium": {
+      "main": [
+        [
+          {
+            "node": "Collect Distribution Results",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Post to Dev.to": {
+      "main": [
+        [
+          {
+            "node": "Collect Distribution Results",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "Queue for Newsletter": {
+      "main": [
+        [
+          {
+            "node": "Collect Distribution Results",
+            "type": "main",
+            "index": 3
+          }
+        ]
+      ]
+    },
+    "Syndicate to Partners": {
+      "main": [
+        [
+          {
+            "node": "Collect Distribution Results",
+            "type": "main",
+            "index": 4
+          }
+        ]
+      ]
+    },
+    "Collect Distribution Results": {
+      "main": [
+        [
+          {
+            "node": "Summarize Distribution",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Summarize Distribution": {
+      "main": [
+        [
+          {
+            "node": "Update CMS Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update CMS Status": {
+      "main": [
+        [
+          {
+            "node": "Slack Distribution Notification",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Email Distribution Report",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Track Distribution Analytics": {
+      "main": [
+        [
+          {
+            "node": "Send to Analytics",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "content-dist-v1",
+  "meta": {
+    "instanceId": "n8n-workflows-library"
+  },
+  "id": "content-distribution-syndication",
+  "tags": [
+    {
+      "id": "marketing",
+      "name": "Marketing"
+    },
+    {
+      "id": "content",
+      "name": "Content"
+    },
+    {
+      "id": "syndication",
+      "name": "Syndication"
+    }
+  ]
+}

@@ -1,0 +1,705 @@
+{
+  "active": false,
+  "connections": {
+    "Content Calendar Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get Scheduled Posts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "New Post Form": {
+      "main": [
+        [
+          {
+            "node": "Parse Post Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Content Webhook": {
+      "main": [
+        [
+          {
+            "node": "Parse Post Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Scheduled Posts": {
+      "main": [
+        [
+          {
+            "node": "Filter Due Posts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter Due Posts": {
+      "main": [
+        [
+          {
+            "node": "Loop Through Posts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Through Posts": {
+      "main": [
+        [
+          {
+            "node": "Select Platforms",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Post Request": {
+      "main": [
+        [
+          {
+            "node": "AI Optimize Content",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Optimize Content": {
+      "main": [
+        [
+          {
+            "node": "Schedule or Publish",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Anthropic Claude": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Optimize Content",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule or Publish": {
+      "main": [
+        [
+          {
+            "node": "Select Platforms",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Save to Calendar",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Select Platforms": {
+      "main": [
+        [
+          {
+            "node": "Post to LinkedIn",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Post to Twitter/X",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Post to Facebook",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Post to Instagram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Post to LinkedIn": {
+      "main": [
+        [
+          {
+            "node": "Merge Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Post to Twitter/X": {
+      "main": [
+        [
+          {
+            "node": "Merge Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Post to Facebook": {
+      "main": [
+        [
+          {
+            "node": "Merge Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Post to Instagram": {
+      "main": [
+        [
+          {
+            "node": "Merge Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge Results": {
+      "main": [
+        [
+          {
+            "node": "Log Post Activity",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log Post Activity": {
+      "main": [
+        [
+          {
+            "node": "Update Calendar Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Calendar Status": {
+      "main": [
+        [
+          {
+            "node": "Notify Team",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-01-06T00:00:00.000Z",
+  "id": "social-media-scheduling",
+  "isArchived": false,
+  "meta": {
+    "instanceId": "marketing-workflows"
+  },
+  "name": "Social Media Scheduling and Publishing",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 15
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [-400, -100],
+      "id": "content-calendar-trigger",
+      "name": "Content Calendar Trigger"
+    },
+    {
+      "parameters": {
+        "formTitle": "Schedule Social Media Post",
+        "formDescription": "Create and schedule a post for social media platforms",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Post Title/Reference",
+              "requiredField": true,
+              "fieldType": "text"
+            },
+            {
+              "fieldLabel": "Post Content",
+              "placeholder": "Enter your post content here...",
+              "requiredField": true,
+              "fieldType": "textarea"
+            },
+            {
+              "fieldLabel": "Target Platforms",
+              "requiredField": true,
+              "fieldType": "multiSelect",
+              "multiselect": true,
+              "fieldOptions": {
+                "values": [
+                  {"option": "LinkedIn"},
+                  {"option": "Twitter/X"},
+                  {"option": "Facebook"},
+                  {"option": "Instagram"}
+                ]
+              }
+            },
+            {
+              "fieldLabel": "Post Type",
+              "requiredField": true,
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {"option": "Text Only"},
+                  {"option": "Image Post"},
+                  {"option": "Video Post"},
+                  {"option": "Link Share"},
+                  {"option": "Carousel"}
+                ]
+              }
+            },
+            {
+              "fieldLabel": "Image/Media URL",
+              "placeholder": "https://example.com/image.jpg",
+              "requiredField": false,
+              "fieldType": "text"
+            },
+            {
+              "fieldLabel": "Link URL (for link shares)",
+              "placeholder": "https://yoursite.com/blog-post",
+              "requiredField": false,
+              "fieldType": "text"
+            },
+            {
+              "fieldLabel": "Hashtags",
+              "placeholder": "#marketing #business #growth",
+              "requiredField": false,
+              "fieldType": "text"
+            },
+            {
+              "fieldLabel": "Schedule Type",
+              "requiredField": true,
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {"option": "Publish Now"},
+                  {"option": "Schedule for Later"},
+                  {"option": "Best Time (AI Optimized)"}
+                ]
+              }
+            },
+            {
+              "fieldLabel": "Scheduled Date/Time",
+              "requiredField": false,
+              "fieldType": "text",
+              "placeholder": "2026-01-15 09:00"
+            },
+            {
+              "fieldLabel": "Campaign/Category",
+              "requiredField": false,
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {"option": "Product Launch"},
+                  {"option": "Brand Awareness"},
+                  {"option": "Thought Leadership"},
+                  {"option": "Promotion/Sale"},
+                  {"option": "Event"},
+                  {"option": "Educational"},
+                  {"option": "Customer Story"},
+                  {"option": "Behind the Scenes"},
+                  {"option": "Other"}
+                ]
+              }
+            },
+            {
+              "fieldLabel": "AI Optimization",
+              "requiredField": true,
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {"option": "Optimize for each platform"},
+                  {"option": "Use content as-is"},
+                  {"option": "Suggest improvements only"}
+                ]
+              }
+            }
+          ]
+        },
+        "options": {
+          "responseMode": "onReceived",
+          "formSubmittedText": "Your post has been scheduled successfully!"
+        }
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.3,
+      "position": [-400, 100],
+      "id": "new-post-form",
+      "name": "New Post Form",
+      "webhookId": "social-post-form"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "social/post",
+        "options": {
+          "responseMode": "onReceived"
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [-400, 300],
+      "id": "content-webhook",
+      "name": "Content Webhook",
+      "webhookId": "social-content-webhook"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get scheduled posts from content calendar\n// In production, this would query Google Sheets, Notion, Airtable, etc.\n\nconst now = new Date();\n\n// Example scheduled posts structure\nconst scheduledPosts = [\n  /*\n  {\n    id: 'post_001',\n    title: 'New Product Launch',\n    content: 'Excited to announce our new product...',\n    platforms: ['LinkedIn', 'Twitter/X', 'Facebook'],\n    postType: 'Image Post',\n    mediaUrl: 'https://example.com/product.jpg',\n    linkUrl: 'https://example.com/product',\n    hashtags: '#newproduct #launch #innovation',\n    scheduledTime: '2026-01-07T09:00:00Z',\n    campaign: 'Product Launch',\n    status: 'scheduled',\n    aiOptimization: 'Optimize for each platform'\n  }\n  */\n];\n\nreturn { json: { posts: scheduledPosts, checkedAt: now.toISOString() } };"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [-180, -100],
+      "id": "get-scheduled-posts",
+      "name": "Get Scheduled Posts"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Filter posts that are due for publishing\nconst data = $input.first().json;\nconst posts = data.posts || [];\nconst now = new Date();\n\n// Filter posts that should be published now (within 5 minute window)\nconst duePosts = posts.filter(post => {\n  if (post.status !== 'scheduled') return false;\n  const scheduledTime = new Date(post.scheduledTime);\n  const diffMinutes = (scheduledTime - now) / (1000 * 60);\n  return diffMinutes <= 5 && diffMinutes >= -5;\n});\n\nif (duePosts.length === 0) {\n  return { json: { hasPosts: false, message: 'No posts due for publishing' } };\n}\n\nreturn duePosts.map(post => ({ json: { ...post, hasPosts: true } }));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [40, -100],
+      "id": "filter-due-posts",
+      "name": "Filter Due Posts"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [260, -100],
+      "id": "loop-through-posts",
+      "name": "Loop Through Posts"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Parse and normalize post request\nconst input = $input.first().json;\n\nconst post = {\n  id: `post_${Date.now()}`,\n  title: input['Post Title/Reference'] || input.title || 'Untitled Post',\n  content: input['Post Content'] || input.content || '',\n  platforms: input['Target Platforms'] || input.platforms || ['LinkedIn'],\n  postType: input['Post Type'] || input.postType || 'Text Only',\n  mediaUrl: input['Image/Media URL'] || input.mediaUrl || '',\n  linkUrl: input['Link URL (for link shares)'] || input.linkUrl || '',\n  hashtags: input['Hashtags'] || input.hashtags || '',\n  scheduleType: input['Schedule Type'] || 'Publish Now',\n  scheduledTime: input['Scheduled Date/Time'] || input.scheduledTime || new Date().toISOString(),\n  campaign: input['Campaign/Category'] || input.campaign || 'Other',\n  aiOptimization: input['AI Optimization'] || 'Use content as-is',\n  createdAt: new Date().toISOString(),\n  status: 'pending'\n};\n\n// Parse platforms if string\nif (typeof post.platforms === 'string') {\n  post.platforms = post.platforms.split(',').map(p => p.trim());\n}\n\n// Determine if immediate publish or schedule\npost.publishNow = post.scheduleType === 'Publish Now';\n\nreturn { json: post };"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [-180, 200],
+      "id": "parse-post-request",
+      "name": "Parse Post Request"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Optimize this social media post for maximum engagement on each target platform.\n\n**Original Content:**\n{{ $json.content }}\n\n**Hashtags:** {{ $json.hashtags }}\n**Post Type:** {{ $json.postType }}\n**Link:** {{ $json.linkUrl }}\n**Campaign:** {{ $json.campaign }}\n**Target Platforms:** {{ $json.platforms.join(', ') }}\n\n**Optimization Mode:** {{ $json.aiOptimization }}\n\n**Platform Guidelines:**\n- LinkedIn: Professional tone, 1300 chars max, 3-5 hashtags, thought leadership focus\n- Twitter/X: Concise, 280 chars max, 2-3 hashtags, conversational, use hooks\n- Facebook: Casual/friendly, can be longer, fewer hashtags, encourage engagement\n- Instagram: Visual focus, 2200 chars max, up to 30 hashtags, emojis welcome\n\n**Generate optimized versions for each target platform:**\n\n```json\n{\n  \"linkedin\": {\n    \"content\": \"optimized content for LinkedIn\",\n    \"hashtags\": \"#tag1 #tag2 #tag3\"\n  },\n  \"twitter\": {\n    \"content\": \"optimized content for Twitter/X\",\n    \"hashtags\": \"#tag1 #tag2\"\n  },\n  \"facebook\": {\n    \"content\": \"optimized content for Facebook\",\n    \"hashtags\": \"#tag1\"\n  },\n  \"instagram\": {\n    \"content\": \"optimized content for Instagram\",\n    \"hashtags\": \"#tag1 #tag2 ... #tag10\"\n  },\n  \"bestPostingTimes\": {\n    \"linkedin\": \"Tuesday-Thursday 8-10 AM\",\n    \"twitter\": \"Weekdays 12-3 PM\",\n    \"facebook\": \"Wednesday 11 AM - 1 PM\",\n    \"instagram\": \"Monday-Friday 11 AM - 1 PM\"\n  }\n}\n```",
+        "options": {
+          "systemMessage": "You are a social media marketing expert. Optimize content for each platform while maintaining the core message. Focus on engagement, clarity, and platform-specific best practices."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [40, 200],
+      "id": "ai-optimize-content",
+      "name": "AI Optimize Content"
+    },
+    {
+      "parameters": {
+        "model": "claude-sonnet-4-20250514",
+        "options": {
+          "temperature": 0.7,
+          "maxTokensToSample": 2048
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatAnthropic",
+      "typeVersion": 1.2,
+      "position": [60, 420],
+      "id": "anthropic-claude",
+      "name": "Anthropic Claude",
+      "credentials": {
+        "anthropicApi": {
+          "id": "anthropic-credentials",
+          "name": "Anthropic API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.publishNow }}",
+                    "rightValue": true,
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "Publish Now"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ !$json.publishNow }}",
+                    "rightValue": true,
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "Schedule"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [260, 200],
+      "id": "schedule-or-publish",
+      "name": "Schedule or Publish"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Parse AI optimized content and prepare for each platform\nconst data = $input.first().json;\n\n// Parse AI response\nlet optimizedContent = {};\ntry {\n  const aiOutput = data.output || data.text || '';\n  const jsonMatch = aiOutput.match(/```json\\n?([\\s\\S]*?)\\n?```/) || aiOutput.match(/\\{[\\s\\S]*\\}/);\n  if (jsonMatch) {\n    optimizedContent = JSON.parse(jsonMatch[1] || jsonMatch[0]);\n  }\n} catch (e) {\n  // Use original content if parsing fails\n  optimizedContent = {\n    linkedin: { content: data.content, hashtags: data.hashtags },\n    twitter: { content: data.content.substring(0, 280), hashtags: data.hashtags },\n    facebook: { content: data.content, hashtags: data.hashtags },\n    instagram: { content: data.content, hashtags: data.hashtags }\n  };\n}\n\n// Create platform-specific posts\nconst platforms = data.platforms || [];\nconst platformPosts = [];\n\nif (platforms.includes('LinkedIn')) {\n  platformPosts.push({\n    ...data,\n    platform: 'LinkedIn',\n    platformContent: optimizedContent.linkedin?.content || data.content,\n    platformHashtags: optimizedContent.linkedin?.hashtags || data.hashtags\n  });\n}\n\nif (platforms.includes('Twitter/X')) {\n  platformPosts.push({\n    ...data,\n    platform: 'Twitter/X',\n    platformContent: optimizedContent.twitter?.content || data.content.substring(0, 280),\n    platformHashtags: optimizedContent.twitter?.hashtags || data.hashtags\n  });\n}\n\nif (platforms.includes('Facebook')) {\n  platformPosts.push({\n    ...data,\n    platform: 'Facebook',\n    platformContent: optimizedContent.facebook?.content || data.content,\n    platformHashtags: optimizedContent.facebook?.hashtags || ''\n  });\n}\n\nif (platforms.includes('Instagram')) {\n  platformPosts.push({\n    ...data,\n    platform: 'Instagram',\n    platformContent: optimizedContent.instagram?.content || data.content,\n    platformHashtags: optimizedContent.instagram?.hashtags || data.hashtags\n  });\n}\n\nreturn platformPosts.map(p => ({ json: p }));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [480, 0],
+      "id": "select-platforms",
+      "name": "Select Platforms"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "content-calendar-spreadsheet-id"
+        },
+        "sheetName": "Scheduled Posts",
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Post ID": "={{ $json.id }}",
+            "Title": "={{ $json.title }}",
+            "Content": "={{ $json.content }}",
+            "Platforms": "={{ $json.platforms.join(', ') }}",
+            "Scheduled Time": "={{ $json.scheduledTime }}",
+            "Campaign": "={{ $json.campaign }}",
+            "Status": "=scheduled",
+            "Created At": "={{ $json.createdAt }}"
+          }
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.2,
+      "position": [480, 300],
+      "id": "save-to-calendar",
+      "name": "Save to Calendar",
+      "disabled": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "google-sheets-credentials",
+          "name": "Google Sheets OAuth2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Post to LinkedIn\nconst post = $input.first().json;\n\nif (post.platform !== 'LinkedIn') {\n  return { json: { ...post, skipped: true, reason: 'Not LinkedIn platform' } };\n}\n\n// In production, this would use LinkedIn API\nconst linkedInPost = {\n  author: 'urn:li:organization:YOUR_ORG_ID',\n  lifecycleState: 'PUBLISHED',\n  specificContent: {\n    'com.linkedin.ugc.ShareContent': {\n      shareCommentary: {\n        text: `${post.platformContent}\\n\\n${post.platformHashtags}`\n      },\n      shareMediaCategory: post.mediaUrl ? 'IMAGE' : 'NONE',\n      media: post.mediaUrl ? [{\n        status: 'READY',\n        originalUrl: post.mediaUrl\n      }] : []\n    }\n  },\n  visibility: {\n    'com.linkedin.ugc.MemberNetworkVisibility': 'PUBLIC'\n  }\n};\n\nreturn {\n  json: {\n    ...post,\n    linkedInPost,\n    posted: true,\n    postedAt: new Date().toISOString(),\n    postUrl: 'https://linkedin.com/feed/update/urn:li:share:PLACEHOLDER'\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [700, -150],
+      "id": "post-to-linkedin",
+      "name": "Post to LinkedIn"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Post to Twitter/X\nconst post = $input.first().json;\n\nif (post.platform !== 'Twitter/X') {\n  return { json: { ...post, skipped: true, reason: 'Not Twitter platform' } };\n}\n\n// Ensure tweet is within character limit\nlet tweetText = post.platformContent;\nconst hashtagsLength = post.platformHashtags?.length || 0;\n\nif (tweetText.length + hashtagsLength + 2 > 280) {\n  tweetText = tweetText.substring(0, 280 - hashtagsLength - 5) + '...';\n}\n\nconst fullTweet = `${tweetText}\\n${post.platformHashtags}`.trim();\n\n// In production, this would use Twitter API v2\nconst twitterPost = {\n  text: fullTweet,\n  media: post.mediaUrl ? { media_ids: ['PLACEHOLDER_MEDIA_ID'] } : undefined\n};\n\nreturn {\n  json: {\n    ...post,\n    twitterPost,\n    finalTweet: fullTweet,\n    characterCount: fullTweet.length,\n    posted: true,\n    postedAt: new Date().toISOString(),\n    postUrl: 'https://twitter.com/user/status/PLACEHOLDER'\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [700, 50],
+      "id": "post-to-twitter",
+      "name": "Post to Twitter/X"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Post to Facebook\nconst post = $input.first().json;\n\nif (post.platform !== 'Facebook') {\n  return { json: { ...post, skipped: true, reason: 'Not Facebook platform' } };\n}\n\n// In production, this would use Facebook Graph API\nconst facebookPost = {\n  message: `${post.platformContent}\\n\\n${post.platformHashtags}`.trim(),\n  link: post.linkUrl || undefined,\n  attached_media: post.mediaUrl ? [{ media_fbid: 'PLACEHOLDER' }] : undefined\n};\n\nreturn {\n  json: {\n    ...post,\n    facebookPost,\n    posted: true,\n    postedAt: new Date().toISOString(),\n    postUrl: 'https://facebook.com/page/posts/PLACEHOLDER'\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [700, 250],
+      "id": "post-to-facebook",
+      "name": "Post to Facebook"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Post to Instagram\nconst post = $input.first().json;\n\nif (post.platform !== 'Instagram') {\n  return { json: { ...post, skipped: true, reason: 'Not Instagram platform' } };\n}\n\n// Instagram requires an image or video\nif (!post.mediaUrl && post.postType !== 'Text Only') {\n  return {\n    json: {\n      ...post,\n      posted: false,\n      error: 'Instagram requires media (image or video)'\n    }\n  };\n}\n\n// In production, this would use Instagram Graph API\nconst instagramPost = {\n  caption: `${post.platformContent}\\n\\n${post.platformHashtags}`.trim(),\n  image_url: post.mediaUrl,\n  media_type: post.postType === 'Video Post' ? 'VIDEO' : 'IMAGE'\n};\n\nreturn {\n  json: {\n    ...post,\n    instagramPost,\n    posted: true,\n    postedAt: new Date().toISOString(),\n    postUrl: 'https://instagram.com/p/PLACEHOLDER'\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [700, 450],
+      "id": "post-to-instagram",
+      "name": "Post to Instagram"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combinationMode": "mergeByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [920, 150],
+      "id": "merge-results",
+      "name": "Merge Results"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "social-posts-log-spreadsheet-id"
+        },
+        "sheetName": "Post Log",
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Post ID": "={{ $json.id }}",
+            "Title": "={{ $json.title }}",
+            "Platform": "={{ $json.platform }}",
+            "Posted At": "={{ $json.postedAt }}",
+            "Post URL": "={{ $json.postUrl }}",
+            "Campaign": "={{ $json.campaign }}",
+            "Status": "={{ $json.posted ? 'Published' : 'Failed' }}",
+            "Error": "={{ $json.error || '' }}"
+          }
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.2,
+      "position": [1140, 150],
+      "id": "log-post-activity",
+      "name": "Log Post Activity",
+      "disabled": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "google-sheets-credentials",
+          "name": "Google Sheets OAuth2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Update calendar status\nconst post = $input.first().json;\n\n// In production, this would update the content calendar\nreturn {\n  json: {\n    ...post,\n    calendarUpdated: true,\n    newStatus: post.posted ? 'published' : 'failed'\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1360, 150],
+      "id": "update-calendar-status",
+      "name": "Update Calendar Status"
+    },
+    {
+      "parameters": {
+        "channel": "#marketing-social",
+        "text": "=:{{ $json.posted ? 'white_check_mark' : 'x' }}: *Social Post {{ $json.posted ? 'Published' : 'Failed' }}*\n\n*Title:* {{ $json.title }}\n*Platform:* {{ $json.platform }}\n*Campaign:* {{ $json.campaign }}\n\n{{ $json.posted ? ':link: ' + $json.postUrl : ':warning: Error: ' + ($json.error || 'Unknown error') }}\n\n_Posted at {{ $json.postedAt }}_",
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.1,
+      "position": [1580, 150],
+      "id": "notify-team",
+      "name": "Notify Team",
+      "credentials": {
+        "slackApi": {
+          "id": "slack-credentials",
+          "name": "Slack API"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "shared": [],
+  "staticData": null,
+  "tags": [
+    {
+      "name": "Marketing"
+    },
+    {
+      "name": "Social Media"
+    }
+  ],
+  "triggerCount": 0,
+  "updatedAt": "2026-01-06T00:00:00.000Z",
+  "versionId": "social-media-v1"
+}
