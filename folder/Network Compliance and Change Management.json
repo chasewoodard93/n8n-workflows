@@ -1,0 +1,810 @@
+{
+  "active": false,
+  "connections": {
+    "Webhook - Change Request": {
+      "main": [
+        [
+          {
+            "node": "Parse Change Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule - Compliance Check": {
+      "main": [
+        [
+          {
+            "node": "Get Compliance Rules",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Change Request": {
+      "main": [
+        [
+          {
+            "node": "AI Risk Assessment",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Risk Assessment": {
+      "main": [
+        [
+          {
+            "node": "Determine Approval Path",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Determine Approval Path": {
+      "main": [
+        [
+          {
+            "node": "Auto Approve Low Risk",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Request Manager Approval",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Request CAB Approval",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Emergency Change Process",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Auto Approve Low Risk": {
+      "main": [
+        [
+          {
+            "node": "Create Change Record",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Request Manager Approval": {
+      "main": [
+        [
+          {
+            "node": "Wait for Approval",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Request CAB Approval": {
+      "main": [
+        [
+          {
+            "node": "Wait for CAB",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Emergency Change Process": {
+      "main": [
+        [
+          {
+            "node": "Create Emergency Record",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait for Approval": {
+      "main": [
+        [
+          {
+            "node": "Create Change Record",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait for CAB": {
+      "main": [
+        [
+          {
+            "node": "Create Change Record",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Emergency Record": {
+      "main": [
+        [
+          {
+            "node": "Alert On-Call Team",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Alert On-Call Team": {
+      "main": [
+        [
+          {
+            "node": "Create Change Record",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Change Record": {
+      "main": [
+        [
+          {
+            "node": "Schedule Implementation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Implementation": {
+      "main": [
+        [
+          {
+            "node": "Notify Stakeholders",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Compliance Rules": {
+      "main": [
+        [
+          {
+            "node": "Get Device Configs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Device Configs": {
+      "main": [
+        [
+          {
+            "node": "Run Compliance Checks",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Run Compliance Checks": {
+      "main": [
+        [
+          {
+            "node": "AI Compliance Analysis",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Compliance Analysis": {
+      "main": [
+        [
+          {
+            "node": "Generate Compliance Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Compliance Report": {
+      "main": [
+        [
+          {
+            "node": "Check Violations",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Violations": {
+      "main": [
+        [
+          {
+            "node": "Create Remediation Tasks",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send Compliance Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Remediation Tasks": {
+      "main": [
+        [
+          {
+            "node": "Alert Security Team",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-01-08T00:00:00.000Z",
+  "id": "network-compliance-change",
+  "isArchived": false,
+  "meta": {
+    "instanceId": "network-ops"
+  },
+  "name": "Network Compliance and Change Management",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "network-change-request",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [0, 0],
+      "id": "webhook-change",
+      "name": "Webhook - Change Request",
+      "webhookId": "network-change-webhook"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 6 * * *"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [0, 400],
+      "id": "schedule-compliance",
+      "name": "Schedule - Compliance Check"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Parse incoming change request\nconst request = $input.first().json;\n\nconst changeRequest = {\n  id: `CHG-${Date.now()}`,\n  submittedAt: new Date().toISOString(),\n  submittedBy: request.submitter || request.email || 'unknown',\n  \n  // Change details\n  title: request.title || 'Network Change',\n  description: request.description || '',\n  changeType: request.changeType || 'standard', // standard, normal, emergency\n  \n  // Affected systems\n  affectedDevices: request.devices || [],\n  affectedSites: request.sites || [],\n  affectedServices: request.services || [],\n  \n  // Implementation details\n  plannedStart: request.plannedStart || '',\n  plannedEnd: request.plannedEnd || '',\n  rollbackPlan: request.rollbackPlan || '',\n  testPlan: request.testPlan || '',\n  \n  // Risk factors\n  impactLevel: request.impact || 'low', // low, medium, high, critical\n  urgency: request.urgency || 'low',\n  outageRequired: request.outageRequired || false,\n  outageMinutes: request.outageMinutes || 0,\n  \n  // Attachments\n  configChanges: request.configChanges || '',\n  documentationLinks: request.links || []\n};\n\nreturn {\n  json: changeRequest\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [220, 0],
+      "id": "parse-request",
+      "name": "Parse Change Request"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "claude-sonnet-4-20250514"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=You are a network change risk assessor. Analyze this change request and provide a risk assessment.\n\nChange Request:\n- Title: {{ $json.title }}\n- Description: {{ $json.description }}\n- Type: {{ $json.changeType }}\n- Affected Devices: {{ $json.affectedDevices.join(', ') || 'Not specified' }}\n- Affected Sites: {{ $json.affectedSites.join(', ') || 'Not specified' }}\n- Outage Required: {{ $json.outageRequired ? 'Yes (' + $json.outageMinutes + ' min)' : 'No' }}\n- Rollback Plan: {{ $json.rollbackPlan || 'Not provided' }}\n\nProvide your assessment in JSON format:\n{\n  \"riskLevel\": \"low|medium|high|critical\",\n  \"riskScore\": 1-100,\n  \"approvalPath\": \"auto|manager|cab|emergency\",\n  \"concerns\": [\"list of concerns\"],\n  \"recommendations\": [\"list of recommendations\"],\n  \"requiredTests\": [\"list of required tests\"],\n  \"estimatedImpact\": \"description of potential impact\"\n}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatAnthropic",
+      "typeVersion": 1.3,
+      "position": [440, 0],
+      "id": "ai-risk",
+      "name": "AI Risk Assessment",
+      "credentials": {
+        "anthropicApi": {
+          "id": "anthropic-credentials",
+          "name": "Anthropic account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.riskLevel }}",
+                    "rightValue": "low",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "Low Risk - Auto"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.riskLevel }}",
+                    "rightValue": "medium",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "Medium Risk - Manager"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.riskLevel }}",
+                    "rightValue": "high",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "High Risk - CAB"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.changeType }}",
+                    "rightValue": "emergency",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "Emergency"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [660, 0],
+      "id": "approval-path",
+      "name": "Determine Approval Path"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Auto-approve low risk changes\nconst data = $input.first().json;\n\nreturn {\n  json: {\n    ...data,\n    approvalStatus: 'approved',\n    approvedBy: 'auto-approval',\n    approvedAt: new Date().toISOString(),\n    approvalNotes: 'Low risk change auto-approved per policy'\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [880, -200],
+      "id": "auto-approve",
+      "name": "Auto Approve Low Risk"
+    },
+    {
+      "parameters": {
+        "channel": "#change-approvals",
+        "text": "=:clipboard: *Change Request Requires Manager Approval*\n\n*ID:* {{ $json.id }}\n*Title:* {{ $json.title }}\n*Submitted By:* {{ $json.submittedBy }}\n*Risk Level:* :yellow_circle: Medium\n\n*Description:*\n{{ $json.description }}\n\n*Affected:*\n• Devices: {{ $json.affectedDevices.join(', ') || 'N/A' }}\n• Sites: {{ $json.affectedSites.join(', ') || 'N/A' }}\n\n*AI Assessment:*\n{{ $json.concerns.join('\\n• ') }}\n\nPlease react with :white_check_mark: to approve or :x: to reject.",
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.1,
+      "position": [880, -50],
+      "id": "request-manager",
+      "name": "Request Manager Approval",
+      "credentials": {
+        "slackApi": {
+          "id": "slack-credentials",
+          "name": "Slack API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "channel": "#cab-requests",
+        "text": "=:rotating_light: *CAB Review Required - High Risk Change*\n\n*ID:* {{ $json.id }}\n*Title:* {{ $json.title }}\n*Submitted By:* {{ $json.submittedBy }}\n*Risk Level:* :red_circle: High\n*Risk Score:* {{ $json.riskScore }}/100\n\n*Description:*\n{{ $json.description }}\n\n*Affected Systems:*\n• Devices: {{ $json.affectedDevices.join(', ') || 'N/A' }}\n• Sites: {{ $json.affectedSites.join(', ') || 'N/A' }}\n• Services: {{ $json.affectedServices.join(', ') || 'N/A' }}\n\n*Outage:* {{ $json.outageRequired ? 'Yes - ' + $json.outageMinutes + ' minutes' : 'No' }}\n\n*AI Risk Concerns:*\n{{ $json.concerns.map(c => '• ' + c).join('\\n') }}\n\n*Recommendations:*\n{{ $json.recommendations.map(r => '• ' + r).join('\\n') }}\n\nThis change will be added to the next CAB meeting agenda.",
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.1,
+      "position": [880, 100],
+      "id": "request-cab",
+      "name": "Request CAB Approval",
+      "credentials": {
+        "slackApi": {
+          "id": "slack-credentials",
+          "name": "Slack API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Emergency change process - expedited approval\nconst data = $input.first().json;\n\nreturn {\n  json: {\n    ...data,\n    isEmergency: true,\n    emergencyJustification: data.description,\n    emergencyApprovalRequired: true,\n    escalationLevel: 'immediate'\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [880, 250],
+      "id": "emergency-process",
+      "name": "Emergency Change Process"
+    },
+    {
+      "parameters": {
+        "webhookId": "approval-wait",
+        "responseMode": "responseNode"
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [1100, -50],
+      "id": "wait-approval",
+      "name": "Wait for Approval"
+    },
+    {
+      "parameters": {
+        "webhookId": "cab-wait",
+        "responseMode": "responseNode"
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [1100, 100],
+      "id": "wait-cab",
+      "name": "Wait for CAB"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.ITSM_API }}/changes",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "type",
+              "value": "emergency"
+            },
+            {
+              "name": "data",
+              "value": "={{ JSON.stringify($json) }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1100, 250],
+      "id": "emergency-record",
+      "name": "Create Emergency Record"
+    },
+    {
+      "parameters": {
+        "resource": "incident",
+        "summary": "=EMERGENCY CHANGE: {{ $json.title }}",
+        "email": "={{ $env.ONCALL_EMAIL }}",
+        "options": {
+          "urgency": "high"
+        }
+      },
+      "type": "n8n-nodes-base.pagerDuty",
+      "typeVersion": 1,
+      "position": [1320, 250],
+      "id": "alert-oncall",
+      "name": "Alert On-Call Team",
+      "credentials": {
+        "pagerDutyApi": {
+          "id": "pagerduty-credentials",
+          "name": "PagerDuty API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.ITSM_API }}/changes",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "id",
+              "value": "={{ $json.id }}"
+            },
+            {
+              "name": "title",
+              "value": "={{ $json.title }}"
+            },
+            {
+              "name": "status",
+              "value": "approved"
+            },
+            {
+              "name": "data",
+              "value": "={{ JSON.stringify($json) }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1540, 0],
+      "id": "create-record",
+      "name": "Create Change Record"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Schedule the change implementation\nconst data = $input.first().json;\n\nconst implementation = {\n  changeId: data.id,\n  scheduledStart: data.plannedStart || new Date(Date.now() + 86400000).toISOString(),\n  scheduledEnd: data.plannedEnd || new Date(Date.now() + 90000000).toISOString(),\n  implementer: data.assignee || data.submittedBy,\n  status: 'scheduled',\n  preChecks: [\n    'Verify backup exists',\n    'Confirm maintenance window',\n    'Notify affected users',\n    'Prepare rollback commands'\n  ],\n  postChecks: [\n    'Verify connectivity',\n    'Run smoke tests',\n    'Check monitoring alerts',\n    'Update documentation'\n  ]\n};\n\nreturn {\n  json: {\n    ...data,\n    implementation\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1760, 0],
+      "id": "schedule-impl",
+      "name": "Schedule Implementation"
+    },
+    {
+      "parameters": {
+        "channel": "#network-changes",
+        "text": "=:calendar: *Change Scheduled*\n\n*ID:* {{ $json.id }}\n*Title:* {{ $json.title }}\n*Scheduled:* {{ $json.implementation.scheduledStart }}\n*Implementer:* {{ $json.implementation.implementer }}\n\n*Pre-Implementation Checklist:*\n{{ $json.implementation.preChecks.map(c => '☐ ' + c).join('\\n') }}",
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.1,
+      "position": [1980, 0],
+      "id": "notify-stakeholders",
+      "name": "Notify Stakeholders",
+      "credentials": {
+        "slackApi": {
+          "id": "slack-credentials",
+          "name": "Slack API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Define compliance rules\nconst rules = [\n  {\n    id: 'SEC-001',\n    name: 'SSH Version 2 Required',\n    severity: 'high',\n    pattern: 'ip ssh version 2',\n    mustExist: true,\n    platforms: ['cisco_ios', 'cisco_nxos']\n  },\n  {\n    id: 'SEC-002',\n    name: 'Telnet Disabled',\n    severity: 'critical',\n    pattern: 'transport input telnet',\n    mustExist: false,\n    platforms: ['cisco_ios', 'cisco_nxos']\n  },\n  {\n    id: 'SEC-003',\n    name: 'Password Encryption',\n    severity: 'high',\n    pattern: 'service password-encryption',\n    mustExist: true,\n    platforms: ['cisco_ios']\n  },\n  {\n    id: 'SEC-004',\n    name: 'NTP Configured',\n    severity: 'medium',\n    pattern: 'ntp server',\n    mustExist: true,\n    platforms: ['all']\n  },\n  {\n    id: 'SEC-005',\n    name: 'Logging Enabled',\n    severity: 'high',\n    pattern: 'logging host',\n    mustExist: true,\n    platforms: ['all']\n  },\n  {\n    id: 'SEC-006',\n    name: 'SNMP Community Not Default',\n    severity: 'critical',\n    pattern: 'snmp-server community public',\n    mustExist: false,\n    platforms: ['all']\n  },\n  {\n    id: 'NET-001',\n    name: 'CDP Disabled on Edge',\n    severity: 'medium',\n    pattern: 'no cdp enable',\n    mustExist: true,\n    platforms: ['cisco_ios'],\n    interfaceType: 'edge'\n  },\n  {\n    id: 'NET-002',\n    name: 'Spanning Tree BPDU Guard',\n    severity: 'high',\n    pattern: 'spanning-tree bpduguard enable',\n    mustExist: true,\n    platforms: ['cisco_ios', 'cisco_nxos'],\n    interfaceType: 'access'\n  }\n];\n\nreturn {\n  json: {\n    rules,\n    checkTime: new Date().toISOString()\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [220, 400],
+      "id": "get-rules",
+      "name": "Get Compliance Rules"
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $env.BACKUP_STORAGE_API }}/configs/latest",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [440, 400],
+      "id": "get-configs",
+      "name": "Get Device Configs"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Run compliance checks against all device configurations\nconst data = $input.first().json;\nconst rules = data.rules || [];\nconst configs = data.configs || [];\n\nconst violations = [];\nconst compliant = [];\n\nconfigs.forEach(device => {\n  const config = device.config || '';\n  const platform = device.platform || '';\n  \n  rules.forEach(rule => {\n    // Check if rule applies to this platform\n    if (rule.platforms.includes('all') || rule.platforms.includes(platform)) {\n      const hasPattern = config.includes(rule.pattern);\n      const isViolation = rule.mustExist ? !hasPattern : hasPattern;\n      \n      if (isViolation) {\n        violations.push({\n          deviceHostname: device.hostname,\n          deviceIp: device.ip,\n          platform: platform,\n          ruleId: rule.id,\n          ruleName: rule.name,\n          severity: rule.severity,\n          pattern: rule.pattern,\n          expected: rule.mustExist ? 'present' : 'absent',\n          actual: hasPattern ? 'present' : 'absent'\n        });\n      } else {\n        compliant.push({\n          deviceHostname: device.hostname,\n          ruleId: rule.id\n        });\n      }\n    }\n  });\n});\n\nconst summary = {\n  totalDevices: configs.length,\n  totalRules: rules.length,\n  totalViolations: violations.length,\n  criticalViolations: violations.filter(v => v.severity === 'critical').length,\n  highViolations: violations.filter(v => v.severity === 'high').length,\n  mediumViolations: violations.filter(v => v.severity === 'medium').length\n};\n\nreturn {\n  json: {\n    summary,\n    violations,\n    compliant,\n    checkTime: data.checkTime\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [660, 400],
+      "id": "run-checks",
+      "name": "Run Compliance Checks"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "claude-sonnet-4-20250514"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Analyze these network compliance check results and provide insights:\n\n*Summary:*\n- Total Devices: {{ $json.summary.totalDevices }}\n- Critical Violations: {{ $json.summary.criticalViolations }}\n- High Violations: {{ $json.summary.highViolations }}\n- Medium Violations: {{ $json.summary.mediumViolations }}\n\n*Violations:*\n{{ JSON.stringify($json.violations.slice(0, 20), null, 2) }}\n\nProvide:\n1. Priority remediation recommendations\n2. Patterns or trends in violations\n3. Potential security risks\n4. Suggested automation improvements"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatAnthropic",
+      "typeVersion": 1.3,
+      "position": [880, 400],
+      "id": "ai-compliance",
+      "name": "AI Compliance Analysis",
+      "credentials": {
+        "anthropicApi": {
+          "id": "anthropic-credentials",
+          "name": "Anthropic account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Generate compliance report\nconst data = $input.first().json;\n\nconst report = {\n  reportId: `COMP-${Date.now()}`,\n  generatedAt: new Date().toISOString(),\n  summary: data.summary,\n  aiInsights: data.message?.content || '',\n  violations: data.violations,\n  complianceScore: data.summary.totalDevices > 0 \n    ? ((1 - (data.summary.totalViolations / (data.summary.totalDevices * 10))) * 100).toFixed(1)\n    : 100,\n  trend: 'stable', // Would compare with previous reports\n  nextScheduledCheck: new Date(Date.now() + 86400000).toISOString()\n};\n\nreturn {\n  json: report\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1100, 400],
+      "id": "generate-report",
+      "name": "Generate Compliance Report"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "has-violations",
+              "leftValue": "={{ $json.summary.criticalViolations + $json.summary.highViolations }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [1320, 400],
+      "id": "check-violations",
+      "name": "Check Violations"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.ITSM_API }}/tasks/batch",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "tasks",
+              "value": "={{ JSON.stringify($json.violations.filter(v => v.severity === 'critical' || v.severity === 'high').map(v => ({ title: `Remediate ${v.ruleId}: ${v.ruleName} on ${v.deviceHostname}`, priority: v.severity, assignee: 'network-team' }))) }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1540, 300],
+      "id": "create-tasks",
+      "name": "Create Remediation Tasks"
+    },
+    {
+      "parameters": {
+        "channel": "#security-alerts",
+        "text": "=:shield: *Network Compliance Violations Detected*\n\n*Compliance Score:* {{ $json.complianceScore }}%\n\n*Critical Violations:* {{ $json.summary.criticalViolations }}\n*High Violations:* {{ $json.summary.highViolations }}\n\n*Top Issues:*\n{{ $json.violations.filter(v => v.severity === 'critical').slice(0, 5).map(v => `• ${v.deviceHostname}: ${v.ruleName}`).join('\\n') }}\n\n*AI Insights:*\n{{ $json.aiInsights.substring(0, 500) }}...\n\nRemediation tasks have been created. Please review and prioritize.",
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.1,
+      "position": [1760, 300],
+      "id": "alert-security",
+      "name": "Alert Security Team",
+      "credentials": {
+        "slackApi": {
+          "id": "slack-credentials",
+          "name": "Slack API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "channel": "#network-ops",
+        "text": "=:white_check_mark: *Daily Compliance Check Complete*\n\n*Compliance Score:* {{ $json.complianceScore }}%\n*Devices Checked:* {{ $json.summary.totalDevices }}\n*Rules Applied:* {{ $json.summary.totalRules }}\n\n{{ $json.summary.totalViolations === 0 ? ':tada: All devices compliant!' : `Minor issues: ${$json.summary.mediumViolations} medium violations` }}\n\n_Report ID: {{ $json.reportId }}_",
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.1,
+      "position": [1540, 500],
+      "id": "send-report",
+      "name": "Send Compliance Report",
+      "credentials": {
+        "slackApi": {
+          "id": "slack-credentials",
+          "name": "Slack API"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "shared": [],
+  "staticData": null,
+  "tags": [
+    {
+      "name": "Network Operations"
+    },
+    {
+      "name": "Compliance"
+    },
+    {
+      "name": "Change Management"
+    }
+  ],
+  "triggerCount": 0,
+  "updatedAt": "2026-01-08T00:00:00.000Z",
+  "versionId": "network-compliance-v1"
+}

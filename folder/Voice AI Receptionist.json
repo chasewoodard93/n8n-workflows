@@ -1,0 +1,587 @@
+{
+  "active": false,
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Get Business Config",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Business Config": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Anthropic Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create an event in Google Calendar": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get many events in Google Calendar": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update an event in Google Calendar": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Delete an event in Google Calendar": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Record Caller Info": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transfer Call": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send SMS Confirmation": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Log Conversation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log Conversation": {
+      "main": [
+        [
+          {
+            "node": "Route Post-Call Actions",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route Post-Call Actions": {
+      "main": [
+        [
+          {
+            "node": "Send Appointment Email",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Create CRM Lead",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send Callback Request",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "End Call",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2025-11-13T01:17:41.770Z",
+  "id": "voice-ai-receptionist",
+  "isArchived": false,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "name": "Voice AI Receptionist",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "voice-receptionist",
+        "options": {
+          "rawBody": true
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [0, 0],
+      "id": "webhook-voice",
+      "name": "Webhook",
+      "webhookId": "voice-receptionist-webhook"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get business configuration from environment or database\n// This makes the receptionist work for ANY business type\n\nconst incomingData = $input.first().json;\n\n// Business configuration - customize per deployment\nconst businessConfig = {\n  // Core Business Info\n  businessName: $env.BUSINESS_NAME || 'Your Business',\n  businessType: $env.BUSINESS_TYPE || 'service', // service, retail, healthcare, legal, restaurant, etc.\n  receptionistName: $env.RECEPTIONIST_NAME || 'Alex',\n  \n  // Contact & Location\n  address: $env.BUSINESS_ADDRESS || '',\n  phone: $env.BUSINESS_PHONE || '',\n  email: $env.BUSINESS_EMAIL || '',\n  website: $env.BUSINESS_WEBSITE || '',\n  \n  // Operating Hours\n  operatingHours: {\n    monday: $env.HOURS_MON || '9:00 AM - 5:00 PM',\n    tuesday: $env.HOURS_TUE || '9:00 AM - 5:00 PM',\n    wednesday: $env.HOURS_WED || '9:00 AM - 5:00 PM',\n    thursday: $env.HOURS_THU || '9:00 AM - 5:00 PM',\n    friday: $env.HOURS_FRI || '9:00 AM - 5:00 PM',\n    saturday: $env.HOURS_SAT || 'Closed',\n    sunday: $env.HOURS_SUN || 'Closed'\n  },\n  \n  // Services/Products (comma-separated in env)\n  services: ($env.BUSINESS_SERVICES || 'consultations,general inquiries').split(',').map(s => s.trim()),\n  \n  // Appointment Settings\n  appointmentDuration: parseInt($env.APPOINTMENT_DURATION || '30'), // minutes\n  allowSameDayBooking: $env.ALLOW_SAME_DAY === 'true',\n  advanceBookingDays: parseInt($env.ADVANCE_BOOKING_DAYS || '30'),\n  \n  // Staff/Departments for transfers\n  departments: ($env.DEPARTMENTS || 'general,sales,support').split(',').map(s => s.trim()),\n  \n  // Custom FAQ/Knowledge Base entries (JSON string in env)\n  customFAQ: JSON.parse($env.CUSTOM_FAQ || '[]'),\n  \n  // Greeting customization\n  greetingStyle: $env.GREETING_STYLE || 'professional', // professional, friendly, formal\n  \n  // Language\n  language: $env.LANGUAGE || 'en'\n};\n\n// Build dynamic system prompt based on business type\nconst getIndustrySpecificPrompt = (type) => {\n  const prompts = {\n    healthcare: `\n## Healthcare-Specific Guidelines:\n- Always ask if this is an emergency (if yes, advise calling 911)\n- Collect insurance information when booking appointments\n- Be HIPAA-conscious - don't discuss specific medical details\n- Ask about the reason for visit in general terms\n- Mention any preparation requirements for appointments`,\n    \n    legal: `\n## Legal-Specific Guidelines:\n- Clarify this is not legal advice\n- Ask about the general nature of their legal matter\n- Mention consultation fees if applicable\n- Be discreet about sensitive matters\n- Note urgency for time-sensitive legal issues`,\n    \n    restaurant: `\n## Restaurant-Specific Guidelines:\n- Handle reservations including party size and special occasions\n- Know the menu highlights and dietary accommodation options\n- Handle takeout/delivery inquiries\n- Mention wait times during peak hours\n- Note any special requests or allergies`,\n    \n    retail: `\n## Retail-Specific Guidelines:\n- Help with product availability inquiries\n- Provide store hours and location details\n- Handle order status inquiries\n- Process return/exchange scheduling\n- Mention current promotions if relevant`,\n    \n    service: `\n## Service Business Guidelines:\n- Understand the service offerings\n- Collect necessary information for service quotes\n- Schedule service appointments or consultations\n- Handle follow-up and status inquiries\n- Note any special requirements or access instructions`,\n    \n    realestate: `\n## Real Estate Guidelines:\n- Handle property viewing requests\n- Collect buyer/seller qualification info\n- Schedule showings and consultations\n- Provide general market information\n- Note property preferences and requirements`,\n    \n    salon: `\n## Salon/Spa Guidelines:\n- Book appointments for specific services and stylists\n- Handle cancellations and rescheduling\n- Mention any preparation requirements\n- Note service preferences and past services\n- Handle gift card and package inquiries`\n  };\n  \n  return prompts[type] || prompts.service;\n};\n\nconst systemPrompt = `You are ${businessConfig.receptionistName}, a ${businessConfig.greetingStyle} AI receptionist for ${businessConfig.businessName}.\n\n## Your Core Responsibilities:\n1. Greet callers warmly and professionally\n2. Determine their needs (appointment, information, speak to someone, etc.)\n3. Handle appointment booking, rescheduling, and cancellations\n4. Answer questions about the business\n5. Transfer calls or take messages when appropriate\n6. Collect caller information accurately\n\n## Business Information:\n- Business: ${businessConfig.businessName}\n- Address: ${businessConfig.address}\n- Phone: ${businessConfig.phone}\n- Website: ${businessConfig.website}\n- Services: ${businessConfig.services.join(', ')}\n\n## Operating Hours:\n${Object.entries(businessConfig.operatingHours).map(([day, hours]) => `- ${day.charAt(0).toUpperCase() + day.slice(1)}: ${hours}`).join('\\n')}\n\n## Appointment Settings:\n- Standard appointment duration: ${businessConfig.appointmentDuration} minutes\n- Can book up to ${businessConfig.advanceBookingDays} days in advance\n${businessConfig.allowSameDayBooking ? '- Same-day appointments available' : '- Same-day appointments not available'}\n\n## Departments/Staff:\n${businessConfig.departments.map(d => `- ${d.charAt(0).toUpperCase() + d.slice(1)}`).join('\\n')}\n\n${getIndustrySpecificPrompt(businessConfig.businessType)}\n\n## Communication Guidelines:\n- Collect information ONE detail at a time\n- When taking email addresses, ask them to spell it letter by letter\n- Confirm all details before finalizing any appointment\n- Be ${businessConfig.greetingStyle} but efficient\n- If you can't help, offer to take a message or transfer\n- Use the available tools for all actions\n\n## Available Actions:\n- Book, reschedule, or cancel appointments (use calendar tools)\n- Record caller information for follow-up\n- Transfer calls to appropriate departments\n- Send SMS confirmations\n\n${businessConfig.customFAQ.length > 0 ? '## Frequently Asked Questions:\\n' + businessConfig.customFAQ.map(faq => `Q: ${faq.question}\\nA: ${faq.answer}`).join('\\n\\n') : ''}`;\n\nreturn {\n  json: {\n    ...incomingData,\n    businessConfig,\n    systemPrompt,\n    timestamp: new Date().toISOString()\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [220, 0],
+      "id": "get-business-config",
+      "name": "Get Business Config"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.systemPrompt }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [440, 0],
+      "id": "ai-agent",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "claude-sonnet-4-20250514",
+          "cachedResultName": "Claude Sonnet 4"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatAnthropic",
+      "typeVersion": 1.3,
+      "position": [300, 220],
+      "id": "anthropic-model",
+      "name": "Anthropic Chat Model",
+      "credentials": {
+        "anthropicApi": {
+          "id": "anthropic-credentials",
+          "name": "Anthropic account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "calendar": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        },
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [500, 220],
+      "id": "create-calendar-event",
+      "name": "Create an event in Google Calendar"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "calendar": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [600, 320],
+      "id": "get-calendar-events",
+      "name": "Get many events in Google Calendar"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "calendar": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        },
+        "updateFields": {}
+      },
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [700, 420],
+      "id": "update-calendar-event",
+      "name": "Update an event in Google Calendar"
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "calendar": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [800, 520],
+      "id": "delete-calendar-event",
+      "name": "Delete an event in Google Calendar"
+    },
+    {
+      "parameters": {
+        "name": "record_caller_info",
+        "description": "Record caller information for follow-up or callback. Use this when the caller needs to be contacted later or when taking a message.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "caller_name": {
+              "type": "string",
+              "description": "Full name of the caller"
+            },
+            "phone_number": {
+              "type": "string",
+              "description": "Caller's phone number"
+            },
+            "email": {
+              "type": "string",
+              "description": "Caller's email address"
+            },
+            "reason": {
+              "type": "string",
+              "description": "Reason for call or message to leave"
+            },
+            "urgency": {
+              "type": "string",
+              "enum": ["low", "medium", "high"],
+              "description": "Urgency level of the callback"
+            },
+            "preferred_callback_time": {
+              "type": "string",
+              "description": "When the caller prefers to be called back"
+            },
+            "department": {
+              "type": "string",
+              "description": "Which department or person should call back"
+            }
+          },
+          "required": ["caller_name", "reason"]
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 1.2,
+      "position": [400, 420],
+      "id": "record-caller-tool",
+      "name": "Record Caller Info"
+    },
+    {
+      "parameters": {
+        "name": "transfer_call",
+        "description": "Transfer the call to a specific department or person. Use when caller needs to speak with someone specific.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "department": {
+              "type": "string",
+              "description": "Department to transfer to"
+            },
+            "reason": {
+              "type": "string",
+              "description": "Brief reason for transfer"
+            },
+            "caller_name": {
+              "type": "string",
+              "description": "Name of the caller being transferred"
+            }
+          },
+          "required": ["department", "reason"]
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 1.2,
+      "position": [300, 520],
+      "id": "transfer-call-tool",
+      "name": "Transfer Call"
+    },
+    {
+      "parameters": {
+        "name": "send_sms_confirmation",
+        "description": "Send an SMS confirmation to the caller with appointment or callback details.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "phone_number": {
+              "type": "string",
+              "description": "Phone number to send SMS to"
+            },
+            "message_type": {
+              "type": "string",
+              "enum": ["appointment_confirmation", "appointment_reminder", "callback_scheduled", "general"],
+              "description": "Type of confirmation message"
+            },
+            "details": {
+              "type": "string",
+              "description": "Specific details to include in the message"
+            }
+          },
+          "required": ["phone_number", "message_type"]
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 1.2,
+      "position": [500, 520],
+      "id": "send-sms-tool",
+      "name": "Send SMS Confirmation"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Log the conversation for analytics and follow-up\nconst data = $input.first().json;\n\nconst conversationLog = {\n  id: `call-${Date.now()}`,\n  timestamp: new Date().toISOString(),\n  businessName: data.businessConfig?.businessName || 'Unknown',\n  callerInfo: data.callerInfo || {},\n  conversationSummary: data.output || '',\n  actions: data.actions || [],\n  duration: data.duration || 0,\n  outcome: data.outcome || 'completed',\n  followUpRequired: data.followUpRequired || false,\n  appointmentBooked: data.appointmentBooked || false,\n  transferRequested: data.transferRequested || false\n};\n\nreturn {\n  json: {\n    ...data,\n    conversationLog\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [660, 0],
+      "id": "log-conversation",
+      "name": "Log Conversation"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.conversationLog.appointmentBooked }}",
+                    "rightValue": true,
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "Appointment Booked"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.conversationLog.outcome }}",
+                    "rightValue": "new_lead",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "New Lead"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.conversationLog.followUpRequired }}",
+                    "rightValue": true,
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "Callback Requested"
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra"
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [880, 0],
+      "id": "route-actions",
+      "name": "Route Post-Call Actions"
+    },
+    {
+      "parameters": {
+        "fromEmail": "={{ $json.businessConfig.email }}",
+        "toEmail": "={{ $json.callerInfo.email }}",
+        "subject": "=Appointment Confirmation - {{ $json.businessConfig.businessName }}",
+        "text": "=Dear {{ $json.callerInfo.name }},\n\nYour appointment has been confirmed.\n\nDetails:\n- Date: {{ $json.appointmentDetails.date }}\n- Time: {{ $json.appointmentDetails.time }}\n- Service: {{ $json.appointmentDetails.service }}\n\nLocation:\n{{ $json.businessConfig.address }}\n\nIf you need to reschedule or cancel, please call us at {{ $json.businessConfig.phone }}.\n\nThank you for choosing {{ $json.businessConfig.businessName }}!\n\nBest regards,\n{{ $json.businessConfig.receptionistName }}\nAI Receptionist"
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [1100, -150],
+      "id": "send-appointment-email",
+      "name": "Send Appointment Email"
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "leadData": {
+          "values": {
+            "firstName": "={{ $json.callerInfo.firstName }}",
+            "lastName": "={{ $json.callerInfo.lastName }}",
+            "email": "={{ $json.callerInfo.email }}",
+            "phone": "={{ $json.callerInfo.phone }}",
+            "source": "Voice AI Receptionist",
+            "notes": "={{ $json.conversationLog.conversationSummary }}"
+          }
+        }
+      },
+      "type": "n8n-nodes-base.hubspot",
+      "typeVersion": 2,
+      "position": [1100, 0],
+      "id": "create-crm-lead",
+      "name": "Create CRM Lead",
+      "credentials": {
+        "hubspotApi": {
+          "id": "hubspot-credentials",
+          "name": "HubSpot API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "channel": "#callbacks",
+        "text": "=:phone: *Callback Request*\n\n*Caller:* {{ $json.callerInfo.name }}\n*Phone:* {{ $json.callerInfo.phone }}\n*Reason:* {{ $json.callbackDetails.reason }}\n*Urgency:* {{ $json.callbackDetails.urgency }}\n*Preferred Time:* {{ $json.callbackDetails.preferredTime }}\n*Department:* {{ $json.callbackDetails.department }}\n\n_Received via Voice AI Receptionist_",
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.1,
+      "position": [1100, 150],
+      "id": "send-callback-request",
+      "name": "Send Callback Request",
+      "credentials": {
+        "slackApi": {
+          "id": "slack-credentials",
+          "name": "Slack API"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [1100, 300],
+      "id": "end-call",
+      "name": "End Call"
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "shared": [
+    {
+      "createdAt": "2025-11-13T01:17:41.776Z",
+      "updatedAt": "2025-11-13T01:17:41.776Z",
+      "role": "workflow:owner",
+      "workflowId": "voice-ai-receptionist",
+      "projectId": "O4Y1BiKG2lGdIwOF"
+    }
+  ],
+  "staticData": null,
+  "tags": [
+    {
+      "name": "Voice AI"
+    },
+    {
+      "name": "Receptionist"
+    },
+    {
+      "name": "Customer Service"
+    }
+  ],
+  "triggerCount": 0,
+  "updatedAt": "2026-01-08T00:00:00.000Z",
+  "versionId": "voice-receptionist-v2"
+}

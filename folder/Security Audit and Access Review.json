@@ -1,0 +1,928 @@
+{
+  "active": false,
+  "connections": {
+    "Schedule - Daily Security": {
+      "main": [
+        [
+          {
+            "node": "Get Security Events",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule - Weekly Access Review": {
+      "main": [
+        [
+          {
+            "node": "Get User Access",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook - Security Alert": {
+      "main": [
+        [
+          {
+            "node": "Process Alert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Security Events": {
+      "main": [
+        [
+          {
+            "node": "AI Analyze Events",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Analyze Events": {
+      "main": [
+        [
+          {
+            "node": "Check Severity",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Severity": {
+      "main": [
+        [
+          {
+            "node": "Create Incident",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Log to SIEM",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Incident": {
+      "main": [
+        [
+          {
+            "node": "Alert Security Team",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Alert Security Team": {
+      "main": [
+        [
+          {
+            "node": "Page On-Call Security",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get User Access": {
+      "main": [
+        [
+          {
+            "node": "AI Review Access",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Review Access": {
+      "main": [
+        [
+          {
+            "node": "Flag Anomalies",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Flag Anomalies": {
+      "main": [
+        [
+          {
+            "node": "Create Access Review Tasks",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send Access Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Access Review Tasks": {
+      "main": [
+        [
+          {
+            "node": "Notify Managers",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Process Alert": {
+      "main": [
+        [
+          {
+            "node": "AI Triage Alert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Triage Alert": {
+      "main": [
+        [
+          {
+            "node": "Route by Threat Level",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route by Threat Level": {
+      "main": [
+        [
+          {
+            "node": "Critical Response",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "High Priority Queue",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Standard Queue",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Critical Response": {
+      "main": [
+        [
+          {
+            "node": "Auto Remediate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Auto Remediate": {
+      "main": [
+        [
+          {
+            "node": "Page Security On-Call",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule - Compliance Audit": {
+      "main": [
+        [
+          {
+            "node": "Run Compliance Checks",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Run Compliance Checks": {
+      "main": [
+        [
+          {
+            "node": "Generate Compliance Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Compliance Report": {
+      "main": [
+        [
+          {
+            "node": "Check Compliance Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Compliance Status": {
+      "main": [
+        [
+          {
+            "node": "Alert Compliance Issues",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Archive Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-01-08T00:00:00.000Z",
+  "id": "security-audit-access-review",
+  "isArchived": false,
+  "meta": {
+    "instanceId": "security-compliance"
+  },
+  "name": "Security Audit and Access Review",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 6 * * *"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [0, 0],
+      "id": "daily-security",
+      "name": "Schedule - Daily Security"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 9 * * 1"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [0, 300],
+      "id": "weekly-access",
+      "name": "Schedule - Weekly Access Review"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "security-alert",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [0, 600],
+      "id": "alert-webhook",
+      "name": "Webhook - Security Alert",
+      "webhookId": "security-alert-webhook"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 8 1 * *"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [0, 900],
+      "id": "compliance-schedule",
+      "name": "Schedule - Compliance Audit"
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $env.SIEM_API }}/events?since={{ new Date(Date.now() - 86400000).toISOString() }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [220, 0],
+      "id": "get-events",
+      "name": "Get Security Events"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "claude-sonnet-4-20250514"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Analyze these security events from the last 24 hours and identify any threats or anomalies:\n\n{{ JSON.stringify($json.events?.slice(0, 50) || $json, null, 2) }}\n\nProvide analysis in JSON format:\n{\n  \"summary\": \"brief summary of security posture\",\n  \"totalEvents\": number,\n  \"criticalFindings\": [\n    {\n      \"type\": \"type of finding\",\n      \"description\": \"details\",\n      \"severity\": \"critical|high|medium|low\",\n      \"affectedSystems\": [\"list\"],\n      \"recommendedAction\": \"what to do\"\n    }\n  ],\n  \"suspiciousPatterns\": [\"patterns detected\"],\n  \"failedLogins\": { \"count\": number, \"topSources\": [\"IPs\"] },\n  \"privilegedAccess\": { \"count\": number, \"unusual\": [\"activities\"] },\n  \"dataExfiltration\": { \"risk\": \"low|medium|high\", \"indicators\": [] },\n  \"overallRisk\": \"low|medium|high|critical\",\n  \"requiresImmediate\": true/false\n}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatAnthropic",
+      "typeVersion": 1.3,
+      "position": [440, 0],
+      "id": "ai-events",
+      "name": "AI Analyze Events",
+      "credentials": {
+        "anthropicApi": {
+          "id": "anthropic-credentials",
+          "name": "Anthropic account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "high-severity",
+              "leftValue": "={{ $json.overallRisk === 'critical' || $json.overallRisk === 'high' || $json.requiresImmediate }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [660, 0],
+      "id": "check-severity",
+      "name": "Check Severity"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.INCIDENT_API }}/incidents",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "title",
+              "value": "=Security Alert: {{ $json.overallRisk }} risk detected"
+            },
+            {
+              "name": "severity",
+              "value": "={{ $json.overallRisk }}"
+            },
+            {
+              "name": "findings",
+              "value": "={{ JSON.stringify($json.criticalFindings) }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [880, -100],
+      "id": "create-incident",
+      "name": "Create Incident"
+    },
+    {
+      "parameters": {
+        "channel": "#security-alerts",
+        "text": "=:rotating_light: *SECURITY ALERT - {{ $json.overallRisk.toUpperCase() }} RISK*\n\n*Summary:* {{ $json.summary }}\n\n*Critical Findings:*\n{{ $json.criticalFindings?.map(f => `• [${f.severity}] ${f.type}: ${f.description}`).join('\\n') || 'None' }}\n\n*Suspicious Patterns:*\n{{ $json.suspiciousPatterns?.map(p => '• ' + p).join('\\n') || 'None detected' }}\n\n*Failed Logins:* {{ $json.failedLogins?.count || 0 }}\n*Privileged Access Events:* {{ $json.privilegedAccess?.count || 0 }}\n\n:warning: Immediate investigation required!",
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.1,
+      "position": [1100, -100],
+      "id": "alert-security",
+      "name": "Alert Security Team",
+      "credentials": {
+        "slackApi": {
+          "id": "slack-credentials",
+          "name": "Slack API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "incident",
+        "summary": "=SECURITY: {{ $json.overallRisk }} risk - {{ $json.summary }}",
+        "email": "={{ $env.SECURITY_ONCALL_EMAIL }}",
+        "options": {
+          "urgency": "high"
+        }
+      },
+      "type": "n8n-nodes-base.pagerDuty",
+      "typeVersion": 1,
+      "position": [1320, -100],
+      "id": "page-security",
+      "name": "Page On-Call Security",
+      "credentials": {
+        "pagerDutyApi": {
+          "id": "pagerduty-credentials",
+          "name": "PagerDuty API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.SIEM_API }}/log",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "analysis",
+              "value": "={{ JSON.stringify($json) }}"
+            },
+            {
+              "name": "date",
+              "value": "={{ new Date().toISOString() }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [880, 100],
+      "id": "log-siem",
+      "name": "Log to SIEM"
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $env.IAM_API }}/users/access",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [220, 300],
+      "id": "get-access",
+      "name": "Get User Access"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "claude-sonnet-4-20250514"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Review user access data for security and compliance issues:\n\n{{ JSON.stringify($json.users?.slice(0, 100) || $json, null, 2) }}\n\nAnalyze for:\n1. Excessive permissions (principle of least privilege violations)\n2. Dormant accounts (no login > 30 days but active permissions)\n3. Orphaned accounts (no manager, terminated employees)\n4. Privilege accumulation (users with too many roles)\n5. Segregation of duties violations\n6. Service accounts with unnecessary access\n\nProvide JSON:\n{\n  \"totalUsers\": number,\n  \"anomalies\": [\n    {\n      \"userId\": \"id\",\n      \"userName\": \"name\",\n      \"issue\": \"description\",\n      \"riskLevel\": \"high|medium|low\",\n      \"recommendation\": \"action to take\"\n    }\n  ],\n  \"dormantAccounts\": number,\n  \"overPrivileged\": number,\n  \"segregationViolations\": number,\n  \"complianceScore\": 0-100,\n  \"recommendations\": [\"top recommendations\"]\n}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatAnthropic",
+      "typeVersion": 1.3,
+      "position": [440, 300],
+      "id": "ai-access",
+      "name": "AI Review Access",
+      "credentials": {
+        "anthropicApi": {
+          "id": "anthropic-credentials",
+          "name": "Anthropic account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "has-anomalies",
+              "leftValue": "={{ ($json.anomalies?.length || 0) > 0 }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [660, 300],
+      "id": "flag-anomalies",
+      "name": "Flag Anomalies"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.TASK_API }}/tasks/batch",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "tasks",
+              "value": "={{ JSON.stringify($json.anomalies.filter(a => a.riskLevel === 'high').map(a => ({ title: `Access Review: ${a.userName} - ${a.issue}`, assignee: 'security-team', priority: 'high', dueDate: new Date(Date.now() + 7 * 86400000).toISOString() }))) }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [880, 200],
+      "id": "create-tasks",
+      "name": "Create Access Review Tasks"
+    },
+    {
+      "parameters": {
+        "channel": "#security-reviews",
+        "text": "=:key: *Weekly Access Review Complete*\n\n*Compliance Score:* {{ $json.complianceScore }}/100\n\n*Findings:*\n• Total Users: {{ $json.totalUsers }}\n• Anomalies Found: {{ $json.anomalies?.length || 0 }}\n• Dormant Accounts: {{ $json.dormantAccounts }}\n• Over-Privileged: {{ $json.overPrivileged }}\n• SoD Violations: {{ $json.segregationViolations }}\n\n*High Risk Issues:*\n{{ $json.anomalies?.filter(a => a.riskLevel === 'high').map(a => `• ${a.userName}: ${a.issue}`).join('\\n') || 'None' }}\n\n*Recommendations:*\n{{ $json.recommendations?.map((r, i) => `${i+1}. ${r}`).join('\\n') || 'None' }}",
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.1,
+      "position": [1100, 200],
+      "id": "notify-managers",
+      "name": "Notify Managers",
+      "credentials": {
+        "slackApi": {
+          "id": "slack-credentials",
+          "name": "Slack API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "channel": "#security",
+        "text": "=:white_check_mark: *Weekly Access Review Complete*\n\n*Compliance Score:* {{ $json.complianceScore }}/100\nNo high-risk anomalies detected.\n\nFull report available in the security portal.",
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.1,
+      "position": [880, 400],
+      "id": "send-report",
+      "name": "Send Access Report",
+      "credentials": {
+        "slackApi": {
+          "id": "slack-credentials",
+          "name": "Slack API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Process incoming security alert\nconst alert = $input.first().json;\n\nconst processedAlert = {\n  id: `ALERT-${Date.now()}`,\n  receivedAt: new Date().toISOString(),\n  source: alert.source || 'unknown',\n  type: alert.type || alert.alertType || 'general',\n  severity: alert.severity || 'medium',\n  description: alert.description || alert.message || '',\n  affectedAssets: alert.assets || alert.hosts || [],\n  indicators: alert.indicators || alert.iocs || [],\n  rawData: alert\n};\n\nreturn {\n  json: processedAlert\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [220, 600],
+      "id": "process-alert",
+      "name": "Process Alert"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "claude-sonnet-4-20250514"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Triage this security alert and provide response recommendations:\n\nAlert ID: {{ $json.id }}\nSource: {{ $json.source }}\nType: {{ $json.type }}\nInitial Severity: {{ $json.severity }}\nDescription: {{ $json.description }}\nAffected Assets: {{ JSON.stringify($json.affectedAssets) }}\nIndicators: {{ JSON.stringify($json.indicators) }}\n\nProvide triage in JSON:\n{\n  \"threatLevel\": \"critical|high|medium|low\",\n  \"threatType\": \"malware|phishing|intrusion|data_breach|dos|insider|other\",\n  \"confidence\": 0-100,\n  \"isFalsePositive\": true/false,\n  \"affectedScope\": \"description of impact\",\n  \"immediateActions\": [\"steps to take now\"],\n  \"containmentSteps\": [\"how to contain\"],\n  \"investigationSteps\": [\"what to investigate\"],\n  \"autoRemediateEligible\": true/false,\n  \"autoRemediateAction\": \"if eligible, what action\"\n}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatAnthropic",
+      "typeVersion": 1.3,
+      "position": [440, 600],
+      "id": "ai-triage",
+      "name": "AI Triage Alert",
+      "credentials": {
+        "anthropicApi": {
+          "id": "anthropic-credentials",
+          "name": "Anthropic account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.threatLevel }}",
+                    "rightValue": "critical",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "Critical"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.threatLevel }}",
+                    "rightValue": "high",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "High"
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra"
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [660, 600],
+      "id": "route-threat",
+      "name": "Route by Threat Level"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Critical threat response\nconst data = $input.first().json;\n\nreturn {\n  json: {\n    ...data,\n    responseLevel: 'critical',\n    autoRemediate: data.autoRemediateEligible,\n    escalate: true\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [880, 500],
+      "id": "critical-response",
+      "name": "Critical Response"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.SECURITY_API }}/remediate",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "action",
+              "value": "={{ $json.autoRemediateAction }}"
+            },
+            {
+              "name": "targets",
+              "value": "={{ JSON.stringify($json.affectedAssets) }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1100, 500],
+      "id": "auto-remediate",
+      "name": "Auto Remediate"
+    },
+    {
+      "parameters": {
+        "resource": "incident",
+        "summary": "=CRITICAL SECURITY: {{ $json.threatType }} - {{ $json.description?.substring(0, 100) }}",
+        "email": "={{ $env.SECURITY_ONCALL_EMAIL }}",
+        "options": {
+          "urgency": "high"
+        }
+      },
+      "type": "n8n-nodes-base.pagerDuty",
+      "typeVersion": 1,
+      "position": [1320, 500],
+      "id": "page-oncall",
+      "name": "Page Security On-Call",
+      "credentials": {
+        "pagerDutyApi": {
+          "id": "pagerduty-credentials",
+          "name": "PagerDuty API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "channel": "#security-queue",
+        "text": "=:exclamation: *High Priority Security Alert*\n\n*Type:* {{ $json.threatType }}\n*Confidence:* {{ $json.confidence }}%\n*Scope:* {{ $json.affectedScope }}\n\n*Immediate Actions:*\n{{ $json.immediateActions?.map((a, i) => `${i+1}. ${a}`).join('\\n') }}\n\nAssigned to security queue for investigation.",
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.1,
+      "position": [880, 650],
+      "id": "high-queue",
+      "name": "High Priority Queue",
+      "credentials": {
+        "slackApi": {
+          "id": "slack-credentials",
+          "name": "Slack API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.SECURITY_API }}/queue/standard",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "alert",
+              "value": "={{ JSON.stringify($json) }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [880, 800],
+      "id": "standard-queue",
+      "name": "Standard Queue"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Run compliance checks\nconst frameworks = ['SOC2', 'GDPR', 'HIPAA', 'PCI-DSS'];\nconst checkResults = [];\n\n// In production, this would query various systems\nframeworks.forEach(framework => {\n  checkResults.push({\n    framework,\n    totalControls: 100,\n    passing: Math.floor(Math.random() * 20) + 80, // Simulated\n    failing: Math.floor(Math.random() * 10),\n    notApplicable: Math.floor(Math.random() * 10),\n    lastChecked: new Date().toISOString()\n  });\n});\n\nreturn {\n  json: {\n    auditDate: new Date().toISOString(),\n    frameworks: checkResults,\n    overallScore: Math.floor(checkResults.reduce((sum, f) => sum + (f.passing / f.totalControls * 100), 0) / frameworks.length)\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [220, 900],
+      "id": "run-compliance",
+      "name": "Run Compliance Checks"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Generate compliance report\nconst data = $input.first().json;\n\nconst report = {\n  reportId: `COMP-${Date.now()}`,\n  generatedAt: data.auditDate,\n  overallScore: data.overallScore,\n  status: data.overallScore >= 90 ? 'compliant' : data.overallScore >= 70 ? 'needs_attention' : 'non_compliant',\n  frameworks: data.frameworks,\n  findings: data.frameworks.filter(f => f.failing > 0).map(f => ({\n    framework: f.framework,\n    failingControls: f.failing,\n    complianceRate: ((f.passing / f.totalControls) * 100).toFixed(1)\n  })),\n  nextAudit: new Date(Date.now() + 30 * 86400000).toISOString()\n};\n\nreturn {\n  json: report\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [440, 900],
+      "id": "gen-compliance-report",
+      "name": "Generate Compliance Report"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "not-compliant",
+              "leftValue": "={{ $json.status !== 'compliant' }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [660, 900],
+      "id": "check-compliance-status",
+      "name": "Check Compliance Status"
+    },
+    {
+      "parameters": {
+        "channel": "#compliance-alerts",
+        "text": "=:warning: *Compliance Issues Detected*\n\n*Overall Score:* {{ $json.overallScore }}%\n*Status:* {{ $json.status }}\n\n*Frameworks with Issues:*\n{{ $json.findings.map(f => `• ${f.framework}: ${f.complianceRate}% compliant (${f.failingControls} failing)`).join('\\n') }}\n\nImmediate remediation required.",
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.1,
+      "position": [880, 800],
+      "id": "alert-compliance",
+      "name": "Alert Compliance Issues",
+      "credentials": {
+        "slackApi": {
+          "id": "slack-credentials",
+          "name": "Slack API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.COMPLIANCE_API }}/reports",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "report",
+              "value": "={{ JSON.stringify($json) }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [880, 1000],
+      "id": "archive-report",
+      "name": "Archive Report"
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "shared": [],
+  "staticData": null,
+  "tags": [
+    {
+      "name": "Security"
+    },
+    {
+      "name": "Compliance"
+    },
+    {
+      "name": "Access Review"
+    }
+  ],
+  "triggerCount": 0,
+  "updatedAt": "2026-01-08T00:00:00.000Z",
+  "versionId": "security-audit-v1"
+}

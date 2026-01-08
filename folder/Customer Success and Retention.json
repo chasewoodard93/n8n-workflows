@@ -1,0 +1,960 @@
+{
+  "active": false,
+  "connections": {
+    "Schedule - Health Check": {
+      "main": [
+        [
+          {
+            "node": "Get Customer Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule - NPS Survey": {
+      "main": [
+        [
+          {
+            "node": "Get Active Customers",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook - Usage Event": {
+      "main": [
+        [
+          {
+            "node": "Process Usage Event",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule - Renewal Check": {
+      "main": [
+        [
+          {
+            "node": "Get Upcoming Renewals",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Customer Data": {
+      "main": [
+        [
+          {
+            "node": "Calculate Health Score",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calculate Health Score": {
+      "main": [
+        [
+          {
+            "node": "AI Churn Analysis",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Churn Analysis": {
+      "main": [
+        [
+          {
+            "node": "Route by Health",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route by Health": {
+      "main": [
+        [
+          {
+            "node": "Alert CSM - At Risk",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Schedule QBR",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send Success Check-in",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Alert CSM - At Risk": {
+      "main": [
+        [
+          {
+            "node": "Create Risk Task",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Active Customers": {
+      "main": [
+        [
+          {
+            "node": "Send NPS Survey",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook - NPS Response": {
+      "main": [
+        [
+          {
+            "node": "Process NPS Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Process NPS Response": {
+      "main": [
+        [
+          {
+            "node": "Route NPS Score",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route NPS Score": {
+      "main": [
+        [
+          {
+            "node": "Alert Detractor",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Request Testimonial",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Log NPS Score",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Process Usage Event": {
+      "main": [
+        [
+          {
+            "node": "Check Usage Patterns",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Usage Patterns": {
+      "main": [
+        [
+          {
+            "node": "Alert Low Usage",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Celebrate Milestone",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Log Usage",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Upcoming Renewals": {
+      "main": [
+        [
+          {
+            "node": "Route Renewal Timeline",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route Renewal Timeline": {
+      "main": [
+        [
+          {
+            "node": "Start Renewal Campaign 90",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Renewal Reminder 30",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Urgent Renewal 7",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-01-08T00:00:00.000Z",
+  "id": "customer-success-retention",
+  "isArchived": false,
+  "meta": {
+    "instanceId": "customer-success"
+  },
+  "name": "Customer Success and Retention",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 8 * * 1"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [0, 0],
+      "id": "health-schedule",
+      "name": "Schedule - Health Check"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 10 1 * *"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [0, 250],
+      "id": "nps-schedule",
+      "name": "Schedule - NPS Survey"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "usage-event",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [0, 500],
+      "id": "usage-webhook",
+      "name": "Webhook - Usage Event",
+      "webhookId": "usage-event-webhook"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 9 * * *"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [0, 750],
+      "id": "renewal-schedule",
+      "name": "Schedule - Renewal Check"
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $env.CRM_API }}/customers?active=true",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [220, 0],
+      "id": "get-customers",
+      "name": "Get Customer Data"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Calculate customer health score\nconst customers = $input.first().json.customers || $input.first().json || [];\n\nconst calculateHealthScore = (customer) => {\n  let score = 0;\n  const factors = [];\n  \n  // Usage score (0-25)\n  const usageRate = customer.usageRate || 0;\n  if (usageRate >= 80) { score += 25; factors.push('High usage'); }\n  else if (usageRate >= 50) { score += 15; factors.push('Moderate usage'); }\n  else if (usageRate >= 20) { score += 5; factors.push('Low usage'); }\n  else { factors.push('Very low usage - risk'); }\n  \n  // Support tickets (0-20)\n  const openTickets = customer.openTickets || 0;\n  const ticketSentiment = customer.avgTicketSentiment || 0;\n  if (openTickets === 0 && ticketSentiment >= 4) { score += 20; factors.push('No issues'); }\n  else if (openTickets <= 2) { score += 15; factors.push('Few tickets'); }\n  else if (openTickets <= 5) { score += 5; factors.push('Multiple open tickets'); }\n  else { factors.push('High ticket volume - risk'); }\n  \n  // NPS Score (0-20)\n  const nps = customer.npsScore || 0;\n  if (nps >= 9) { score += 20; factors.push('Promoter'); }\n  else if (nps >= 7) { score += 10; factors.push('Passive'); }\n  else if (nps > 0) { factors.push('Detractor - risk'); }\n  \n  // Engagement (0-20)\n  const lastLogin = customer.lastLoginDays || 999;\n  if (lastLogin <= 7) { score += 20; factors.push('Active engagement'); }\n  else if (lastLogin <= 14) { score += 15; factors.push('Recent engagement'); }\n  else if (lastLogin <= 30) { score += 5; factors.push('Declining engagement'); }\n  else { factors.push('No recent engagement - risk'); }\n  \n  // Contract value growth (0-15)\n  const growth = customer.contractGrowth || 0;\n  if (growth > 0) { score += 15; factors.push('Account growing'); }\n  else if (growth === 0) { score += 10; factors.push('Stable account'); }\n  else { factors.push('Account shrinking - risk'); }\n  \n  return {\n    ...customer,\n    healthScore: score,\n    healthStatus: score >= 80 ? 'healthy' : score >= 50 ? 'needs_attention' : 'at_risk',\n    healthFactors: factors\n  };\n};\n\nconst analyzed = (Array.isArray(customers) ? customers : [customers]).map(calculateHealthScore);\n\nreturn analyzed.map(c => ({ json: c }));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [440, 0],
+      "id": "calc-health",
+      "name": "Calculate Health Score"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "claude-sonnet-4-20250514"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Analyze this customer's health data and provide churn risk assessment:\n\n*Customer:* {{ $json.name }} ({{ $json.id }})\n*Account Type:* {{ $json.accountType }}\n*Contract Value:* ${{ $json.contractValue }}\n*Health Score:* {{ $json.healthScore }}/100\n*Status:* {{ $json.healthStatus }}\n\n*Health Factors:*\n{{ $json.healthFactors.join('\\n') }}\n\n*Metrics:*\n- Usage Rate: {{ $json.usageRate }}%\n- Last Login: {{ $json.lastLoginDays }} days ago\n- Open Tickets: {{ $json.openTickets }}\n- NPS Score: {{ $json.npsScore }}\n- Contract Growth: {{ $json.contractGrowth }}%\n\nProvide JSON with:\n{\n  \"churnRisk\": \"low|medium|high|critical\",\n  \"churnProbability\": 0-100,\n  \"keyRisks\": [\"list of specific risks\"],\n  \"recommendedActions\": [\"prioritized action items\"],\n  \"talkingPoints\": [\"for CSM call\"],\n  \"upsellOpportunities\": [\"if healthy\"]\n}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatAnthropic",
+      "typeVersion": 1.3,
+      "position": [660, 0],
+      "id": "ai-churn",
+      "name": "AI Churn Analysis",
+      "credentials": {
+        "anthropicApi": {
+          "id": "anthropic-credentials",
+          "name": "Anthropic account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.healthStatus }}",
+                    "rightValue": "at_risk",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "At Risk"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.healthStatus }}",
+                    "rightValue": "needs_attention",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "Needs Attention"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.healthStatus }}",
+                    "rightValue": "healthy",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "Healthy"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [880, 0],
+      "id": "route-health",
+      "name": "Route by Health"
+    },
+    {
+      "parameters": {
+        "channel": "#customer-success-alerts",
+        "text": "=:rotating_light: *At-Risk Customer Alert*\n\n*Customer:* {{ $json.name }}\n*Account ID:* {{ $json.id }}\n*CSM:* {{ $json.csm || 'Unassigned' }}\n*Contract Value:* ${{ $json.contractValue }}\n*Renewal Date:* {{ $json.renewalDate }}\n\n*Health Score:* {{ $json.healthScore }}/100 :red_circle:\n*Churn Risk:* {{ $json.churnRisk }} ({{ $json.churnProbability }}%)\n\n*Key Risks:*\n{{ $json.keyRisks.map(r => '• ' + r).join('\\n') }}\n\n*Recommended Actions:*\n{{ $json.recommendedActions.map((a, i) => `${i+1}. ${a}`).join('\\n') }}\n\n*Talking Points for Call:*\n{{ $json.talkingPoints.map(t => '• ' + t).join('\\n') }}",
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.1,
+      "position": [1100, -100],
+      "id": "alert-csm",
+      "name": "Alert CSM - At Risk",
+      "credentials": {
+        "slackApi": {
+          "id": "slack-credentials",
+          "name": "Slack API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.TASK_API }}/tasks",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "title",
+              "value": "=At-Risk Customer: {{ $json.name }}"
+            },
+            {
+              "name": "assignee",
+              "value": "={{ $json.csm }}"
+            },
+            {
+              "name": "priority",
+              "value": "high"
+            },
+            {
+              "name": "dueDate",
+              "value": "={{ new Date(Date.now() + 86400000).toISOString() }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1320, -100],
+      "id": "create-risk-task",
+      "name": "Create Risk Task"
+    },
+    {
+      "parameters": {
+        "fromEmail": "success@company.com",
+        "toEmail": "={{ $json.email }}",
+        "subject": "=Let's schedule your Quarterly Business Review",
+        "text": "=Hi {{ $json.contactName }},\n\nI hope this email finds you well! As your Customer Success Manager, I wanted to reach out to schedule our upcoming Quarterly Business Review.\n\nThis is a great opportunity for us to:\n- Review your usage and ROI\n- Discuss any challenges or opportunities\n- Align on goals for the next quarter\n- Explore new features that might benefit your team\n\nPlease let me know your availability for a 30-minute call in the next two weeks.\n\nBest regards,\n{{ $json.csm || 'Customer Success Team' }}"
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [1100, 50],
+      "id": "schedule-qbr",
+      "name": "Schedule QBR"
+    },
+    {
+      "parameters": {
+        "fromEmail": "success@company.com",
+        "toEmail": "={{ $json.email }}",
+        "subject": "=Quick check-in from {{ $env.COMPANY_NAME }}",
+        "text": "=Hi {{ $json.contactName }},\n\nJust wanted to check in and see how things are going!\n\nI noticed your team has been doing great with the platform. Here are some highlights:\n- Active users: {{ $json.activeUsers }}\n- Usage rate: {{ $json.usageRate }}%\n\nIs there anything we can help you with? Any features you'd like to learn more about?\n\nWe're here to help!\n\nBest,\n{{ $json.csm || 'Customer Success Team' }}"
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [1100, 150],
+      "id": "success-checkin",
+      "name": "Send Success Check-in"
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $env.CRM_API }}/customers?active=true&npsEligible=true",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [220, 250],
+      "id": "get-active",
+      "name": "Get Active Customers"
+    },
+    {
+      "parameters": {
+        "fromEmail": "feedback@company.com",
+        "toEmail": "={{ $json.email }}",
+        "subject": "=How likely are you to recommend us?",
+        "text": "=Hi {{ $json.contactName }},\n\nWe value your feedback! Please take 30 seconds to answer one question:\n\nHow likely are you to recommend {{ $env.COMPANY_NAME }} to a colleague or friend?\n\n{{ [0,1,2,3,4,5,6,7,8,9,10].map(n => `${n}: {{ $env.NPS_URL }}?customer={{ $json.id }}&score=${n}`).join('\\n') }}\n\n0 = Not at all likely\n10 = Extremely likely\n\nThank you for your time!\n\n{{ $env.COMPANY_NAME }} Team"
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [440, 250],
+      "id": "send-nps",
+      "name": "Send NPS Survey"
+    },
+    {
+      "parameters": {
+        "httpMethod": "GET",
+        "path": "nps-response",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [0, 400],
+      "id": "nps-webhook",
+      "name": "Webhook - NPS Response",
+      "webhookId": "nps-response-webhook"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Process NPS response\nconst query = $input.first().json.query || $input.first().json;\n\nconst response = {\n  customerId: query.customer,\n  score: parseInt(query.score || '0'),\n  comment: query.comment || '',\n  submittedAt: new Date().toISOString(),\n  category: parseInt(query.score) >= 9 ? 'promoter' : parseInt(query.score) >= 7 ? 'passive' : 'detractor'\n};\n\nreturn {\n  json: response\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [220, 400],
+      "id": "process-nps",
+      "name": "Process NPS Response"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.category }}",
+                    "rightValue": "detractor",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "Detractor"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.category }}",
+                    "rightValue": "promoter",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "Promoter"
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra"
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [440, 400],
+      "id": "route-nps",
+      "name": "Route NPS Score"
+    },
+    {
+      "parameters": {
+        "channel": "#customer-success-alerts",
+        "text": "=:warning: *NPS Detractor Alert*\n\n*Customer ID:* {{ $json.customerId }}\n*Score:* {{ $json.score }}/10\n*Comment:* {{ $json.comment || 'No comment' }}\n\nImmediate follow-up recommended!",
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.1,
+      "position": [660, 300],
+      "id": "alert-detractor",
+      "name": "Alert Detractor",
+      "credentials": {
+        "slackApi": {
+          "id": "slack-credentials",
+          "name": "Slack API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fromEmail": "marketing@company.com",
+        "toEmail": "={{ $json.email }}",
+        "subject": "=Thank you for your amazing feedback!",
+        "text": "=Hi {{ $json.contactName }},\n\nThank you so much for your wonderful feedback! We're thrilled to hear you'd recommend us.\n\nWould you be willing to share your experience? We'd love to feature your story:\n\n- Write a short testimonial\n- Participate in a case study\n- Leave a review on G2/Capterra\n\nAs a thank you, we'll extend your subscription by one month!\n\nInterested? Reply to this email or click here: {{ $env.TESTIMONIAL_URL }}?customer={{ $json.customerId }}\n\nBest,\n{{ $env.COMPANY_NAME }} Team"
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [660, 450],
+      "id": "request-testimonial",
+      "name": "Request Testimonial"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.CRM_API }}/customers/{{ $json.customerId }}/nps",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "score",
+              "value": "={{ $json.score }}"
+            },
+            {
+              "name": "date",
+              "value": "={{ $json.submittedAt }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [660, 550],
+      "id": "log-nps",
+      "name": "Log NPS Score"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Process usage event and check patterns\nconst event = $input.first().json;\n\nconst usageData = {\n  customerId: event.customerId,\n  eventType: event.type,\n  timestamp: new Date().toISOString(),\n  \n  // Check patterns\n  isFirstLogin: event.type === 'login' && event.isFirst,\n  isMilestone: event.type === 'milestone',\n  milestoneType: event.milestone || null,\n  \n  // Usage metrics\n  currentUsage: event.usage || 0,\n  previousUsage: event.previousUsage || 0,\n  usageChange: ((event.usage || 0) - (event.previousUsage || 0)) / (event.previousUsage || 1) * 100,\n  \n  // Flags\n  isLowUsage: (event.usage || 0) < 20,\n  isHighUsage: (event.usage || 0) > 80,\n  isDecreasing: event.usage < event.previousUsage * 0.7\n};\n\nreturn {\n  json: usageData\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [220, 500],
+      "id": "process-usage",
+      "name": "Process Usage Event"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.isLowUsage || $json.isDecreasing }}",
+                    "rightValue": true,
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "Low Usage Alert"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.isMilestone }}",
+                    "rightValue": true,
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "Milestone"
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra"
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [440, 500],
+      "id": "check-patterns",
+      "name": "Check Usage Patterns"
+    },
+    {
+      "parameters": {
+        "channel": "#customer-success",
+        "text": "=:chart_with_downwards_trend: *Low Usage Alert*\n\n*Customer:* {{ $json.customerId }}\n*Current Usage:* {{ $json.currentUsage }}%\n*Change:* {{ $json.usageChange.toFixed(1) }}%\n\nProactive outreach recommended.",
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.1,
+      "position": [660, 450],
+      "id": "alert-low-usage",
+      "name": "Alert Low Usage",
+      "credentials": {
+        "slackApi": {
+          "id": "slack-credentials",
+          "name": "Slack API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fromEmail": "success@company.com",
+        "toEmail": "={{ $json.email }}",
+        "subject": "=🎉 Congratulations on your milestone!",
+        "text": "=Hi {{ $json.contactName }},\n\nWe noticed you just hit a big milestone: {{ $json.milestoneType }}!\n\nThis is a great achievement and we wanted to celebrate with you. Keep up the amazing work!\n\nBest,\n{{ $env.COMPANY_NAME }} Team"
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [660, 550],
+      "id": "celebrate-milestone",
+      "name": "Celebrate Milestone"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.ANALYTICS_API }}/usage",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "data",
+              "value": "={{ JSON.stringify($json) }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [660, 650],
+      "id": "log-usage",
+      "name": "Log Usage"
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $env.CRM_API }}/renewals?daysUntil=90",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [220, 750],
+      "id": "get-renewals",
+      "name": "Get Upcoming Renewals"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.daysUntilRenewal }}",
+                    "rightValue": 90,
+                    "operator": {
+                      "type": "number",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "90 Days"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.daysUntilRenewal }}",
+                    "rightValue": 30,
+                    "operator": {
+                      "type": "number",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "30 Days"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.daysUntilRenewal }}",
+                    "rightValue": 7,
+                    "operator": {
+                      "type": "number",
+                      "operation": "lte"
+                    }
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "7 Days"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [440, 750],
+      "id": "route-renewal",
+      "name": "Route Renewal Timeline"
+    },
+    {
+      "parameters": {
+        "fromEmail": "renewals@company.com",
+        "toEmail": "={{ $json.email }}",
+        "subject": "=Your renewal is coming up - Let's chat!",
+        "text": "=Hi {{ $json.contactName }},\n\nYour subscription renewal is coming up in 90 days ({{ $json.renewalDate }}).\n\nI'd love to schedule a quick call to:\n- Review your usage and ROI\n- Discuss any needs for the coming year\n- Explore options that might benefit your team\n\nAre you available for a 20-minute call this week?\n\nBest regards,\n{{ $json.csm || 'Account Team' }}"
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [660, 700],
+      "id": "renewal-90",
+      "name": "Start Renewal Campaign 90"
+    },
+    {
+      "parameters": {
+        "fromEmail": "renewals@company.com",
+        "toEmail": "={{ $json.email }}",
+        "subject": "=Action needed: Renewal in 30 days",
+        "text": "=Hi {{ $json.contactName }},\n\nJust a friendly reminder that your subscription renews on {{ $json.renewalDate }} - that's 30 days away!\n\nTo ensure uninterrupted service:\n- Review your current plan: {{ $env.BILLING_URL }}\n- Update payment information if needed\n- Reach out with any questions\n\nWant to discuss renewal options? Reply to this email!\n\nBest,\n{{ $json.csm || 'Account Team' }}"
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [660, 800],
+      "id": "renewal-30",
+      "name": "Renewal Reminder 30"
+    },
+    {
+      "parameters": {
+        "channel": "#renewals-urgent",
+        "text": "=:warning: *Urgent Renewal - {{ $json.daysUntilRenewal }} Days*\n\n*Customer:* {{ $json.name }}\n*Contract Value:* ${{ $json.contractValue }}\n*Renewal Date:* {{ $json.renewalDate }}\n*CSM:* {{ $json.csm }}\n*Status:* {{ $json.renewalStatus || 'Pending' }}\n\nImmediate action required!",
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.1,
+      "position": [660, 900],
+      "id": "renewal-7",
+      "name": "Urgent Renewal 7",
+      "credentials": {
+        "slackApi": {
+          "id": "slack-credentials",
+          "name": "Slack API"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "shared": [],
+  "staticData": null,
+  "tags": [
+    {
+      "name": "Customer Success"
+    },
+    {
+      "name": "Retention"
+    },
+    {
+      "name": "NPS"
+    }
+  ],
+  "triggerCount": 0,
+  "updatedAt": "2026-01-08T00:00:00.000Z",
+  "versionId": "customer-success-v1"
+}

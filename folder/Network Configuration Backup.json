@@ -1,0 +1,755 @@
+{
+  "active": false,
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get Device Inventory",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get Device Inventory",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Device Inventory": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Devices",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Devices": {
+      "main": [
+        [
+          {
+            "node": "Determine Device Type",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Aggregate Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Determine Device Type": {
+      "main": [
+        [
+          {
+            "node": "Backup Cisco Device",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Backup Juniper Device",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Backup Arista Device",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Backup Firewall Device",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Backup Cisco Device": {
+      "main": [
+        [
+          {
+            "node": "Process Backup Result",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Backup Juniper Device": {
+      "main": [
+        [
+          {
+            "node": "Process Backup Result",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Backup Arista Device": {
+      "main": [
+        [
+          {
+            "node": "Process Backup Result",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Backup Firewall Device": {
+      "main": [
+        [
+          {
+            "node": "Process Backup Result",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Process Backup Result": {
+      "main": [
+        [
+          {
+            "node": "Compare with Previous",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Compare with Previous": {
+      "main": [
+        [
+          {
+            "node": "Store Backup",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Store Backup": {
+      "main": [
+        [
+          {
+            "node": "Check for Changes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check for Changes": {
+      "main": [
+        [
+          {
+            "node": "AI Analyze Changes",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Loop Over Devices",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Analyze Changes": {
+      "main": [
+        [
+          {
+            "node": "Log Change Detection",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log Change Detection": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Devices",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate Results": {
+      "main": [
+        [
+          {
+            "node": "Generate Backup Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Backup Report": {
+      "main": [
+        [
+          {
+            "node": "Check Backup Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Backup Status": {
+      "main": [
+        [
+          {
+            "node": "Send Success Report",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send Failure Alert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-01-08T00:00:00.000Z",
+  "id": "network-config-backup",
+  "isArchived": false,
+  "meta": {
+    "instanceId": "network-ops"
+  },
+  "name": "Network Configuration Backup",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "hoursInterval": 6
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [0, 0],
+      "id": "schedule-trigger",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [0, 200],
+      "id": "manual-trigger",
+      "name": "Manual Trigger"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get device inventory from source of truth (NetBox, Nautobot, or static config)\nconst sourceOfTruth = $env.SOURCE_OF_TRUTH || 'static';\n\n// In production, this would query NetBox/Nautobot API\n// For now, using environment-based configuration\nconst devices = JSON.parse($env.NETWORK_DEVICES || '[]');\n\n// If no devices configured, use example structure\nconst inventory = devices.length > 0 ? devices : [\n  {\n    hostname: 'core-rtr-01',\n    ip: '192.168.1.1',\n    platform: 'cisco_ios',\n    type: 'router',\n    site: 'datacenter-1',\n    role: 'core'\n  },\n  {\n    hostname: 'dist-sw-01',\n    ip: '192.168.1.10',\n    platform: 'cisco_nxos',\n    type: 'switch',\n    site: 'datacenter-1',\n    role: 'distribution'\n  },\n  {\n    hostname: 'fw-01',\n    ip: '192.168.1.254',\n    platform: 'paloalto_panos',\n    type: 'firewall',\n    site: 'datacenter-1',\n    role: 'perimeter'\n  }\n];\n\nconst backupConfig = {\n  backupPath: $env.BACKUP_PATH || '/backups/network',\n  retentionDays: parseInt($env.BACKUP_RETENTION_DAYS || '90'),\n  gitRepo: $env.BACKUP_GIT_REPO || '',\n  compareWithPrevious: $env.COMPARE_BACKUPS !== 'false'\n};\n\nreturn {\n  json: {\n    devices: inventory,\n    backupConfig,\n    startTime: new Date().toISOString(),\n    sourceOfTruth\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [220, 100],
+      "id": "get-inventory",
+      "name": "Get Device Inventory"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [440, 100],
+      "id": "loop-devices",
+      "name": "Loop Over Devices"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.platform }}",
+                    "rightValue": "cisco",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    }
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "Cisco"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.platform }}",
+                    "rightValue": "juniper",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    }
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "Juniper"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.platform }}",
+                    "rightValue": "arista",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    }
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "Arista"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.type }}",
+                    "rightValue": "firewall",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "Firewall"
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra"
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [660, 100],
+      "id": "device-type-switch",
+      "name": "Determine Device Type"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.NETWORK_AUTOMATION_API }}/backup/cisco",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "hostname",
+              "value": "={{ $json.hostname }}"
+            },
+            {
+              "name": "ip",
+              "value": "={{ $json.ip }}"
+            },
+            {
+              "name": "platform",
+              "value": "={{ $json.platform }}"
+            },
+            {
+              "name": "command",
+              "value": "show running-config"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 60000
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [880, -100],
+      "id": "backup-cisco",
+      "name": "Backup Cisco Device"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.NETWORK_AUTOMATION_API }}/backup/juniper",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "hostname",
+              "value": "={{ $json.hostname }}"
+            },
+            {
+              "name": "ip",
+              "value": "={{ $json.ip }}"
+            },
+            {
+              "name": "command",
+              "value": "show configuration | display set"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 60000
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [880, 50],
+      "id": "backup-juniper",
+      "name": "Backup Juniper Device"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.NETWORK_AUTOMATION_API }}/backup/arista",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "hostname",
+              "value": "={{ $json.hostname }}"
+            },
+            {
+              "name": "ip",
+              "value": "={{ $json.ip }}"
+            },
+            {
+              "name": "command",
+              "value": "show running-config"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 60000
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [880, 200],
+      "id": "backup-arista",
+      "name": "Backup Arista Device"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.NETWORK_AUTOMATION_API }}/backup/firewall",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "hostname",
+              "value": "={{ $json.hostname }}"
+            },
+            {
+              "name": "ip",
+              "value": "={{ $json.ip }}"
+            },
+            {
+              "name": "platform",
+              "value": "={{ $json.platform }}"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 120000
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [880, 350],
+      "id": "backup-firewall",
+      "name": "Backup Firewall Device"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Process backup result from device\nconst input = $input.first().json;\n\nconst backupResult = {\n  hostname: input.hostname || 'unknown',\n  ip: input.ip || '',\n  platform: input.platform || '',\n  site: input.site || '',\n  role: input.role || '',\n  backupTime: new Date().toISOString(),\n  success: input.success !== false && !input.error,\n  config: input.config || input.output || '',\n  configHash: '', // Will be computed\n  error: input.error || null,\n  responseTime: input.responseTime || 0\n};\n\n// Compute hash of configuration for change detection\nif (backupResult.config) {\n  const crypto = require('crypto');\n  backupResult.configHash = crypto.createHash('sha256')\n    .update(backupResult.config)\n    .digest('hex');\n  backupResult.configSize = backupResult.config.length;\n}\n\nreturn {\n  json: backupResult\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1100, 100],
+      "id": "process-result",
+      "name": "Process Backup Result"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Compare current backup with previous version\nconst current = $input.first().json;\n\n// In production, this would query a database or file system\n// for the previous backup hash\nconst previousHash = $env[`LAST_HASH_${current.hostname.replace(/-/g, '_').toUpperCase()}`] || '';\n\nconst comparison = {\n  ...current,\n  hasChanges: previousHash !== '' && previousHash !== current.configHash,\n  previousHash: previousHash,\n  isFirstBackup: previousHash === '',\n  changeDetectedAt: previousHash !== current.configHash ? new Date().toISOString() : null\n};\n\nreturn {\n  json: comparison\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1320, 100],
+      "id": "compare-previous",
+      "name": "Compare with Previous"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.BACKUP_STORAGE_API }}/store",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "hostname",
+              "value": "={{ $json.hostname }}"
+            },
+            {
+              "name": "config",
+              "value": "={{ $json.config }}"
+            },
+            {
+              "name": "hash",
+              "value": "={{ $json.configHash }}"
+            },
+            {
+              "name": "timestamp",
+              "value": "={{ $json.backupTime }}"
+            },
+            {
+              "name": "platform",
+              "value": "={{ $json.platform }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1540, 100],
+      "id": "store-backup",
+      "name": "Store Backup"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "has-changes",
+              "leftValue": "={{ $json.hasChanges }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [1760, 100],
+      "id": "check-changes",
+      "name": "Check for Changes"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "claude-sonnet-4-20250514"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=You are a network configuration analyst. Analyze the following configuration change for device {{ $json.hostname }} ({{ $json.platform }}).\n\nThe configuration has changed since the last backup. Please:\n1. Identify what type of changes were made (security, routing, interface, ACL, etc.)\n2. Assess potential risk level (low, medium, high, critical)\n3. Flag any security concerns\n4. Note if this appears to be a planned or unexpected change\n\nDevice: {{ $json.hostname }}\nPlatform: {{ $json.platform }}\nSite: {{ $json.site }}\nRole: {{ $json.role }}\n\nProvide a concise analysis suitable for a change log."
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatAnthropic",
+      "typeVersion": 1.3,
+      "position": [1980, 0],
+      "id": "ai-analyze",
+      "name": "AI Analyze Changes",
+      "credentials": {
+        "anthropicApi": {
+          "id": "anthropic-credentials",
+          "name": "Anthropic account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Log the detected change\nconst data = $input.first().json;\n\nconst changeLog = {\n  id: `chg-${Date.now()}`,\n  hostname: data.hostname,\n  platform: data.platform,\n  site: data.site,\n  role: data.role,\n  detectedAt: data.changeDetectedAt,\n  previousHash: data.previousHash,\n  currentHash: data.configHash,\n  aiAnalysis: data.message?.content || data.analysis || 'Analysis pending',\n  requiresReview: true,\n  status: 'detected'\n};\n\n// This would be stored in a database in production\nreturn {\n  json: {\n    ...data,\n    changeLog\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [2200, 0],
+      "id": "log-change",
+      "name": "Log Change Detection"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [1980, 300],
+      "id": "aggregate-results",
+      "name": "Aggregate Results"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Generate backup report\nconst items = $input.first().json.data || [];\n\nconst successCount = items.filter(i => i.success).length;\nconst failureCount = items.filter(i => !i.success).length;\nconst changeCount = items.filter(i => i.hasChanges).length;\n\nconst report = {\n  reportId: `backup-${Date.now()}`,\n  generatedAt: new Date().toISOString(),\n  summary: {\n    totalDevices: items.length,\n    successful: successCount,\n    failed: failureCount,\n    changesDetected: changeCount,\n    successRate: items.length > 0 ? ((successCount / items.length) * 100).toFixed(1) + '%' : '0%'\n  },\n  failures: items.filter(i => !i.success).map(i => ({\n    hostname: i.hostname,\n    ip: i.ip,\n    error: i.error\n  })),\n  changes: items.filter(i => i.hasChanges).map(i => ({\n    hostname: i.hostname,\n    site: i.site,\n    analysis: i.changeLog?.aiAnalysis || 'Pending'\n  })),\n  allDevices: items.map(i => ({\n    hostname: i.hostname,\n    success: i.success,\n    hasChanges: i.hasChanges,\n    backupTime: i.backupTime\n  }))\n};\n\nreturn {\n  json: report\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [2200, 300],
+      "id": "generate-report",
+      "name": "Generate Backup Report"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "all-success",
+              "leftValue": "={{ $json.summary.failed }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [2420, 300],
+      "id": "check-status",
+      "name": "Check Backup Status"
+    },
+    {
+      "parameters": {
+        "channel": "#network-ops",
+        "text": "=:white_check_mark: *Network Backup Completed Successfully*\n\n*Summary:*\n• Total Devices: {{ $json.summary.totalDevices }}\n• Successful: {{ $json.summary.successful }}\n• Changes Detected: {{ $json.summary.changesDetected }}\n\n{{ $json.summary.changesDetected > 0 ? ':warning: Configuration changes detected - review recommended' : ':check: No unexpected changes' }}\n\n_Report ID: {{ $json.reportId }}_",
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.1,
+      "position": [2640, 200],
+      "id": "success-report",
+      "name": "Send Success Report",
+      "credentials": {
+        "slackApi": {
+          "id": "slack-credentials",
+          "name": "Slack API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "channel": "#network-ops",
+        "text": "=:x: *Network Backup Failures Detected*\n\n*Summary:*\n• Total Devices: {{ $json.summary.totalDevices }}\n• Successful: {{ $json.summary.successful }}\n• Failed: {{ $json.summary.failed }}\n\n*Failed Devices:*\n{{ $json.failures.map(f => `• ${f.hostname} (${f.ip}): ${f.error}`).join('\\n') }}\n\n:rotating_light: Immediate investigation required!\n\n_Report ID: {{ $json.reportId }}_",
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.1,
+      "position": [2640, 400],
+      "id": "failure-alert",
+      "name": "Send Failure Alert",
+      "credentials": {
+        "slackApi": {
+          "id": "slack-credentials",
+          "name": "Slack API"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "shared": [],
+  "staticData": null,
+  "tags": [
+    {
+      "name": "Network Operations"
+    },
+    {
+      "name": "Backup"
+    },
+    {
+      "name": "Configuration Management"
+    }
+  ],
+  "triggerCount": 0,
+  "updatedAt": "2026-01-08T00:00:00.000Z",
+  "versionId": "network-backup-v1"
+}

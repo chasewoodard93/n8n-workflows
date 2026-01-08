@@ -1,0 +1,768 @@
+{
+  "active": false,
+  "connections": {
+    "Webhook - Task Created": {
+      "main": [
+        [
+          {
+            "node": "Process Task",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule - Daily Standup": {
+      "main": [
+        [
+          {
+            "node": "Get Active Tasks",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule - Weekly Review": {
+      "main": [
+        [
+          {
+            "node": "Generate Sprint Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Process Task": {
+      "main": [
+        [
+          {
+            "node": "AI Estimate Effort",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Estimate Effort": {
+      "main": [
+        [
+          {
+            "node": "Check Dependencies",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Dependencies": {
+      "main": [
+        [
+          {
+            "node": "Block on Dependencies",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Auto-Assign Task",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Block on Dependencies": {
+      "main": [
+        [
+          {
+            "node": "Notify Blocked",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Auto-Assign Task": {
+      "main": [
+        [
+          {
+            "node": "Update Project Board",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Project Board": {
+      "main": [
+        [
+          {
+            "node": "Notify Assignee",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Active Tasks": {
+      "main": [
+        [
+          {
+            "node": "Check Overdue",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Overdue": {
+      "main": [
+        [
+          {
+            "node": "AI Generate Standup",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Generate Standup": {
+      "main": [
+        [
+          {
+            "node": "Post Standup Summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Post Standup Summary": {
+      "main": [
+        [
+          {
+            "node": "Check Blockers",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Blockers": {
+      "main": [
+        [
+          {
+            "node": "Escalate Blockers",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "End Standup",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Sprint Report": {
+      "main": [
+        [
+          {
+            "node": "Calculate Metrics",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calculate Metrics": {
+      "main": [
+        [
+          {
+            "node": "AI Sprint Analysis",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Sprint Analysis": {
+      "main": [
+        [
+          {
+            "node": "Send Sprint Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook - Time Entry": {
+      "main": [
+        [
+          {
+            "node": "Log Time Entry",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log Time Entry": {
+      "main": [
+        [
+          {
+            "node": "Update Task Progress",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Task Progress": {
+      "main": [
+        [
+          {
+            "node": "Check Budget",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Budget": {
+      "main": [
+        [
+          {
+            "node": "Alert Budget Exceeded",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "End Time Log",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-01-08T00:00:00.000Z",
+  "id": "project-task-management",
+  "isArchived": false,
+  "meta": {
+    "instanceId": "project-management"
+  },
+  "name": "Project Task Management",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "task-created",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [0, 0],
+      "id": "task-webhook",
+      "name": "Webhook - Task Created",
+      "webhookId": "task-created-webhook"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 9 * * 1-5"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [0, 300],
+      "id": "standup-schedule",
+      "name": "Schedule - Daily Standup"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 17 * * 5"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [0, 500],
+      "id": "weekly-schedule",
+      "name": "Schedule - Weekly Review"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Process new task\nconst input = $input.first().json;\n\nconst task = {\n  id: input.id || `TASK-${Date.now()}`,\n  title: input.title || input.name || 'Untitled Task',\n  description: input.description || '',\n  project: input.project || input.projectId || '',\n  projectName: input.projectName || '',\n  \n  // Assignment\n  assignee: input.assignee || null,\n  reporter: input.reporter || input.createdBy || '',\n  \n  // Timing\n  createdAt: new Date().toISOString(),\n  dueDate: input.dueDate || null,\n  startDate: input.startDate || null,\n  \n  // Status\n  status: input.status || 'backlog',\n  priority: input.priority || 'medium',\n  type: input.type || 'task', // task, bug, feature, epic\n  \n  // Effort\n  estimatedHours: input.estimatedHours || null,\n  loggedHours: 0,\n  \n  // Dependencies\n  blockedBy: input.blockedBy || [],\n  blocking: input.blocking || [],\n  \n  // Labels\n  labels: input.labels || [],\n  sprint: input.sprint || null,\n  epic: input.epic || null\n};\n\nreturn {\n  json: task\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [220, 0],
+      "id": "process-task",
+      "name": "Process Task"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "claude-sonnet-4-20250514"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=You are a project management assistant. Analyze this task and provide effort estimation.\n\nTask: {{ $json.title }}\nDescription: {{ $json.description }}\nType: {{ $json.type }}\nProject: {{ $json.projectName }}\n\nProvide your analysis in JSON format:\n{\n  \"estimatedHours\": number (1-40),\n  \"complexity\": \"low|medium|high\",\n  \"suggestedAssignee\": \"based on task type, suggest a role\",\n  \"requiredSkills\": [\"list of skills\"],\n  \"risks\": [\"potential risks\"],\n  \"subtasks\": [\"suggested subtasks if complex\"]\n}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatAnthropic",
+      "typeVersion": 1.3,
+      "position": [440, 0],
+      "id": "ai-estimate",
+      "name": "AI Estimate Effort",
+      "credentials": {
+        "anthropicApi": {
+          "id": "anthropic-credentials",
+          "name": "Anthropic account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "has-dependencies",
+              "leftValue": "={{ $json.blockedBy.length }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [660, 0],
+      "id": "check-deps",
+      "name": "Check Dependencies"
+    },
+    {
+      "parameters": {
+        "jsCode": "const data = $input.first().json;\nreturn { json: { ...data, status: 'blocked', blockedReason: 'Waiting on dependencies' } };"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [880, -100],
+      "id": "block-deps",
+      "name": "Block on Dependencies"
+    },
+    {
+      "parameters": {
+        "channel": "#project-updates",
+        "text": "=:no_entry: *Task Blocked*\n\n*{{ $json.id }}:* {{ $json.title }}\n*Blocked by:* {{ $json.blockedBy.join(', ') }}\n*Reporter:* {{ $json.reporter }}",
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.1,
+      "position": [1100, -100],
+      "id": "notify-blocked",
+      "name": "Notify Blocked",
+      "credentials": {
+        "slackApi": {
+          "id": "slack-credentials",
+          "name": "Slack API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Auto-assign task based on skills and availability\nconst data = $input.first().json;\n\n// In production, this would query team availability\nconst teamMembers = JSON.parse($env.TEAM_MEMBERS || '[]');\nconst requiredSkills = data.requiredSkills || [];\n\n// Simple matching - find first available member with required skills\nlet assignee = data.assignee;\nif (!assignee && teamMembers.length > 0) {\n  const match = teamMembers.find(m => \n    requiredSkills.some(skill => m.skills?.includes(skill))\n  );\n  assignee = match?.name || teamMembers[0]?.name || 'unassigned';\n}\n\nreturn {\n  json: {\n    ...data,\n    assignee: assignee,\n    assignedAt: new Date().toISOString(),\n    status: 'todo'\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [880, 100],
+      "id": "auto-assign",
+      "name": "Auto-Assign Task"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.PROJECT_API }}/tasks",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "task",
+              "value": "={{ JSON.stringify($json) }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1100, 100],
+      "id": "update-board",
+      "name": "Update Project Board"
+    },
+    {
+      "parameters": {
+        "channel": "#project-updates",
+        "text": "=:clipboard: *New Task Assigned*\n\n*{{ $json.id }}:* {{ $json.title }}\n*Assignee:* {{ $json.assignee }}\n*Priority:* {{ $json.priority }}\n*Estimated:* {{ $json.estimatedHours || 'TBD' }} hours\n*Due:* {{ $json.dueDate || 'Not set' }}\n\n{{ $json.description.substring(0, 200) }}{{ $json.description.length > 200 ? '...' : '' }}",
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.1,
+      "position": [1320, 100],
+      "id": "notify-assignee",
+      "name": "Notify Assignee",
+      "credentials": {
+        "slackApi": {
+          "id": "slack-credentials",
+          "name": "Slack API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $env.PROJECT_API }}/tasks?status=in_progress,blocked,review",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [220, 300],
+      "id": "get-tasks",
+      "name": "Get Active Tasks"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Check for overdue tasks\nconst tasks = $input.first().json.tasks || $input.first().json || [];\nconst now = new Date();\n\nconst taskList = Array.isArray(tasks) ? tasks : [tasks];\n\nconst categorized = {\n  overdue: taskList.filter(t => t.dueDate && new Date(t.dueDate) < now),\n  dueToday: taskList.filter(t => {\n    if (!t.dueDate) return false;\n    const due = new Date(t.dueDate);\n    return due.toDateString() === now.toDateString();\n  }),\n  inProgress: taskList.filter(t => t.status === 'in_progress'),\n  blocked: taskList.filter(t => t.status === 'blocked'),\n  inReview: taskList.filter(t => t.status === 'review')\n};\n\nreturn {\n  json: {\n    ...categorized,\n    totalActive: taskList.length,\n    date: now.toISOString()\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [440, 300],
+      "id": "check-overdue",
+      "name": "Check Overdue"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "claude-sonnet-4-20250514"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Generate a daily standup summary for the team based on this data:\n\n*In Progress:* {{ $json.inProgress.length }} tasks\n{{ $json.inProgress.map(t => `- ${t.id}: ${t.title} (${t.assignee})`).join('\\n') }}\n\n*Blocked:* {{ $json.blocked.length }} tasks\n{{ $json.blocked.map(t => `- ${t.id}: ${t.title} - ${t.blockedReason || 'No reason specified'}`).join('\\n') }}\n\n*In Review:* {{ $json.inReview.length }} tasks\n{{ $json.inReview.map(t => `- ${t.id}: ${t.title}`).join('\\n') }}\n\n*Overdue:* {{ $json.overdue.length }} tasks\n{{ $json.overdue.map(t => `- ${t.id}: ${t.title} (was due ${t.dueDate})`).join('\\n') }}\n\n*Due Today:* {{ $json.dueToday.length }} tasks\n{{ $json.dueToday.map(t => `- ${t.id}: ${t.title}`).join('\\n') }}\n\nWrite a brief, friendly standup summary highlighting:\n1. Key progress\n2. Blockers needing attention\n3. Items due today\n4. Overdue items needing escalation"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatAnthropic",
+      "typeVersion": 1.3,
+      "position": [660, 300],
+      "id": "ai-standup",
+      "name": "AI Generate Standup",
+      "credentials": {
+        "anthropicApi": {
+          "id": "anthropic-credentials",
+          "name": "Anthropic account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "channel": "#daily-standup",
+        "text": "=:sunrise: *Daily Standup - {{ new Date().toLocaleDateString() }}*\n\n{{ $json.message?.content || 'Summary generation failed' }}\n\n---\n*Quick Stats:*\n• In Progress: {{ $json.inProgress?.length || 0 }}\n• Blocked: {{ $json.blocked?.length || 0 }}\n• In Review: {{ $json.inReview?.length || 0 }}\n• Overdue: {{ $json.overdue?.length || 0 }}\n• Due Today: {{ $json.dueToday?.length || 0 }}",
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.1,
+      "position": [880, 300],
+      "id": "post-standup",
+      "name": "Post Standup Summary",
+      "credentials": {
+        "slackApi": {
+          "id": "slack-credentials",
+          "name": "Slack API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "has-blockers",
+              "leftValue": "={{ ($json.blocked?.length || 0) + ($json.overdue?.length || 0) }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [1100, 300],
+      "id": "check-blockers",
+      "name": "Check Blockers"
+    },
+    {
+      "parameters": {
+        "channel": "#project-escalations",
+        "text": "=:rotating_light: *Attention Required*\n\n*Blocked Tasks:* {{ $json.blocked?.length || 0 }}\n*Overdue Tasks:* {{ $json.overdue?.length || 0 }}\n\nPlease review and help unblock the team.",
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.1,
+      "position": [1320, 200],
+      "id": "escalate-blockers",
+      "name": "Escalate Blockers",
+      "credentials": {
+        "slackApi": {
+          "id": "slack-credentials",
+          "name": "Slack API"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [1320, 400],
+      "id": "end-standup",
+      "name": "End Standup"
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $env.PROJECT_API }}/sprints/current",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [220, 500],
+      "id": "get-sprint",
+      "name": "Generate Sprint Report"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Calculate sprint metrics\nconst sprint = $input.first().json;\nconst tasks = sprint.tasks || [];\n\nconst metrics = {\n  sprintName: sprint.name || 'Current Sprint',\n  startDate: sprint.startDate,\n  endDate: sprint.endDate,\n  \n  // Task counts\n  totalTasks: tasks.length,\n  completed: tasks.filter(t => t.status === 'done').length,\n  inProgress: tasks.filter(t => t.status === 'in_progress').length,\n  todo: tasks.filter(t => t.status === 'todo').length,\n  blocked: tasks.filter(t => t.status === 'blocked').length,\n  \n  // Points\n  totalPoints: tasks.reduce((sum, t) => sum + (t.points || 0), 0),\n  completedPoints: tasks.filter(t => t.status === 'done').reduce((sum, t) => sum + (t.points || 0), 0),\n  \n  // Hours\n  estimatedHours: tasks.reduce((sum, t) => sum + (t.estimatedHours || 0), 0),\n  loggedHours: tasks.reduce((sum, t) => sum + (t.loggedHours || 0), 0),\n  \n  // Velocity\n  completionRate: tasks.length > 0 ? ((tasks.filter(t => t.status === 'done').length / tasks.length) * 100).toFixed(1) : 0,\n  \n  // By assignee\n  byAssignee: tasks.reduce((acc, t) => {\n    const assignee = t.assignee || 'Unassigned';\n    if (!acc[assignee]) acc[assignee] = { completed: 0, total: 0 };\n    acc[assignee].total++;\n    if (t.status === 'done') acc[assignee].completed++;\n    return acc;\n  }, {})\n};\n\nreturn {\n  json: metrics\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [440, 500],
+      "id": "calc-metrics",
+      "name": "Calculate Metrics"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "claude-sonnet-4-20250514"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Analyze this sprint data and provide insights:\n\n*Sprint:* {{ $json.sprintName }}\n*Dates:* {{ $json.startDate }} to {{ $json.endDate }}\n\n*Progress:*\n- Completed: {{ $json.completed }}/{{ $json.totalTasks }} tasks ({{ $json.completionRate }}%)\n- Story Points: {{ $json.completedPoints }}/{{ $json.totalPoints }}\n- Hours: {{ $json.loggedHours }}/{{ $json.estimatedHours }} estimated\n\n*Status Breakdown:*\n- Done: {{ $json.completed }}\n- In Progress: {{ $json.inProgress }}\n- To Do: {{ $json.todo }}\n- Blocked: {{ $json.blocked }}\n\n*By Team Member:*\n{{ Object.entries($json.byAssignee).map(([name, data]) => `- ${name}: ${data.completed}/${data.total} completed`).join('\\n') }}\n\nProvide:\n1. Sprint health assessment\n2. Risks to sprint goal\n3. Team performance highlights\n4. Recommendations for next sprint"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatAnthropic",
+      "typeVersion": 1.3,
+      "position": [660, 500],
+      "id": "ai-sprint",
+      "name": "AI Sprint Analysis",
+      "credentials": {
+        "anthropicApi": {
+          "id": "anthropic-credentials",
+          "name": "Anthropic account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "channel": "#sprint-reviews",
+        "text": "=:chart_with_upwards_trend: *Weekly Sprint Report - {{ $json.sprintName }}*\n\n*Progress:* {{ $json.completionRate }}% Complete\n\n```\nCompleted: {{ '█'.repeat(Math.floor($json.completionRate / 10)) }}{{ '░'.repeat(10 - Math.floor($json.completionRate / 10)) }} {{ $json.completed }}/{{ $json.totalTasks }}\n```\n\n*Metrics:*\n• Story Points: {{ $json.completedPoints }}/{{ $json.totalPoints }}\n• Hours Logged: {{ $json.loggedHours }}/{{ $json.estimatedHours }}\n• Blocked Tasks: {{ $json.blocked }}\n\n*AI Analysis:*\n{{ $json.message?.content || 'Analysis pending' }}",
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.1,
+      "position": [880, 500],
+      "id": "send-report",
+      "name": "Send Sprint Report",
+      "credentials": {
+        "slackApi": {
+          "id": "slack-credentials",
+          "name": "Slack API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "time-entry",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [0, 700],
+      "id": "time-webhook",
+      "name": "Webhook - Time Entry",
+      "webhookId": "time-entry-webhook"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Log time entry\nconst input = $input.first().json;\n\nconst timeEntry = {\n  id: `TIME-${Date.now()}`,\n  taskId: input.taskId,\n  userId: input.userId || input.user,\n  hours: parseFloat(input.hours || '0'),\n  description: input.description || '',\n  loggedAt: new Date().toISOString(),\n  date: input.date || new Date().toISOString().split('T')[0],\n  billable: input.billable !== false\n};\n\nreturn {\n  json: timeEntry\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [220, 700],
+      "id": "log-time",
+      "name": "Log Time Entry"
+    },
+    {
+      "parameters": {
+        "method": "PATCH",
+        "url": "={{ $env.PROJECT_API }}/tasks/{{ $json.taskId }}/time",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "hours",
+              "value": "={{ $json.hours }}"
+            },
+            {
+              "name": "entryId",
+              "value": "={{ $json.id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [440, 700],
+      "id": "update-progress",
+      "name": "Update Task Progress"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "over-budget",
+              "leftValue": "={{ $json.loggedHours > $json.estimatedHours * 1.2 }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [660, 700],
+      "id": "check-budget",
+      "name": "Check Budget"
+    },
+    {
+      "parameters": {
+        "channel": "#project-alerts",
+        "text": "=:warning: *Task Over Budget*\n\n*Task:* {{ $json.taskId }}\n*Estimated:* {{ $json.estimatedHours }} hours\n*Logged:* {{ $json.loggedHours }} hours ({{ ((($json.loggedHours / $json.estimatedHours) - 1) * 100).toFixed(0) }}% over)\n\nPlease review and update estimate if needed.",
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.1,
+      "position": [880, 600],
+      "id": "budget-alert",
+      "name": "Alert Budget Exceeded",
+      "credentials": {
+        "slackApi": {
+          "id": "slack-credentials",
+          "name": "Slack API"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [880, 800],
+      "id": "end-time",
+      "name": "End Time Log"
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "shared": [],
+  "staticData": null,
+  "tags": [
+    {
+      "name": "Project Management"
+    },
+    {
+      "name": "Task Tracking"
+    },
+    {
+      "name": "Time Tracking"
+    }
+  ],
+  "triggerCount": 0,
+  "updatedAt": "2026-01-08T00:00:00.000Z",
+  "versionId": "project-task-v1"
+}

@@ -1,0 +1,773 @@
+{
+  "active": false,
+  "connections": {
+    "Webhook - Document Upload": {
+      "main": [
+        [
+          {
+            "node": "Process Document",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Process Document": {
+      "main": [
+        [
+          {
+            "node": "AI Classify Document",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Classify Document": {
+      "main": [
+        [
+          {
+            "node": "Route by Type",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route by Type": {
+      "main": [
+        [
+          {
+            "node": "Contract Workflow",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Invoice Workflow",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Policy Workflow",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "General Document",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Contract Workflow": {
+      "main": [
+        [
+          {
+            "node": "Determine Approvers",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Invoice Workflow": {
+      "main": [
+        [
+          {
+            "node": "Match to PO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Policy Workflow": {
+      "main": [
+        [
+          {
+            "node": "Legal Review",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "General Document": {
+      "main": [
+        [
+          {
+            "node": "Store Document",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Determine Approvers": {
+      "main": [
+        [
+          {
+            "node": "Send for Approval",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send for Approval": {
+      "main": [
+        [
+          {
+            "node": "Wait for Approval",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait for Approval": {
+      "main": [
+        [
+          {
+            "node": "Check Approval Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Approval Status": {
+      "main": [
+        [
+          {
+            "node": "Document Approved",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Document Rejected",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Document Approved": {
+      "main": [
+        [
+          {
+            "node": "Store Document",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Match to PO": {
+      "main": [
+        [
+          {
+            "node": "Check Match",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Match": {
+      "main": [
+        [
+          {
+            "node": "Auto Approve Invoice",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Flag for Review",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Auto Approve Invoice": {
+      "main": [
+        [
+          {
+            "node": "Store Document",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Legal Review": {
+      "main": [
+        [
+          {
+            "node": "Store Document",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Store Document": {
+      "main": [
+        [
+          {
+            "node": "Index Document",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Index Document": {
+      "main": [
+        [
+          {
+            "node": "Notify Stakeholders",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule - Expiration Check": {
+      "main": [
+        [
+          {
+            "node": "Get Expiring Documents",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Expiring Documents": {
+      "main": [
+        [
+          {
+            "node": "Send Expiration Alerts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-01-08T00:00:00.000Z",
+  "id": "document-workflow-approvals",
+  "isArchived": false,
+  "meta": {
+    "instanceId": "document-management"
+  },
+  "name": "Document Workflow and Approvals",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "document-upload",
+        "options": {
+          "rawBody": true
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [0, 200],
+      "id": "upload-webhook",
+      "name": "Webhook - Document Upload",
+      "webhookId": "document-upload-webhook"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 9 * * *"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [0, 700],
+      "id": "expiration-schedule",
+      "name": "Schedule - Expiration Check"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Process uploaded document\nconst input = $input.first().json;\n\nconst document = {\n  id: `DOC-${Date.now()}`,\n  uploadedAt: new Date().toISOString(),\n  uploadedBy: input.uploadedBy || input.user || '',\n  \n  // File info\n  fileName: input.fileName || input.name || 'unnamed',\n  fileType: input.fileType || input.mimeType || '',\n  fileSize: input.fileSize || 0,\n  fileUrl: input.fileUrl || input.url || '',\n  \n  // Metadata\n  title: input.title || input.fileName || '',\n  description: input.description || '',\n  department: input.department || '',\n  project: input.project || '',\n  tags: input.tags || [],\n  \n  // Status\n  status: 'processing',\n  version: 1,\n  \n  // Extracted content (for classification)\n  content: input.content || input.text || ''\n};\n\nreturn {\n  json: document\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [220, 200],
+      "id": "process-doc",
+      "name": "Process Document"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "claude-sonnet-4-20250514"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Classify this document and extract key metadata:\n\nFile Name: {{ $json.fileName }}\nFile Type: {{ $json.fileType }}\nContent Preview: {{ $json.content?.substring(0, 1000) || 'No content available' }}\nDescription: {{ $json.description }}\nDepartment: {{ $json.department }}\n\nProvide classification in JSON format:\n{\n  \"documentType\": \"contract|invoice|policy|report|proposal|other\",\n  \"subType\": \"specific type (e.g., NDA, service agreement, expense report)\",\n  \"confidentiality\": \"public|internal|confidential|restricted\",\n  \"requiresApproval\": true/false,\n  \"approvalType\": \"none|manager|legal|executive|board\",\n  \"suggestedTags\": [\"relevant tags\"],\n  \"expirationDate\": \"if applicable, YYYY-MM-DD\",\n  \"parties\": [\"if contract, list parties\"],\n  \"value\": \"if financial, amount\",\n  \"summary\": \"2-3 sentence summary\",\n  \"riskLevel\": \"low|medium|high\"\n}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatAnthropic",
+      "typeVersion": 1.3,
+      "position": [440, 200],
+      "id": "ai-classify",
+      "name": "AI Classify Document",
+      "credentials": {
+        "anthropicApi": {
+          "id": "anthropic-credentials",
+          "name": "Anthropic account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.documentType }}",
+                    "rightValue": "contract",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "Contract"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.documentType }}",
+                    "rightValue": "invoice",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "Invoice"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.documentType }}",
+                    "rightValue": "policy",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "Policy"
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra"
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [660, 200],
+      "id": "route-type",
+      "name": "Route by Type"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Contract-specific workflow setup\nconst data = $input.first().json;\n\nconst contractWorkflow = {\n  ...data,\n  workflowType: 'contract',\n  approvalChain: [],\n  currentApprover: 0\n};\n\n// Determine approval chain based on value and risk\nconst value = parseFloat(data.value) || 0;\nconst riskLevel = data.riskLevel || 'medium';\n\nif (value > 100000 || riskLevel === 'high') {\n  contractWorkflow.approvalChain = ['legal', 'finance', 'executive'];\n} else if (value > 25000 || riskLevel === 'medium') {\n  contractWorkflow.approvalChain = ['legal', 'manager'];\n} else {\n  contractWorkflow.approvalChain = ['manager'];\n}\n\nreturn {\n  json: contractWorkflow\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [880, 50],
+      "id": "contract-wf",
+      "name": "Contract Workflow"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Invoice workflow - match to PO\nconst data = $input.first().json;\n\nreturn {\n  json: {\n    ...data,\n    workflowType: 'invoice',\n    requiresPoMatch: true,\n    poNumber: data.poNumber || null,\n    invoiceAmount: parseFloat(data.value) || 0\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [880, 200],
+      "id": "invoice-wf",
+      "name": "Invoice Workflow"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Policy workflow - requires legal review\nconst data = $input.first().json;\n\nreturn {\n  json: {\n    ...data,\n    workflowType: 'policy',\n    requiresLegalReview: true,\n    effectiveDate: data.effectiveDate || null\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [880, 350],
+      "id": "policy-wf",
+      "name": "Policy Workflow"
+    },
+    {
+      "parameters": {
+        "jsCode": "// General document - direct to storage\nconst data = $input.first().json;\n\nreturn {\n  json: {\n    ...data,\n    workflowType: 'general',\n    status: 'approved'\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [880, 500],
+      "id": "general-wf",
+      "name": "General Document"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Determine approvers based on type and value\nconst data = $input.first().json;\n\nconst approverEmails = {\n  legal: $env.LEGAL_APPROVER_EMAIL || 'legal@company.com',\n  finance: $env.FINANCE_APPROVER_EMAIL || 'finance@company.com',\n  executive: $env.EXECUTIVE_APPROVER_EMAIL || 'exec@company.com',\n  manager: data.uploadedByManager || 'manager@company.com'\n};\n\nconst currentApproverRole = data.approvalChain[data.currentApprover];\nconst currentApproverEmail = approverEmails[currentApproverRole];\n\nreturn {\n  json: {\n    ...data,\n    currentApproverRole,\n    currentApproverEmail,\n    approvalDeadline: new Date(Date.now() + 3 * 86400000).toISOString() // 3 days\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1100, 50],
+      "id": "determine-approvers",
+      "name": "Determine Approvers"
+    },
+    {
+      "parameters": {
+        "fromEmail": "documents@company.com",
+        "toEmail": "={{ $json.currentApproverEmail }}",
+        "subject": "=Document Approval Required: {{ $json.title || $json.fileName }}",
+        "text": "=A document requires your approval:\n\n*Document:* {{ $json.title || $json.fileName }}\n*Type:* {{ $json.documentType }} - {{ $json.subType }}\n*Uploaded by:* {{ $json.uploadedBy }}\n*Risk Level:* {{ $json.riskLevel }}\n\n*Summary:*\n{{ $json.summary }}\n\n{{ $json.value ? `*Value:* $${$json.value}` : '' }}\n{{ $json.parties?.length ? `*Parties:* ${$json.parties.join(', ')}` : '' }}\n\n*Approval Deadline:* {{ new Date($json.approvalDeadline).toLocaleDateString() }}\n\nTo approve: {{ $env.APPROVAL_URL }}/approve?doc={{ $json.id }}&approver={{ $json.currentApproverRole }}\nTo reject: {{ $env.APPROVAL_URL }}/reject?doc={{ $json.id }}&approver={{ $json.currentApproverRole }}\n\nOr review in the document portal: {{ $env.DOCUMENT_PORTAL_URL }}/{{ $json.id }}"
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [1320, 50],
+      "id": "send-approval",
+      "name": "Send for Approval"
+    },
+    {
+      "parameters": {
+        "httpMethod": "GET",
+        "path": "document-approval",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [1540, 50],
+      "id": "wait-approval",
+      "name": "Wait for Approval",
+      "webhookId": "document-approval-webhook"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "approved",
+              "leftValue": "={{ $json.action }}",
+              "rightValue": "approve",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [1760, 50],
+      "id": "check-approval",
+      "name": "Check Approval Status"
+    },
+    {
+      "parameters": {
+        "jsCode": "const data = $input.first().json;\nreturn { json: { ...data, status: 'approved', approvedAt: new Date().toISOString() } };"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1980, -50],
+      "id": "doc-approved",
+      "name": "Document Approved"
+    },
+    {
+      "parameters": {
+        "channel": "#document-alerts",
+        "text": "=:x: *Document Rejected*\n\n*Document:* {{ $json.title || $json.fileName }}\n*Rejected by:* {{ $json.currentApproverRole }}\n*Reason:* {{ $json.rejectionReason || 'Not specified' }}\n\nUploader {{ $json.uploadedBy }} has been notified.",
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.1,
+      "position": [1980, 150],
+      "id": "doc-rejected",
+      "name": "Document Rejected",
+      "credentials": {
+        "slackApi": {
+          "id": "slack-credentials",
+          "name": "Slack API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $env.FINANCE_API }}/purchase-orders?number={{ $json.poNumber }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1100, 200],
+      "id": "match-po",
+      "name": "Match to PO"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "po-match",
+              "leftValue": "={{ $json.poFound && Math.abs($json.invoiceAmount - $json.poAmount) < 100 }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [1320, 200],
+      "id": "check-match",
+      "name": "Check Match"
+    },
+    {
+      "parameters": {
+        "jsCode": "const data = $input.first().json;\nreturn { json: { ...data, status: 'approved', approvedBy: 'auto-match', approvedAt: new Date().toISOString() } };"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1540, 150],
+      "id": "auto-approve-inv",
+      "name": "Auto Approve Invoice"
+    },
+    {
+      "parameters": {
+        "channel": "#ap-review",
+        "text": "=:warning: *Invoice Requires Review*\n\n*Invoice:* {{ $json.fileName }}\n*Amount:* ${{ $json.invoiceAmount }}\n*PO Number:* {{ $json.poNumber || 'Not provided' }}\n\nReason: {{ $json.poFound ? 'Amount mismatch' : 'No matching PO found' }}",
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.1,
+      "position": [1540, 300],
+      "id": "flag-review",
+      "name": "Flag for Review",
+      "credentials": {
+        "slackApi": {
+          "id": "slack-credentials",
+          "name": "Slack API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "channel": "#legal-review",
+        "text": "=:page_facing_up: *Policy Document for Legal Review*\n\n*Document:* {{ $json.title || $json.fileName }}\n*Type:* {{ $json.subType }}\n*Effective Date:* {{ $json.effectiveDate || 'TBD' }}\n\n*Summary:*\n{{ $json.summary }}\n\nPlease review and approve in the document portal.",
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.1,
+      "position": [1100, 350],
+      "id": "legal-review",
+      "name": "Legal Review",
+      "credentials": {
+        "slackApi": {
+          "id": "slack-credentials",
+          "name": "Slack API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.DOCUMENT_STORAGE_API }}/documents",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "document",
+              "value": "={{ JSON.stringify($json) }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1760, 400],
+      "id": "store-doc",
+      "name": "Store Document"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.SEARCH_API }}/index",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "id",
+              "value": "={{ $json.id }}"
+            },
+            {
+              "name": "title",
+              "value": "={{ $json.title }}"
+            },
+            {
+              "name": "content",
+              "value": "={{ $json.content }}"
+            },
+            {
+              "name": "tags",
+              "value": "={{ JSON.stringify($json.suggestedTags) }}"
+            },
+            {
+              "name": "type",
+              "value": "={{ $json.documentType }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1980, 400],
+      "id": "index-doc",
+      "name": "Index Document"
+    },
+    {
+      "parameters": {
+        "channel": "#documents",
+        "text": "=:file_folder: *New Document Added*\n\n*{{ $json.title || $json.fileName }}*\nType: {{ $json.documentType }} | Status: {{ $json.status }}\nUploaded by: {{ $json.uploadedBy }}\n\nView: {{ $env.DOCUMENT_PORTAL_URL }}/{{ $json.id }}",
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.1,
+      "position": [2200, 400],
+      "id": "notify-stakeholders",
+      "name": "Notify Stakeholders",
+      "credentials": {
+        "slackApi": {
+          "id": "slack-credentials",
+          "name": "Slack API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $env.DOCUMENT_STORAGE_API }}/documents?expiringWithin=30",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [220, 700],
+      "id": "get-expiring",
+      "name": "Get Expiring Documents"
+    },
+    {
+      "parameters": {
+        "channel": "#document-alerts",
+        "text": "=:calendar: *Documents Expiring Soon*\n\n{{ $json.documents?.map(d => `• ${d.title} - Expires: ${d.expirationDate}`).join('\\n') || 'No documents expiring' }}\n\nPlease review and renew as needed.",
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.1,
+      "position": [440, 700],
+      "id": "expiration-alerts",
+      "name": "Send Expiration Alerts",
+      "credentials": {
+        "slackApi": {
+          "id": "slack-credentials",
+          "name": "Slack API"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "shared": [],
+  "staticData": null,
+  "tags": [
+    {
+      "name": "Document Management"
+    },
+    {
+      "name": "Approvals"
+    },
+    {
+      "name": "Workflow"
+    }
+  ],
+  "triggerCount": 0,
+  "updatedAt": "2026-01-08T00:00:00.000Z",
+  "versionId": "document-workflow-v1"
+}

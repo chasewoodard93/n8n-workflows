@@ -1,0 +1,871 @@
+{
+  "active": false,
+  "connections": {
+    "Email Trigger": {
+      "main": [
+        [
+          {
+            "node": "Parse Support Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook - Support Form": {
+      "main": [
+        [
+          {
+            "node": "Parse Support Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Chat Widget Webhook": {
+      "main": [
+        [
+          {
+            "node": "Parse Support Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Support Request": {
+      "main": [
+        [
+          {
+            "node": "AI Categorize and Prioritize",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Categorize and Prioritize": {
+      "main": [
+        [
+          {
+            "node": "Check for Auto-Resolution",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check for Auto-Resolution": {
+      "main": [
+        [
+          {
+            "node": "AI Generate Solution",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Create Support Ticket",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Generate Solution": {
+      "main": [
+        [
+          {
+            "node": "Send Auto-Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Auto-Response": {
+      "main": [
+        [
+          {
+            "node": "Mark as Auto-Resolved",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Support Ticket": {
+      "main": [
+        [
+          {
+            "node": "Route to Team",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route to Team": {
+      "main": [
+        [
+          {
+            "node": "Assign to Technical Support",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Assign to Billing Support",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Assign to Account Manager",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Assign to General Queue",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Assign to Technical Support": {
+      "main": [
+        [
+          {
+            "node": "Send Confirmation Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Assign to Billing Support": {
+      "main": [
+        [
+          {
+            "node": "Send Confirmation Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Assign to Account Manager": {
+      "main": [
+        [
+          {
+            "node": "Send Confirmation Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Assign to General Queue": {
+      "main": [
+        [
+          {
+            "node": "Send Confirmation Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Confirmation Email": {
+      "main": [
+        [
+          {
+            "node": "Notify Support Team",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Notify Support Team": {
+      "main": [
+        [
+          {
+            "node": "Check Priority",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Priority": {
+      "main": [
+        [
+          {
+            "node": "Page On-Call",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Start SLA Timer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule - CSAT Survey": {
+      "main": [
+        [
+          {
+            "node": "Get Resolved Tickets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Resolved Tickets": {
+      "main": [
+        [
+          {
+            "node": "Send CSAT Survey",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook - Survey Response": {
+      "main": [
+        [
+          {
+            "node": "Process CSAT Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Process CSAT Response": {
+      "main": [
+        [
+          {
+            "node": "Check Score",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Score": {
+      "main": [
+        [
+          {
+            "node": "Flag for Follow-up",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Update Ticket Score",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-01-08T00:00:00.000Z",
+  "id": "customer-support-ticketing",
+  "isArchived": false,
+  "meta": {
+    "instanceId": "customer-support"
+  },
+  "name": "Customer Support Ticketing",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "filters": {
+          "sender": "",
+          "subject": ""
+        }
+      },
+      "type": "n8n-nodes-base.emailReadImap",
+      "typeVersion": 2,
+      "position": [0, 0],
+      "id": "email-trigger",
+      "name": "Email Trigger"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "support-request",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [0, 200],
+      "id": "form-webhook",
+      "name": "Webhook - Support Form",
+      "webhookId": "support-form-webhook"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "chat-support",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [0, 400],
+      "id": "chat-webhook",
+      "name": "Chat Widget Webhook",
+      "webhookId": "chat-support-webhook"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Parse and normalize support request from any channel\nconst input = $input.first().json;\n\nconst supportRequest = {\n  id: `TKT-${Date.now()}`,\n  receivedAt: new Date().toISOString(),\n  \n  // Customer info\n  customerEmail: input.from || input.email || input.customerEmail || '',\n  customerName: input.name || input.customerName || input.fromName || '',\n  customerId: input.customerId || '',\n  accountType: input.accountType || 'standard', // standard, premium, enterprise\n  \n  // Request details\n  subject: input.subject || input.title || 'Support Request',\n  body: input.body || input.text || input.message || input.description || '',\n  channel: input.channel || 'email', // email, form, chat, phone\n  \n  // Attachments\n  hasAttachments: (input.attachments && input.attachments.length > 0) || false,\n  attachments: input.attachments || [],\n  \n  // Context\n  productArea: input.product || '',\n  browserInfo: input.browser || '',\n  osInfo: input.os || '',\n  errorMessage: input.error || '',\n  \n  // Initial status\n  status: 'new',\n  priority: null, // Will be set by AI\n  category: null, // Will be set by AI\n  assignedTo: null\n};\n\nreturn {\n  json: supportRequest\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [220, 200],
+      "id": "parse-request",
+      "name": "Parse Support Request"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "claude-sonnet-4-20250514"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=You are a customer support AI assistant. Analyze this support request and categorize it.\n\nSubject: {{ $json.subject }}\nMessage: {{ $json.body }}\nProduct Area: {{ $json.productArea || 'Not specified' }}\nError Message: {{ $json.errorMessage || 'None' }}\nAccount Type: {{ $json.accountType }}\n\nProvide your analysis in JSON format:\n{\n  \"category\": \"technical|billing|account|feature_request|bug_report|general\",\n  \"subcategory\": \"specific subcategory\",\n  \"priority\": \"critical|high|medium|low\",\n  \"sentiment\": \"positive|neutral|negative|frustrated\",\n  \"canAutoResolve\": true/false,\n  \"suggestedResponse\": \"if canAutoResolve is true, provide a helpful response\",\n  \"knowledgeBaseMatch\": \"relevant KB article if applicable\",\n  \"escalationReason\": \"reason if needs escalation\",\n  \"summary\": \"brief summary of the issue\",\n  \"requiredSkills\": [\"list of skills needed to resolve\"]\n}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatAnthropic",
+      "typeVersion": 1.3,
+      "position": [440, 200],
+      "id": "ai-categorize",
+      "name": "AI Categorize and Prioritize",
+      "credentials": {
+        "anthropicApi": {
+          "id": "anthropic-credentials",
+          "name": "Anthropic account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "can-auto-resolve",
+              "leftValue": "={{ $json.canAutoResolve }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [660, 200],
+      "id": "check-auto",
+      "name": "Check for Auto-Resolution"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "claude-sonnet-4-20250514"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Generate a helpful, professional customer support response for this issue.\n\nCustomer Name: {{ $json.customerName }}\nIssue: {{ $json.subject }}\nDetails: {{ $json.body }}\nCategory: {{ $json.category }}\nKnowledge Base Match: {{ $json.knowledgeBaseMatch || 'None' }}\n\nWrite a friendly, helpful response that:\n1. Acknowledges their issue\n2. Provides a clear solution or next steps\n3. Offers additional help if needed\n4. Uses a professional but warm tone\n\nDo not include subject line - just the email body."
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatAnthropic",
+      "typeVersion": 1.3,
+      "position": [880, 100],
+      "id": "ai-solution",
+      "name": "AI Generate Solution",
+      "credentials": {
+        "anthropicApi": {
+          "id": "anthropic-credentials",
+          "name": "Anthropic account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fromEmail": "support@company.com",
+        "toEmail": "={{ $json.customerEmail }}",
+        "subject": "=Re: {{ $json.subject }} [{{ $json.id }}]",
+        "text": "={{ $json.message?.content || $json.suggestedResponse }}"
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [1100, 100],
+      "id": "auto-response",
+      "name": "Send Auto-Response"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Mark ticket as auto-resolved\nconst data = $input.first().json;\n\nreturn {\n  json: {\n    ...data,\n    status: 'auto-resolved',\n    resolvedAt: new Date().toISOString(),\n    resolvedBy: 'ai-assistant',\n    resolutionType: 'automatic'\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1320, 100],
+      "id": "mark-resolved",
+      "name": "Mark as Auto-Resolved"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.HELPDESK_API }}/tickets",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "id",
+              "value": "={{ $json.id }}"
+            },
+            {
+              "name": "subject",
+              "value": "={{ $json.subject }}"
+            },
+            {
+              "name": "description",
+              "value": "={{ $json.body }}"
+            },
+            {
+              "name": "category",
+              "value": "={{ $json.category }}"
+            },
+            {
+              "name": "priority",
+              "value": "={{ $json.priority }}"
+            },
+            {
+              "name": "customerEmail",
+              "value": "={{ $json.customerEmail }}"
+            },
+            {
+              "name": "customerName",
+              "value": "={{ $json.customerName }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [880, 300],
+      "id": "create-ticket",
+      "name": "Create Support Ticket"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.category }}",
+                    "rightValue": "technical",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "Technical"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.category }}",
+                    "rightValue": "billing",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "Billing"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.category }}",
+                    "rightValue": "account",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "Account"
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra"
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [1100, 300],
+      "id": "route-team",
+      "name": "Route to Team"
+    },
+    {
+      "parameters": {
+        "jsCode": "const data = $input.first().json;\nreturn { json: { ...data, assignedTo: 'technical-support', queue: 'tech-queue' } };"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1320, 150],
+      "id": "assign-tech",
+      "name": "Assign to Technical Support"
+    },
+    {
+      "parameters": {
+        "jsCode": "const data = $input.first().json;\nreturn { json: { ...data, assignedTo: 'billing-support', queue: 'billing-queue' } };"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1320, 250],
+      "id": "assign-billing",
+      "name": "Assign to Billing Support"
+    },
+    {
+      "parameters": {
+        "jsCode": "const data = $input.first().json;\nreturn { json: { ...data, assignedTo: 'account-manager', queue: 'account-queue' } };"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1320, 350],
+      "id": "assign-account",
+      "name": "Assign to Account Manager"
+    },
+    {
+      "parameters": {
+        "jsCode": "const data = $input.first().json;\nreturn { json: { ...data, assignedTo: 'general-support', queue: 'general-queue' } };"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1320, 450],
+      "id": "assign-general",
+      "name": "Assign to General Queue"
+    },
+    {
+      "parameters": {
+        "fromEmail": "support@company.com",
+        "toEmail": "={{ $json.customerEmail }}",
+        "subject": "=We received your request [{{ $json.id }}]",
+        "text": "=Hi {{ $json.customerName }},\n\nThank you for contacting us. We've received your support request and a member of our {{ $json.assignedTo.replace(/-/g, ' ') }} team will be in touch shortly.\n\nTicket ID: {{ $json.id }}\nPriority: {{ $json.priority }}\nCategory: {{ $json.category }}\n\nExpected Response Time:\n{{ $json.priority === 'critical' ? '• Critical: Within 1 hour' : $json.priority === 'high' ? '• High: Within 4 hours' : $json.priority === 'medium' ? '• Medium: Within 24 hours' : '• Low: Within 48 hours' }}\n\nYou can reply to this email to add more information to your request.\n\nBest regards,\nSupport Team"
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [1540, 300],
+      "id": "confirm-email",
+      "name": "Send Confirmation Email"
+    },
+    {
+      "parameters": {
+        "channel": "={{ '#support-' + $json.queue }}",
+        "text": "=:ticket: *New Support Ticket*\n\n*ID:* {{ $json.id }}\n*Customer:* {{ $json.customerName }} ({{ $json.customerEmail }})\n*Account Type:* {{ $json.accountType }}\n\n*Subject:* {{ $json.subject }}\n*Category:* {{ $json.category }} / {{ $json.subcategory }}\n*Priority:* {{ $json.priority === 'critical' ? ':red_circle:' : $json.priority === 'high' ? ':orange_circle:' : $json.priority === 'medium' ? ':yellow_circle:' : ':white_circle:' }} {{ $json.priority }}\n*Sentiment:* {{ $json.sentiment }}\n\n*Summary:*\n{{ $json.summary }}\n\n*Required Skills:* {{ $json.requiredSkills.join(', ') }}",
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.1,
+      "position": [1760, 300],
+      "id": "notify-team",
+      "name": "Notify Support Team",
+      "credentials": {
+        "slackApi": {
+          "id": "slack-credentials",
+          "name": "Slack API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "critical-priority",
+              "leftValue": "={{ $json.priority }}",
+              "rightValue": "critical",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [1980, 300],
+      "id": "check-priority",
+      "name": "Check Priority"
+    },
+    {
+      "parameters": {
+        "resource": "incident",
+        "summary": "=CRITICAL: {{ $json.subject }}",
+        "email": "={{ $env.ONCALL_EMAIL }}",
+        "options": {
+          "urgency": "high"
+        }
+      },
+      "type": "n8n-nodes-base.pagerDuty",
+      "typeVersion": 1,
+      "position": [2200, 200],
+      "id": "page-oncall",
+      "name": "Page On-Call",
+      "credentials": {
+        "pagerDutyApi": {
+          "id": "pagerduty-credentials",
+          "name": "PagerDuty API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Start SLA timer based on priority\nconst data = $input.first().json;\n\nconst slaConfig = {\n  critical: { response: 60, resolution: 240 }, // minutes\n  high: { response: 240, resolution: 480 },\n  medium: { response: 1440, resolution: 2880 },\n  low: { response: 2880, resolution: 5760 }\n};\n\nconst sla = slaConfig[data.priority] || slaConfig.medium;\n\nreturn {\n  json: {\n    ...data,\n    sla: {\n      responseDeadline: new Date(Date.now() + sla.response * 60000).toISOString(),\n      resolutionDeadline: new Date(Date.now() + sla.resolution * 60000).toISOString(),\n      responseMinutes: sla.response,\n      resolutionMinutes: sla.resolution\n    }\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [2200, 400],
+      "id": "sla-timer",
+      "name": "Start SLA Timer"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "hoursInterval": 24
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [0, 600],
+      "id": "csat-schedule",
+      "name": "Schedule - CSAT Survey"
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $env.HELPDESK_API }}/tickets?status=resolved&resolvedAfter={{ new Date(Date.now() - 86400000).toISOString() }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [220, 600],
+      "id": "get-resolved",
+      "name": "Get Resolved Tickets"
+    },
+    {
+      "parameters": {
+        "fromEmail": "support@company.com",
+        "toEmail": "={{ $json.customerEmail }}",
+        "subject": "=How did we do? [{{ $json.id }}]",
+        "text": "=Hi {{ $json.customerName }},\n\nYour recent support request has been resolved. We'd love to hear your feedback!\n\nPlease take a moment to rate your experience:\n\n⭐ Very Satisfied: {{ $env.SURVEY_URL }}?ticket={{ $json.id }}&rating=5\n⭐ Satisfied: {{ $env.SURVEY_URL }}?ticket={{ $json.id }}&rating=4\n⭐ Neutral: {{ $env.SURVEY_URL }}?ticket={{ $json.id }}&rating=3\n⭐ Dissatisfied: {{ $env.SURVEY_URL }}?ticket={{ $json.id }}&rating=2\n⭐ Very Dissatisfied: {{ $env.SURVEY_URL }}?ticket={{ $json.id }}&rating=1\n\nYour feedback helps us improve!\n\nBest regards,\nSupport Team"
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [440, 600],
+      "id": "send-csat",
+      "name": "Send CSAT Survey"
+    },
+    {
+      "parameters": {
+        "httpMethod": "GET",
+        "path": "csat-response",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [0, 800],
+      "id": "survey-webhook",
+      "name": "Webhook - Survey Response",
+      "webhookId": "csat-survey-webhook"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Process CSAT survey response\nconst query = $input.first().json.query || $input.first().json;\n\nconst response = {\n  ticketId: query.ticket || '',\n  rating: parseInt(query.rating || '0'),\n  comment: query.comment || '',\n  submittedAt: new Date().toISOString()\n};\n\nreturn {\n  json: response\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [220, 800],
+      "id": "process-csat",
+      "name": "Process CSAT Response"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "low-score",
+              "leftValue": "={{ $json.rating }}",
+              "rightValue": 3,
+              "operator": {
+                "type": "number",
+                "operation": "lte"
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [440, 800],
+      "id": "check-score",
+      "name": "Check Score"
+    },
+    {
+      "parameters": {
+        "channel": "#support-escalations",
+        "text": "=:warning: *Low CSAT Score Alert*\n\n*Ticket:* {{ $json.ticketId }}\n*Rating:* {{ '⭐'.repeat($json.rating) }} ({{ $json.rating }}/5)\n*Comment:* {{ $json.comment || 'No comment provided' }}\n\nPlease follow up with this customer.",
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.1,
+      "position": [660, 700],
+      "id": "flag-followup",
+      "name": "Flag for Follow-up",
+      "credentials": {
+        "slackApi": {
+          "id": "slack-credentials",
+          "name": "Slack API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "PATCH",
+        "url": "={{ $env.HELPDESK_API }}/tickets/{{ $json.ticketId }}",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "csatScore",
+              "value": "={{ $json.rating }}"
+            },
+            {
+              "name": "csatComment",
+              "value": "={{ $json.comment }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [660, 900],
+      "id": "update-score",
+      "name": "Update Ticket Score"
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "shared": [],
+  "staticData": null,
+  "tags": [
+    {
+      "name": "Customer Support"
+    },
+    {
+      "name": "Ticketing"
+    },
+    {
+      "name": "CSAT"
+    }
+  ],
+  "triggerCount": 0,
+  "updatedAt": "2026-01-08T00:00:00.000Z",
+  "versionId": "support-ticketing-v1"
+}

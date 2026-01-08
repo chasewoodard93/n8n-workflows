@@ -1,0 +1,613 @@
+{
+  "active": false,
+  "connections": {
+    "Schedule - Daily ETL": {
+      "main": [
+        [
+          {
+            "node": "Extract Sales Data",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Extract Marketing Data",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Extract Support Data",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Extract Finance Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Sales Data": {
+      "main": [
+        [
+          {
+            "node": "Transform Sales Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Marketing Data": {
+      "main": [
+        [
+          {
+            "node": "Transform Marketing Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Support Data": {
+      "main": [
+        [
+          {
+            "node": "Transform Support Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Finance Data": {
+      "main": [
+        [
+          {
+            "node": "Transform Finance Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transform Sales Data": {
+      "main": [
+        [
+          {
+            "node": "Merge All Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transform Marketing Data": {
+      "main": [
+        [
+          {
+            "node": "Merge All Data",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Transform Support Data": {
+      "main": [
+        [
+          {
+            "node": "Merge All Data",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "Transform Finance Data": {
+      "main": [
+        [
+          {
+            "node": "Merge All Data",
+            "type": "main",
+            "index": 3
+          }
+        ]
+      ]
+    },
+    "Merge All Data": {
+      "main": [
+        [
+          {
+            "node": "Calculate KPIs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calculate KPIs": {
+      "main": [
+        [
+          {
+            "node": "AI Generate Insights",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Generate Insights": {
+      "main": [
+        [
+          {
+            "node": "Load to Data Warehouse",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Load to Data Warehouse": {
+      "main": [
+        [
+          {
+            "node": "Update Dashboard",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Dashboard": {
+      "main": [
+        [
+          {
+            "node": "Check Anomalies",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Anomalies": {
+      "main": [
+        [
+          {
+            "node": "Alert Anomaly",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send Daily Summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule - Weekly Report": {
+      "main": [
+        [
+          {
+            "node": "Get Weekly KPIs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Weekly KPIs": {
+      "main": [
+        [
+          {
+            "node": "AI Weekly Analysis",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Weekly Analysis": {
+      "main": [
+        [
+          {
+            "node": "Generate Executive Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Executive Report": {
+      "main": [
+        [
+          {
+            "node": "Send Executive Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-01-08T00:00:00.000Z",
+  "id": "business-intelligence-dashboard",
+  "isArchived": false,
+  "meta": {
+    "instanceId": "analytics"
+  },
+  "name": "Business Intelligence Dashboard",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 5 * * *"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [0, 200],
+      "id": "daily-schedule",
+      "name": "Schedule - Daily ETL"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 8 * * 1"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [0, 700],
+      "id": "weekly-schedule",
+      "name": "Schedule - Weekly Report"
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $env.CRM_API }}/deals?createdAfter={{ new Date(Date.now() - 86400000).toISOString() }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [220, 0],
+      "id": "extract-sales",
+      "name": "Extract Sales Data"
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $env.MARKETING_API }}/campaigns/metrics?period=daily",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [220, 150],
+      "id": "extract-marketing",
+      "name": "Extract Marketing Data"
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $env.HELPDESK_API }}/tickets/metrics?period=daily",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [220, 300],
+      "id": "extract-support",
+      "name": "Extract Support Data"
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $env.FINANCE_API }}/transactions?period=daily",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [220, 450],
+      "id": "extract-finance",
+      "name": "Extract Finance Data"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Transform sales data\nconst data = $input.first().json;\nconst deals = data.deals || data || [];\n\nconst salesMetrics = {\n  date: new Date().toISOString().split('T')[0],\n  department: 'sales',\n  \n  // Pipeline metrics\n  newDeals: deals.filter(d => d.stage === 'new').length,\n  qualifiedDeals: deals.filter(d => d.stage === 'qualified').length,\n  proposalsSent: deals.filter(d => d.stage === 'proposal').length,\n  closedWon: deals.filter(d => d.stage === 'won').length,\n  closedLost: deals.filter(d => d.stage === 'lost').length,\n  \n  // Value metrics\n  pipelineValue: deals.reduce((sum, d) => sum + (d.value || 0), 0),\n  wonValue: deals.filter(d => d.stage === 'won').reduce((sum, d) => sum + (d.value || 0), 0),\n  averageDealSize: deals.length > 0 ? deals.reduce((sum, d) => sum + (d.value || 0), 0) / deals.length : 0,\n  \n  // Conversion\n  winRate: deals.length > 0 ? (deals.filter(d => d.stage === 'won').length / deals.length * 100).toFixed(1) : 0\n};\n\nreturn {\n  json: salesMetrics\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [440, 0],
+      "id": "transform-sales",
+      "name": "Transform Sales Data"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Transform marketing data\nconst data = $input.first().json;\n\nconst marketingMetrics = {\n  date: new Date().toISOString().split('T')[0],\n  department: 'marketing',\n  \n  // Traffic\n  websiteVisits: data.visits || 0,\n  uniqueVisitors: data.uniqueVisitors || 0,\n  pageViews: data.pageViews || 0,\n  bounceRate: data.bounceRate || 0,\n  \n  // Lead generation\n  newLeads: data.leads || 0,\n  mqls: data.mqls || 0,\n  conversionRate: data.conversionRate || 0,\n  costPerLead: data.spend && data.leads ? (data.spend / data.leads).toFixed(2) : 0,\n  \n  // Campaigns\n  emailsSent: data.emailsSent || 0,\n  emailOpenRate: data.openRate || 0,\n  emailClickRate: data.clickRate || 0,\n  \n  // Social\n  socialReach: data.socialReach || 0,\n  socialEngagement: data.socialEngagement || 0,\n  \n  // Spend\n  adSpend: data.adSpend || 0,\n  contentPieces: data.contentPublished || 0\n};\n\nreturn {\n  json: marketingMetrics\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [440, 150],
+      "id": "transform-marketing",
+      "name": "Transform Marketing Data"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Transform support data\nconst data = $input.first().json;\n\nconst supportMetrics = {\n  date: new Date().toISOString().split('T')[0],\n  department: 'support',\n  \n  // Volume\n  ticketsCreated: data.created || 0,\n  ticketsResolved: data.resolved || 0,\n  ticketsOpen: data.open || 0,\n  ticketsEscalated: data.escalated || 0,\n  \n  // Performance\n  avgResponseTime: data.avgResponseTime || 0, // minutes\n  avgResolutionTime: data.avgResolutionTime || 0, // hours\n  firstContactResolution: data.fcrRate || 0,\n  \n  // Satisfaction\n  csatScore: data.csat || 0,\n  npsScore: data.nps || 0,\n  \n  // By channel\n  emailTickets: data.emailTickets || 0,\n  chatTickets: data.chatTickets || 0,\n  phoneTickets: data.phoneTickets || 0,\n  \n  // SLA\n  slaCompliance: data.slaCompliance || 0\n};\n\nreturn {\n  json: supportMetrics\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [440, 300],
+      "id": "transform-support",
+      "name": "Transform Support Data"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Transform finance data\nconst data = $input.first().json;\n\nconst financeMetrics = {\n  date: new Date().toISOString().split('T')[0],\n  department: 'finance',\n  \n  // Revenue\n  revenue: data.revenue || 0,\n  recurringRevenue: data.mrr || 0,\n  oneTimeRevenue: data.oneTime || 0,\n  \n  // Collections\n  invoicesSent: data.invoicesSent || 0,\n  invoicesPaid: data.invoicesPaid || 0,\n  amountCollected: data.collected || 0,\n  outstandingAR: data.arBalance || 0,\n  dso: data.dso || 0, // Days Sales Outstanding\n  \n  // Expenses\n  totalExpenses: data.expenses || 0,\n  payroll: data.payroll || 0,\n  operations: data.operations || 0,\n  marketing: data.marketingSpend || 0,\n  \n  // Margins\n  grossMargin: data.grossMargin || 0,\n  netMargin: data.netMargin || 0,\n  \n  // Cash\n  cashBalance: data.cash || 0,\n  burnRate: data.burnRate || 0,\n  runway: data.runway || 0 // months\n};\n\nreturn {\n  json: financeMetrics\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [440, 450],
+      "id": "transform-finance",
+      "name": "Transform Finance Data"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "mergeByFields": {
+          "values": [
+            {
+              "field1": "date",
+              "field2": "date"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [660, 200],
+      "id": "merge-data",
+      "name": "Merge All Data"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Calculate cross-department KPIs\nconst items = $input.all().map(i => i.json);\n\nconst sales = items.find(i => i.department === 'sales') || {};\nconst marketing = items.find(i => i.department === 'marketing') || {};\nconst support = items.find(i => i.department === 'support') || {};\nconst finance = items.find(i => i.department === 'finance') || {};\n\nconst kpis = {\n  date: new Date().toISOString().split('T')[0],\n  \n  // Executive KPIs\n  revenue: finance.revenue || 0,\n  mrr: finance.recurringRevenue || 0,\n  grossMargin: finance.grossMargin || 0,\n  \n  // Growth KPIs\n  newDeals: sales.closedWon || 0,\n  newRevenue: sales.wonValue || 0,\n  newLeads: marketing.newLeads || 0,\n  leadToCustomerRate: marketing.newLeads > 0 ? ((sales.closedWon / marketing.newLeads) * 100).toFixed(2) : 0,\n  \n  // Customer KPIs\n  csat: support.csatScore || 0,\n  nps: support.npsScore || 0,\n  ticketVolume: support.ticketsCreated || 0,\n  resolutionTime: support.avgResolutionTime || 0,\n  \n  // Efficiency KPIs\n  cac: marketing.newLeads > 0 ? ((marketing.adSpend || 0) / sales.closedWon).toFixed(2) : 0,\n  ltv: 0, // Would need historical data\n  \n  // Health indicators\n  pipelineHealth: sales.pipelineValue || 0,\n  cashRunway: finance.runway || 0,\n  slaCompliance: support.slaCompliance || 0,\n  \n  // Raw metrics for drill-down\n  salesMetrics: sales,\n  marketingMetrics: marketing,\n  supportMetrics: support,\n  financeMetrics: finance\n};\n\n// Calculate period-over-period changes (would need historical data)\nkpis.trends = {\n  revenueChange: 0, // placeholder\n  leadsChange: 0,\n  csatChange: 0\n};\n\nreturn {\n  json: kpis\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [880, 200],
+      "id": "calc-kpis",
+      "name": "Calculate KPIs"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "claude-sonnet-4-20250514"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Analyze these daily business metrics and provide actionable insights:\n\n*Revenue:* ${{ $json.revenue.toLocaleString() }}\n*MRR:* ${{ $json.mrr.toLocaleString() }}\n*Gross Margin:* {{ $json.grossMargin }}%\n\n*Sales:*\n- New Deals Won: {{ $json.newDeals }}\n- New Revenue: ${{ $json.newRevenue.toLocaleString() }}\n- Pipeline Value: ${{ $json.pipelineHealth.toLocaleString() }}\n\n*Marketing:*\n- New Leads: {{ $json.newLeads }}\n- Lead to Customer Rate: {{ $json.leadToCustomerRate }}%\n- CAC: ${{ $json.cac }}\n\n*Customer Success:*\n- CSAT: {{ $json.csat }}/5\n- NPS: {{ $json.nps }}\n- Ticket Volume: {{ $json.ticketVolume }}\n- Avg Resolution Time: {{ $json.resolutionTime }}h\n\n*Financial Health:*\n- Cash Runway: {{ $json.cashRunway }} months\n- SLA Compliance: {{ $json.slaCompliance }}%\n\nProvide:\n1. Top 3 positive highlights\n2. Top 3 concerns or risks\n3. Recommended actions for today\n4. Any anomalies detected"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatAnthropic",
+      "typeVersion": 1.3,
+      "position": [1100, 200],
+      "id": "ai-insights",
+      "name": "AI Generate Insights",
+      "credentials": {
+        "anthropicApi": {
+          "id": "anthropic-credentials",
+          "name": "Anthropic account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.DATA_WAREHOUSE_API }}/kpis",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "data",
+              "value": "={{ JSON.stringify($json) }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1320, 200],
+      "id": "load-dw",
+      "name": "Load to Data Warehouse"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.DASHBOARD_API }}/refresh",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "date",
+              "value": "={{ $json.date }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1540, 200],
+      "id": "update-dashboard",
+      "name": "Update Dashboard"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "anomaly",
+              "leftValue": "={{ $json.message?.content?.includes('anomal') || $json.message?.content?.includes('concern') }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [1760, 200],
+      "id": "check-anomaly",
+      "name": "Check Anomalies"
+    },
+    {
+      "parameters": {
+        "channel": "#executive-alerts",
+        "text": "=:warning: *Daily Metrics Anomaly Detected*\n\n{{ $json.message?.content || 'Check dashboard for details' }}\n\n_Dashboard: {{ $env.DASHBOARD_URL }}_",
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.1,
+      "position": [1980, 100],
+      "id": "alert-anomaly",
+      "name": "Alert Anomaly",
+      "credentials": {
+        "slackApi": {
+          "id": "slack-credentials",
+          "name": "Slack API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "channel": "#daily-metrics",
+        "text": "=:chart_with_upwards_trend: *Daily Business Metrics - {{ $json.date }}*\n\n*Key Numbers:*\n• Revenue: ${{ $json.revenue?.toLocaleString() || '0' }}\n• MRR: ${{ $json.mrr?.toLocaleString() || '0' }}\n• New Deals: {{ $json.newDeals || 0 }}\n• New Leads: {{ $json.newLeads || 0 }}\n• CSAT: {{ $json.csat || 'N/A' }}/5\n\n*AI Insights:*\n{{ $json.message?.content?.substring(0, 500) || 'Processing...' }}\n\n:bar_chart: Full dashboard: {{ $env.DASHBOARD_URL }}",
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.1,
+      "position": [1980, 300],
+      "id": "send-summary",
+      "name": "Send Daily Summary",
+      "credentials": {
+        "slackApi": {
+          "id": "slack-credentials",
+          "name": "Slack API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $env.DATA_WAREHOUSE_API }}/kpis?period=week",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [220, 700],
+      "id": "get-weekly",
+      "name": "Get Weekly KPIs"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "claude-sonnet-4-20250514"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Create an executive weekly business report based on this data:\n\n{{ JSON.stringify($json, null, 2) }}\n\nStructure the report with:\n1. Executive Summary (2-3 sentences)\n2. Key Wins This Week\n3. Areas of Concern\n4. Week-over-Week Trends\n5. Recommended Focus Areas for Next Week\n6. Resource Allocation Recommendations\n\nUse clear, concise language suitable for C-level executives."
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatAnthropic",
+      "typeVersion": 1.3,
+      "position": [440, 700],
+      "id": "ai-weekly",
+      "name": "AI Weekly Analysis",
+      "credentials": {
+        "anthropicApi": {
+          "id": "anthropic-credentials",
+          "name": "Anthropic account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Generate formatted executive report\nconst data = $input.first().json;\nconst analysis = data.message?.content || '';\n\nconst report = {\n  title: `Weekly Business Report - Week of ${new Date().toLocaleDateString()}`,\n  generatedAt: new Date().toISOString(),\n  period: 'weekly',\n  content: analysis,\n  metrics: data.metrics || {},\n  charts: [\n    { type: 'revenue_trend', url: `${$env.DASHBOARD_URL}/charts/revenue` },\n    { type: 'pipeline_funnel', url: `${$env.DASHBOARD_URL}/charts/pipeline` },\n    { type: 'customer_health', url: `${$env.DASHBOARD_URL}/charts/health` }\n  ],\n  dashboardUrl: $env.DASHBOARD_URL\n};\n\nreturn {\n  json: report\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [660, 700],
+      "id": "generate-report",
+      "name": "Generate Executive Report"
+    },
+    {
+      "parameters": {
+        "fromEmail": "reports@company.com",
+        "toEmail": "={{ $env.EXECUTIVE_EMAILS }}",
+        "subject": "={{ $json.title }}",
+        "text": "={{ $json.content }}\n\n---\nView interactive dashboard: {{ $json.dashboardUrl }}\n\nThis report was automatically generated on {{ new Date($json.generatedAt).toLocaleString() }}"
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [880, 700],
+      "id": "send-executive",
+      "name": "Send Executive Report"
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "shared": [],
+  "staticData": null,
+  "tags": [
+    {
+      "name": "Analytics"
+    },
+    {
+      "name": "Business Intelligence"
+    },
+    {
+      "name": "ETL"
+    }
+  ],
+  "triggerCount": 0,
+  "updatedAt": "2026-01-08T00:00:00.000Z",
+  "versionId": "bi-dashboard-v1"
+}
