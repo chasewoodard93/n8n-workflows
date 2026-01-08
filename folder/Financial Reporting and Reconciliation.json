@@ -1,0 +1,1096 @@
+{
+  "name": "Financial Reporting and Reconciliation",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 6,
+              "triggerAtDay": 1
+            }
+          ]
+        }
+      },
+      "id": "monthly-trigger",
+      "name": "Monthly Report Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 7
+            }
+          ]
+        }
+      },
+      "id": "daily-trigger",
+      "name": "Daily Reconciliation Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [240, 520]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "generate-report",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "report-webhook",
+      "name": "On-Demand Report Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [240, 740]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "report_type",
+              "name": "report_type",
+              "value": "monthly",
+              "type": "string"
+            },
+            {
+              "id": "period",
+              "name": "period",
+              "value": "={{ new Date(Date.now() - 30*24*60*60*1000).toISOString().slice(0,7) }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "set-monthly",
+      "name": "Set Monthly Report",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "report_type",
+              "name": "report_type",
+              "value": "daily_reconciliation",
+              "type": "string"
+            },
+            {
+              "id": "date",
+              "name": "date",
+              "value": "={{ new Date(Date.now() - 24*60*60*1000).toISOString().split('T')[0] }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "set-daily",
+      "name": "Set Daily Reconciliation",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [460, 520]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "report_type",
+              "name": "report_type",
+              "value": "={{ $json.body.report_type }}",
+              "type": "string"
+            },
+            {
+              "id": "period",
+              "name": "period",
+              "value": "={{ $json.body.period }}",
+              "type": "string"
+            },
+            {
+              "id": "start_date",
+              "name": "start_date",
+              "value": "={{ $json.body.start_date }}",
+              "type": "string"
+            },
+            {
+              "id": "end_date",
+              "name": "end_date",
+              "value": "={{ $json.body.end_date }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "set-ondemand",
+      "name": "Set On-Demand Report",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [460, 740]
+    },
+    {
+      "parameters": {
+        "rules": {
+          "rules": [
+            {
+              "outputKey": "monthly",
+              "conditions": {
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.report_type }}",
+                    "rightValue": "monthly",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "outputKey": "daily",
+              "conditions": {
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.report_type }}",
+                    "rightValue": "daily_reconciliation",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "outputKey": "custom",
+              "conditions": {
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.report_type }}",
+                    "rightValue": "custom",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "route-report",
+      "name": "Route by Report Type",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [680, 520]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $env.ACCOUNTING_API_URL }}/api/reports/income-statement?period={{ $json.period }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $env.ACCOUNTING_API_KEY }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "fetch-income",
+      "name": "Fetch Income Statement",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [920, 200]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $env.ACCOUNTING_API_URL }}/api/reports/balance-sheet?period={{ $json.period }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $env.ACCOUNTING_API_KEY }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "fetch-balance",
+      "name": "Fetch Balance Sheet",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [920, 340]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $env.ACCOUNTING_API_URL }}/api/reports/cash-flow?period={{ $json.period }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $env.ACCOUNTING_API_KEY }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "fetch-cashflow",
+      "name": "Fetch Cash Flow",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [920, 480]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $env.ACCOUNTING_API_URL }}/api/reports/ar-aging?period={{ $json.period }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $env.ACCOUNTING_API_KEY }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "fetch-ar-aging",
+      "name": "Fetch AR Aging",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [920, 620]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $env.BANK_API_URL }}/api/transactions?date={{ $json.date }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $env.BANK_API_KEY }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "fetch-bank-transactions",
+      "name": "Fetch Bank Transactions",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [920, 760]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $env.ACCOUNTING_API_URL }}/api/transactions?date={{ $json.date }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $env.ACCOUNTING_API_KEY }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "fetch-book-transactions",
+      "name": "Fetch Book Transactions",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [920, 900]
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "mergeByFields": {
+          "values": []
+        },
+        "options": {}
+      },
+      "id": "merge-monthly",
+      "name": "Merge Monthly Data",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [1140, 400]
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\n\n// Combine all financial data\nconst incomeStatement = items[0]?.json || {};\nconst balanceSheet = items[1]?.json || {};\nconst cashFlow = items[2]?.json || {};\nconst arAging = items[3]?.json || {};\n\n// Calculate key metrics\nconst metrics = {\n  // Profitability\n  gross_margin: incomeStatement.gross_profit / incomeStatement.revenue * 100,\n  net_margin: incomeStatement.net_income / incomeStatement.revenue * 100,\n  operating_margin: incomeStatement.operating_income / incomeStatement.revenue * 100,\n  \n  // Liquidity\n  current_ratio: balanceSheet.current_assets / balanceSheet.current_liabilities,\n  quick_ratio: (balanceSheet.current_assets - balanceSheet.inventory) / balanceSheet.current_liabilities,\n  \n  // Efficiency\n  dso: arAging.total_ar / (incomeStatement.revenue / 30), // Days Sales Outstanding\n  \n  // Cash\n  operating_cash_flow: cashFlow.operating_cash_flow,\n  free_cash_flow: cashFlow.operating_cash_flow - cashFlow.capital_expenditures,\n  \n  // Growth (vs prior period)\n  revenue_growth: incomeStatement.revenue_growth_pct,\n  expense_growth: incomeStatement.expense_growth_pct\n};\n\nreturn [{\n  json: {\n    period: items[0]?.json?.period,\n    income_statement: incomeStatement,\n    balance_sheet: balanceSheet,\n    cash_flow: cashFlow,\n    ar_aging: arAging,\n    metrics: metrics,\n    generated_at: new Date().toISOString()\n  }\n}];"
+      },
+      "id": "calculate-metrics",
+      "name": "Calculate Financial Metrics",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1360, 400]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "Analyze this monthly financial report and provide executive insights:\n\nPeriod: {{ $json.period }}\n\nIncome Statement Summary:\n- Revenue: ${{ $json.income_statement.revenue?.toLocaleString() }}\n- Gross Profit: ${{ $json.income_statement.gross_profit?.toLocaleString() }}\n- Operating Income: ${{ $json.income_statement.operating_income?.toLocaleString() }}\n- Net Income: ${{ $json.income_statement.net_income?.toLocaleString() }}\n\nKey Metrics:\n- Gross Margin: {{ $json.metrics.gross_margin?.toFixed(1) }}%\n- Net Margin: {{ $json.metrics.net_margin?.toFixed(1) }}%\n- Current Ratio: {{ $json.metrics.current_ratio?.toFixed(2) }}\n- Days Sales Outstanding: {{ $json.metrics.dso?.toFixed(0) }} days\n- Free Cash Flow: ${{ $json.metrics.free_cash_flow?.toLocaleString() }}\n\nAR Aging:\n- Current: ${{ $json.ar_aging.current?.toLocaleString() }}\n- 30 Days: ${{ $json.ar_aging.days_30?.toLocaleString() }}\n- 60 Days: ${{ $json.ar_aging.days_60?.toLocaleString() }}\n- 90+ Days: ${{ $json.ar_aging.days_90_plus?.toLocaleString() }}\n\nProvide:\n1. Executive Summary (3-4 sentences)\n2. Key Highlights (3-5 bullet points)\n3. Areas of Concern (if any)\n4. Recommendations (2-3 actionable items)\n5. Month-over-Month Trend Analysis\n\nFormat as JSON with these sections.",
+        "options": {
+          "systemMessage": "You are a CFO-level financial analyst. Provide clear, actionable insights based on financial data. Focus on business impact and strategic implications."
+        }
+      },
+      "id": "ai-financial-analysis",
+      "name": "AI Financial Analysis",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.4,
+      "position": [1580, 400]
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "claude-sonnet-4-20250514",
+          "mode": "list",
+          "cachedResultName": "claude-sonnet-4-20250514"
+        },
+        "options": {
+          "temperature": 0.3
+        }
+      },
+      "id": "anthropic-model",
+      "name": "Claude Sonnet",
+      "type": "@n8n/n8n-nodes-langchain.lmChatAnthropic",
+      "typeVersion": 1.2,
+      "position": [1600, 600]
+    },
+    {
+      "parameters": {
+        "jsCode": "const data = $input.first().json;\nlet aiAnalysis;\n\ntry {\n  aiAnalysis = JSON.parse(data.text || data.response);\n} catch (e) {\n  aiAnalysis = {\n    executive_summary: data.text || data.response,\n    highlights: [],\n    concerns: [],\n    recommendations: []\n  };\n}\n\nreturn [{\n  json: {\n    ...data,\n    analysis: aiAnalysis\n  }\n}];"
+      },
+      "id": "parse-analysis",
+      "name": "Parse AI Analysis",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1800, 400]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.REPORTING_API_URL }}/api/reports/generate-pdf",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $env.REPORTING_API_KEY }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"template\": \"monthly_financial_report\",\n  \"data\": {{ JSON.stringify($json) }},\n  \"output_format\": \"pdf\"\n}",
+        "options": {}
+      },
+      "id": "generate-pdf",
+      "name": "Generate PDF Report",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [2020, 400]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.BOX_API_URL }}/2.0/files/content",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $env.BOX_ACCESS_TOKEN }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "attributes",
+              "value": "={\"name\": \"Financial_Report_{{ $json.period }}.pdf\", \"parent\": {\"id\": \"{{ $env.BOX_FINANCE_FOLDER }}\"}}"
+            },
+            {
+              "name": "file",
+              "value": "={{ $json.pdf_content }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "upload-box",
+      "name": "Upload to Box",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [2240, 400]
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $env.EXECUTIVE_TEAM_EMAIL }}",
+        "subject": "=Monthly Financial Report - {{ $json.period }}",
+        "emailType": "html",
+        "message": "=<div style=\"font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto;\">\n<h1>Monthly Financial Report</h1>\n<p><strong>Period:</strong> {{ $json.period }}</p>\n\n<h2>Executive Summary</h2>\n<p>{{ $json.analysis.executive_summary }}</p>\n\n<h2>Key Metrics</h2>\n<table style=\"width: 100%; border-collapse: collapse; margin: 20px 0;\">\n<tr style=\"background: #f5f5f5;\">\n<td style=\"padding: 10px; border: 1px solid #ddd;\"><strong>Revenue</strong></td>\n<td style=\"padding: 10px; border: 1px solid #ddd; text-align: right;\">${{ $json.income_statement.revenue?.toLocaleString() }}</td>\n<td style=\"padding: 10px; border: 1px solid #ddd;\"><strong>Gross Margin</strong></td>\n<td style=\"padding: 10px; border: 1px solid #ddd; text-align: right;\">{{ $json.metrics.gross_margin?.toFixed(1) }}%</td>\n</tr>\n<tr>\n<td style=\"padding: 10px; border: 1px solid #ddd;\"><strong>Net Income</strong></td>\n<td style=\"padding: 10px; border: 1px solid #ddd; text-align: right;\">${{ $json.income_statement.net_income?.toLocaleString() }}</td>\n<td style=\"padding: 10px; border: 1px solid #ddd;\"><strong>Net Margin</strong></td>\n<td style=\"padding: 10px; border: 1px solid #ddd; text-align: right;\">{{ $json.metrics.net_margin?.toFixed(1) }}%</td>\n</tr>\n<tr style=\"background: #f5f5f5;\">\n<td style=\"padding: 10px; border: 1px solid #ddd;\"><strong>Current Ratio</strong></td>\n<td style=\"padding: 10px; border: 1px solid #ddd; text-align: right;\">{{ $json.metrics.current_ratio?.toFixed(2) }}</td>\n<td style=\"padding: 10px; border: 1px solid #ddd;\"><strong>DSO</strong></td>\n<td style=\"padding: 10px; border: 1px solid #ddd; text-align: right;\">{{ $json.metrics.dso?.toFixed(0) }} days</td>\n</tr>\n</table>\n\n<h2>Key Highlights</h2>\n<ul>\n{{ $json.analysis.highlights?.map(h => `<li>${h}</li>`).join('') || '<li>Analysis pending</li>' }}\n</ul>\n\n{{ $json.analysis.concerns?.length > 0 ? `<h2 style=\"color: #d32f2f;\">Areas of Concern</h2><ul>${$json.analysis.concerns.map(c => '<li>' + c + '</li>').join('')}</ul>` : '' }}\n\n<h2>Recommendations</h2>\n<ul>\n{{ $json.analysis.recommendations?.map(r => `<li>${r}</li>`).join('') || '<li>No specific recommendations</li>' }}\n</ul>\n\n<p style=\"margin-top: 30px;\"><a href=\"{{ $json.box_url }}\" style=\"background: #1976d2; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px;\">Download Full Report (PDF)</a></p>\n</div>",
+        "options": {}
+      },
+      "id": "email-executives",
+      "name": "Email Executive Team",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [2460, 400],
+      "credentials": {
+        "smtp": {
+          "id": "smtp-creds",
+          "name": "SMTP"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "mergeByFields": {
+          "values": []
+        },
+        "options": {}
+      },
+      "id": "merge-reconciliation",
+      "name": "Merge Reconciliation Data",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [1140, 820]
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\n\nconst bankTxns = items[0]?.json?.transactions || [];\nconst bookTxns = items[1]?.json?.transactions || [];\n\nconst reconciliation = {\n  date: items[0]?.json?.date,\n  bank_balance: items[0]?.json?.ending_balance,\n  book_balance: items[1]?.json?.ending_balance,\n  \n  matched: [],\n  bank_only: [],\n  book_only: [],\n  discrepancies: []\n};\n\n// Create lookup maps\nconst bankMap = new Map();\nconst bookMap = new Map();\n\nfor (const txn of bankTxns) {\n  const key = `${txn.amount}_${txn.reference || txn.description}`;\n  bankMap.set(key, txn);\n}\n\nfor (const txn of bookTxns) {\n  const key = `${txn.amount}_${txn.reference || txn.description}`;\n  bookMap.set(key, txn);\n}\n\n// Match transactions\nfor (const [key, bankTxn] of bankMap) {\n  if (bookMap.has(key)) {\n    reconciliation.matched.push({\n      bank: bankTxn,\n      book: bookMap.get(key)\n    });\n    bookMap.delete(key);\n  } else {\n    reconciliation.bank_only.push(bankTxn);\n  }\n}\n\n// Remaining book transactions\nfor (const [key, bookTxn] of bookMap) {\n  reconciliation.book_only.push(bookTxn);\n}\n\n// Calculate totals\nreconciliation.summary = {\n  matched_count: reconciliation.matched.length,\n  bank_only_count: reconciliation.bank_only.length,\n  book_only_count: reconciliation.book_only.length,\n  balance_difference: reconciliation.bank_balance - reconciliation.book_balance,\n  is_reconciled: reconciliation.bank_only.length === 0 && reconciliation.book_only.length === 0\n};\n\nreturn [{ json: reconciliation }];"
+      },
+      "id": "perform-reconciliation",
+      "name": "Perform Reconciliation",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1360, 820]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "has-discrepancies",
+              "leftValue": "={{ $json.summary.bank_only_count + $json.summary.book_only_count }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "check-discrepancies",
+      "name": "Has Discrepancies?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [1580, 820]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.ACCOUNTING_API_URL }}/api/reconciliation",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $env.ACCOUNTING_API_KEY }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json) }}",
+        "options": {}
+      },
+      "id": "save-reconciliation",
+      "name": "Save Reconciliation",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1800, 720]
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $env.ACCOUNTING_TEAM_EMAIL }}",
+        "subject": "=⚠️ Bank Reconciliation Discrepancies - {{ $json.date }}",
+        "emailType": "html",
+        "message": "=<div style=\"font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;\">\n<h2 style=\"color: #ff9800;\">Bank Reconciliation Alert</h2>\n<p>Discrepancies found in the daily bank reconciliation for {{ $json.date }}.</p>\n\n<div style=\"background: #fff3e0; padding: 15px; border-radius: 4px; margin: 20px 0;\">\n<p><strong>Bank Balance:</strong> ${{ $json.bank_balance?.toLocaleString() }}</p>\n<p><strong>Book Balance:</strong> ${{ $json.book_balance?.toLocaleString() }}</p>\n<p><strong>Difference:</strong> ${{ $json.summary.balance_difference?.toLocaleString() }}</p>\n</div>\n\n<h3>Unmatched Transactions</h3>\n\n{{ $json.bank_only.length > 0 ? `<h4>In Bank Only (${$json.bank_only.length})</h4><ul>${$json.bank_only.slice(0,10).map(t => '<li>' + t.description + ': $' + t.amount + '</li>').join('')}</ul>` : '' }}\n\n{{ $json.book_only.length > 0 ? `<h4>In Books Only (${$json.book_only.length})</h4><ul>${$json.book_only.slice(0,10).map(t => '<li>' + t.description + ': $' + t.amount + '</li>').join('')}</ul>` : '' }}\n\n<p style=\"margin: 20px 0;\"><a href=\"{{ $env.RECONCILIATION_PORTAL_URL }}/review/{{ $json.date }}\" style=\"background: #ff9800; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px;\">Review Discrepancies</a></p>\n</div>",
+        "options": {}
+      },
+      "id": "email-discrepancies",
+      "name": "Email Discrepancy Alert",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [1800, 920],
+      "credentials": {
+        "smtp": {
+          "id": "smtp-creds",
+          "name": "SMTP"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "channel": "={{ $env.SLACK_FINANCE_CHANNEL }}",
+        "text": "=📊 *Daily Bank Reconciliation*",
+        "otherOptions": {},
+        "attachments": [
+          {
+            "color": "={{ $json.summary.is_reconciled ? '#4caf50' : '#ff9800' }}",
+            "fields": {
+              "item": [
+                {
+                  "title": "Date",
+                  "value": "={{ $json.date }}",
+                  "short": true
+                },
+                {
+                  "title": "Status",
+                  "value": "={{ $json.summary.is_reconciled ? '✓ Reconciled' : '⚠️ Discrepancies Found' }}",
+                  "short": true
+                },
+                {
+                  "title": "Bank Balance",
+                  "value": "=${{ $json.bank_balance?.toLocaleString() }}",
+                  "short": true
+                },
+                {
+                  "title": "Book Balance",
+                  "value": "=${{ $json.book_balance?.toLocaleString() }}",
+                  "short": true
+                },
+                {
+                  "title": "Matched",
+                  "value": "={{ $json.summary.matched_count }} transactions",
+                  "short": true
+                },
+                {
+                  "title": "Unmatched",
+                  "value": "={{ $json.summary.bank_only_count + $json.summary.book_only_count }} transactions",
+                  "short": true
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "id": "slack-reconciliation",
+      "name": "Slack Reconciliation Status",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.2,
+      "position": [2020, 820],
+      "credentials": {
+        "slackApi": {
+          "id": "slack-creds",
+          "name": "Slack API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "channel": "={{ $env.SLACK_FINANCE_CHANNEL }}",
+        "text": "=📈 *Monthly Financial Report Generated*",
+        "otherOptions": {},
+        "attachments": [
+          {
+            "color": "#4caf50",
+            "fields": {
+              "item": [
+                {
+                  "title": "Period",
+                  "value": "={{ $json.period }}",
+                  "short": true
+                },
+                {
+                  "title": "Revenue",
+                  "value": "=${{ $json.income_statement.revenue?.toLocaleString() }}",
+                  "short": true
+                },
+                {
+                  "title": "Net Income",
+                  "value": "=${{ $json.income_statement.net_income?.toLocaleString() }}",
+                  "short": true
+                },
+                {
+                  "title": "Net Margin",
+                  "value": "={{ $json.metrics.net_margin?.toFixed(1) }}%",
+                  "short": true
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "id": "slack-monthly",
+      "name": "Slack Monthly Report",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.2,
+      "position": [2680, 400],
+      "credentials": {
+        "slackApi": {
+          "id": "slack-creds",
+          "name": "Slack API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ success: true, report_type: $json.report_type, download_url: $json.box_url }) }}",
+        "options": {}
+      },
+      "id": "respond-report",
+      "name": "Respond Report Generated",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [2680, 600]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.ACCOUNTING_API_URL }}/api/reports/custom",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $env.ACCOUNTING_API_KEY }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"report_type\": \"{{ $json.report_type }}\",\n  \"start_date\": \"{{ $json.start_date }}\",\n  \"end_date\": \"{{ $json.end_date }}\",\n  \"include_sections\": [\"income_statement\", \"balance_sheet\", \"cash_flow\", \"ar_aging\"]\n}",
+        "options": {}
+      },
+      "id": "generate-custom",
+      "name": "Generate Custom Report",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [920, 1040]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Budget vs Actual variance analysis\nconst data = $input.first().json;\n\nconst variance = {\n  period: data.period,\n  categories: []\n};\n\nconst budget = data.budget || {};\nconst actual = data.income_statement || {};\n\nconst categories = [\n  { name: 'Revenue', budget_key: 'revenue', actual_key: 'revenue' },\n  { name: 'COGS', budget_key: 'cogs', actual_key: 'cost_of_goods_sold' },\n  { name: 'Operating Expenses', budget_key: 'opex', actual_key: 'operating_expenses' },\n  { name: 'Marketing', budget_key: 'marketing', actual_key: 'marketing_expense' },\n  { name: 'Payroll', budget_key: 'payroll', actual_key: 'payroll_expense' }\n];\n\nfor (const cat of categories) {\n  const budgetAmount = budget[cat.budget_key] || 0;\n  const actualAmount = actual[cat.actual_key] || 0;\n  const varianceAmount = actualAmount - budgetAmount;\n  const variancePct = budgetAmount > 0 ? (varianceAmount / budgetAmount * 100) : 0;\n  \n  variance.categories.push({\n    name: cat.name,\n    budget: budgetAmount,\n    actual: actualAmount,\n    variance: varianceAmount,\n    variance_pct: variancePct,\n    favorable: cat.name === 'Revenue' ? varianceAmount >= 0 : varianceAmount <= 0\n  });\n}\n\nreturn [{ json: { ...data, variance_analysis: variance } }];"
+      },
+      "id": "variance-analysis",
+      "name": "Budget Variance Analysis",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [2020, 300]
+    }
+  ],
+  "connections": {
+    "Monthly Report Trigger": {
+      "main": [
+        [
+          {
+            "node": "Set Monthly Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Daily Reconciliation Trigger": {
+      "main": [
+        [
+          {
+            "node": "Set Daily Reconciliation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "On-Demand Report Webhook": {
+      "main": [
+        [
+          {
+            "node": "Set On-Demand Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Monthly Report": {
+      "main": [
+        [
+          {
+            "node": "Route by Report Type",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Daily Reconciliation": {
+      "main": [
+        [
+          {
+            "node": "Route by Report Type",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set On-Demand Report": {
+      "main": [
+        [
+          {
+            "node": "Route by Report Type",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route by Report Type": {
+      "main": [
+        [
+          {
+            "node": "Fetch Income Statement",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Fetch Balance Sheet",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Fetch Cash Flow",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Fetch AR Aging",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Fetch Bank Transactions",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Fetch Book Transactions",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Generate Custom Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Income Statement": {
+      "main": [
+        [
+          {
+            "node": "Merge Monthly Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Balance Sheet": {
+      "main": [
+        [
+          {
+            "node": "Merge Monthly Data",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Fetch Cash Flow": {
+      "main": [
+        [
+          {
+            "node": "Merge Monthly Data",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "Fetch AR Aging": {
+      "main": [
+        [
+          {
+            "node": "Merge Monthly Data",
+            "type": "main",
+            "index": 3
+          }
+        ]
+      ]
+    },
+    "Fetch Bank Transactions": {
+      "main": [
+        [
+          {
+            "node": "Merge Reconciliation Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Book Transactions": {
+      "main": [
+        [
+          {
+            "node": "Merge Reconciliation Data",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge Monthly Data": {
+      "main": [
+        [
+          {
+            "node": "Calculate Financial Metrics",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calculate Financial Metrics": {
+      "main": [
+        [
+          {
+            "node": "AI Financial Analysis",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Financial Analysis": {
+      "main": [
+        [
+          {
+            "node": "Parse AI Analysis",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Claude Sonnet": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Financial Analysis",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse AI Analysis": {
+      "main": [
+        [
+          {
+            "node": "Variance Analysis",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Variance Analysis": {
+      "main": [
+        [
+          {
+            "node": "Generate PDF Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate PDF Report": {
+      "main": [
+        [
+          {
+            "node": "Upload to Box",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload to Box": {
+      "main": [
+        [
+          {
+            "node": "Email Executive Team",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Email Executive Team": {
+      "main": [
+        [
+          {
+            "node": "Slack Monthly Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Slack Monthly Report": {
+      "main": [
+        [
+          {
+            "node": "Respond Report Generated",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge Reconciliation Data": {
+      "main": [
+        [
+          {
+            "node": "Perform Reconciliation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Perform Reconciliation": {
+      "main": [
+        [
+          {
+            "node": "Check Discrepancies?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Discrepancies?": {
+      "main": [
+        [
+          {
+            "node": "Save Reconciliation",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Email Discrepancy Alert",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Save Reconciliation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save Reconciliation": {
+      "main": [
+        [
+          {
+            "node": "Slack Reconciliation Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Custom Report": {
+      "main": [
+        [
+          {
+            "node": "Calculate Financial Metrics",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "fin-reporting-v1",
+  "meta": {
+    "instanceId": "n8n-workflows-library"
+  },
+  "id": "financial-reporting-reconciliation",
+  "tags": [
+    {
+      "id": "finance",
+      "name": "Finance"
+    },
+    {
+      "id": "reporting",
+      "name": "Reporting"
+    },
+    {
+      "id": "reconciliation",
+      "name": "Reconciliation"
+    }
+  ]
+}
