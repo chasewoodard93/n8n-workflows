@@ -1,0 +1,1109 @@
+{
+  "name": "PTO and Leave Management",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "pto-request",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "request-webhook",
+      "name": "PTO Request Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "pto-approve",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "approve-webhook",
+      "name": "Approval Action Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [240, 520]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 7
+            }
+          ]
+        }
+      },
+      "id": "daily-check",
+      "name": "Daily Leave Check",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [240, 740]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "action",
+              "name": "action",
+              "value": "new_request",
+              "type": "string"
+            },
+            {
+              "id": "request_id",
+              "name": "request_id",
+              "value": "=PTO-{{ Date.now() }}",
+              "type": "string"
+            },
+            {
+              "id": "employee_id",
+              "name": "employee_id",
+              "value": "={{ $json.body.employee_id }}",
+              "type": "string"
+            },
+            {
+              "id": "employee_name",
+              "name": "employee_name",
+              "value": "={{ $json.body.employee_name }}",
+              "type": "string"
+            },
+            {
+              "id": "employee_email",
+              "name": "employee_email",
+              "value": "={{ $json.body.employee_email }}",
+              "type": "string"
+            },
+            {
+              "id": "leave_type",
+              "name": "leave_type",
+              "value": "={{ $json.body.leave_type }}",
+              "type": "string"
+            },
+            {
+              "id": "start_date",
+              "name": "start_date",
+              "value": "={{ $json.body.start_date }}",
+              "type": "string"
+            },
+            {
+              "id": "end_date",
+              "name": "end_date",
+              "value": "={{ $json.body.end_date }}",
+              "type": "string"
+            },
+            {
+              "id": "reason",
+              "name": "reason",
+              "value": "={{ $json.body.reason }}",
+              "type": "string"
+            },
+            {
+              "id": "manager_id",
+              "name": "manager_id",
+              "value": "={{ $json.body.manager_id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "set-request",
+      "name": "Set Request Data",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "action",
+              "name": "action",
+              "value": "approval",
+              "type": "string"
+            },
+            {
+              "id": "request_id",
+              "name": "request_id",
+              "value": "={{ $json.body.request_id }}",
+              "type": "string"
+            },
+            {
+              "id": "approver_id",
+              "name": "approver_id",
+              "value": "={{ $json.body.approver_id }}",
+              "type": "string"
+            },
+            {
+              "id": "decision",
+              "name": "decision",
+              "value": "={{ $json.body.decision }}",
+              "type": "string"
+            },
+            {
+              "id": "comments",
+              "name": "comments",
+              "value": "={{ $json.body.comments }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "set-approval",
+      "name": "Set Approval Data",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [460, 520]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "action",
+              "name": "action",
+              "value": "daily_check",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "set-daily",
+      "name": "Set Daily Check",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [460, 740]
+    },
+    {
+      "parameters": {
+        "rules": {
+          "rules": [
+            {
+              "outputKey": "request",
+              "conditions": {
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.action }}",
+                    "rightValue": "new_request",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "outputKey": "approval",
+              "conditions": {
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.action }}",
+                    "rightValue": "approval",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "outputKey": "daily",
+              "conditions": {
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.action }}",
+                    "rightValue": "daily_check",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "route-action",
+      "name": "Route by Action",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [680, 520]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $env.HRIS_API_URL }}/api/employees/{{ $json.employee_id }}/leave-balance",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $env.HRIS_API_KEY }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "fetch-balance",
+      "name": "Fetch Leave Balance",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [920, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "const request = $input.first().json;\nconst balance = request.leave_balance || {};\n\n// Calculate business days requested\nconst startDate = new Date(request.start_date);\nconst endDate = new Date(request.end_date);\nlet businessDays = 0;\n\nfor (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {\n  const day = d.getDay();\n  if (day !== 0 && day !== 6) {\n    businessDays++;\n  }\n}\n\n// Get available balance for leave type\nconst leaveTypeBalances = {\n  'vacation': balance.vacation_days || 0,\n  'sick': balance.sick_days || 0,\n  'personal': balance.personal_days || 0,\n  'bereavement': 5, // Usually unlimited/policy-based\n  'jury_duty': 999, // Usually unlimited\n  'parental': balance.parental_leave || 0,\n  'unpaid': 999 // Unpaid leave usually approved case-by-case\n};\n\nconst availableBalance = leaveTypeBalances[request.leave_type] || 0;\nconst hasSufficientBalance = businessDays <= availableBalance;\n\n// Check for blackout dates or team conflicts\nconst teamConflicts = request.team_leave_dates || [];\nconst hasConflicts = teamConflicts.some(leave => {\n  const leaveStart = new Date(leave.start_date);\n  const leaveEnd = new Date(leave.end_date);\n  return (startDate <= leaveEnd && endDate >= leaveStart);\n});\n\nreturn [{\n  json: {\n    ...request,\n    days_requested: businessDays,\n    available_balance: availableBalance,\n    remaining_after_approval: availableBalance - businessDays,\n    has_sufficient_balance: hasSufficientBalance,\n    has_team_conflicts: hasConflicts,\n    status: 'pending_approval',\n    submitted_at: new Date().toISOString()\n  }\n}];"
+      },
+      "id": "validate-request",
+      "name": "Validate Request",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1140, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "has-balance",
+              "leftValue": "={{ $json.has_sufficient_balance }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "check-balance",
+      "name": "Has Sufficient Balance?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [1360, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.HRIS_API_URL }}/api/leave-requests",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $env.HRIS_API_KEY }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json) }}",
+        "options": {}
+      },
+      "id": "save-request",
+      "name": "Save Leave Request",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1580, 200]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $env.HRIS_API_URL }}/api/employees/{{ $json.manager_id }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $env.HRIS_API_KEY }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "fetch-manager",
+      "name": "Fetch Manager",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1800, 200]
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.manager.email }}",
+        "subject": "=PTO Request: {{ $json.employee_name }} - {{ $json.start_date }} to {{ $json.end_date }}",
+        "emailType": "html",
+        "message": "=<div style=\"font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;\">\n<h2>PTO Approval Request</h2>\n<p>{{ $json.employee_name }} has requested time off and needs your approval.</p>\n\n<div style=\"background: #e3f2fd; padding: 15px; border-radius: 4px; margin: 20px 0;\">\n<p><strong>Request ID:</strong> {{ $json.request_id }}</p>\n<p><strong>Employee:</strong> {{ $json.employee_name }}</p>\n<p><strong>Leave Type:</strong> {{ $json.leave_type }}</p>\n<p><strong>Dates:</strong> {{ $json.start_date }} to {{ $json.end_date }}</p>\n<p><strong>Days Requested:</strong> {{ $json.days_requested }}</p>\n<p><strong>Reason:</strong> {{ $json.reason || 'Not specified' }}</p>\n</div>\n\n<div style=\"background: #f5f5f5; padding: 15px; border-radius: 4px; margin: 20px 0;\">\n<h4>Leave Balance</h4>\n<p><strong>Available:</strong> {{ $json.available_balance }} days</p>\n<p><strong>After Approval:</strong> {{ $json.remaining_after_approval }} days</p>\n{{ $json.has_team_conflicts ? '<p style=\"color: #ff9800;\">⚠️ Note: Team member conflict detected during this period</p>' : '' }}\n</div>\n\n<div style=\"margin: 20px 0;\">\n<a href=\"{{ $env.PTO_PORTAL_URL }}/approve/{{ $json.request_id }}?action=approve\" style=\"background: #4CAF50; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; margin-right: 10px;\">Approve</a>\n<a href=\"{{ $env.PTO_PORTAL_URL }}/approve/{{ $json.request_id }}?action=reject\" style=\"background: #f44336; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px;\">Deny</a>\n</div>\n</div>",
+        "options": {}
+      },
+      "id": "email-manager",
+      "name": "Email Manager for Approval",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [2020, 200],
+      "credentials": {
+        "smtp": {
+          "id": "smtp-creds",
+          "name": "SMTP"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.employee_email }}",
+        "subject": "=PTO Request Submitted: {{ $json.start_date }} to {{ $json.end_date }}",
+        "emailType": "html",
+        "message": "=<div style=\"font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;\">\n<h2>PTO Request Submitted</h2>\n<p>Your time off request has been submitted and is pending approval.</p>\n\n<div style=\"background: #e3f2fd; padding: 15px; border-radius: 4px; margin: 20px 0;\">\n<p><strong>Request ID:</strong> {{ $json.request_id }}</p>\n<p><strong>Leave Type:</strong> {{ $json.leave_type }}</p>\n<p><strong>Dates:</strong> {{ $json.start_date }} to {{ $json.end_date }}</p>\n<p><strong>Days Requested:</strong> {{ $json.days_requested }}</p>\n<p><strong>Status:</strong> Pending Approval</p>\n</div>\n\n<p>You will be notified once your manager reviews your request.</p>\n\n<p><a href=\"{{ $env.PTO_PORTAL_URL }}/my-requests/{{ $json.request_id }}\">View Request Status</a></p>\n</div>",
+        "options": {}
+      },
+      "id": "email-employee-confirm",
+      "name": "Email Employee Confirmation",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [2240, 200],
+      "credentials": {
+        "smtp": {
+          "id": "smtp-creds",
+          "name": "SMTP"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.employee_email }}",
+        "subject": "=PTO Request Issue: Insufficient Leave Balance",
+        "emailType": "html",
+        "message": "=<div style=\"font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;\">\n<h2 style=\"color: #ff9800;\">PTO Request - Insufficient Balance</h2>\n<p>Your time off request cannot be submitted due to insufficient leave balance.</p>\n\n<div style=\"background: #fff3e0; padding: 15px; border-radius: 4px; margin: 20px 0;\">\n<p><strong>Leave Type:</strong> {{ $json.leave_type }}</p>\n<p><strong>Dates Requested:</strong> {{ $json.start_date }} to {{ $json.end_date }}</p>\n<p><strong>Days Requested:</strong> {{ $json.days_requested }}</p>\n<p><strong>Available Balance:</strong> {{ $json.available_balance }} days</p>\n</div>\n\n<p>Options:</p>\n<ul>\n<li>Request fewer days</li>\n<li>Request unpaid leave for the additional days</li>\n<li>Contact HR to discuss options</li>\n</ul>\n\n<p><a href=\"{{ $env.PTO_PORTAL_URL }}/new-request\">Submit a New Request</a></p>\n</div>",
+        "options": {}
+      },
+      "id": "email-insufficient",
+      "name": "Email Insufficient Balance",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [1580, 400],
+      "credentials": {
+        "smtp": {
+          "id": "smtp-creds",
+          "name": "SMTP"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ success: true, request_id: $json.request_id, status: 'pending_approval' }) }}",
+        "options": {}
+      },
+      "id": "respond-request",
+      "name": "Respond Request Submitted",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [2460, 200]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ success: false, error: 'insufficient_balance', available: $json.available_balance, requested: $json.days_requested }) }}",
+        "options": {}
+      },
+      "id": "respond-insufficient",
+      "name": "Respond Insufficient Balance",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [1800, 400]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $env.HRIS_API_URL }}/api/leave-requests/{{ $json.request_id }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $env.HRIS_API_KEY }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "fetch-request",
+      "name": "Fetch Leave Request",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [920, 520]
+    },
+    {
+      "parameters": {
+        "method": "PUT",
+        "url": "={{ $env.HRIS_API_URL }}/api/leave-requests/{{ $json.request_id }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $env.HRIS_API_KEY }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"status\": \"{{ $json.decision }}\",\n  \"approved_by\": \"{{ $json.approver_id }}\",\n  \"approved_at\": \"{{ new Date().toISOString() }}\",\n  \"comments\": \"{{ $json.comments }}\"\n}",
+        "options": {}
+      },
+      "id": "update-request",
+      "name": "Update Request Status",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1140, 520]
+    },
+    {
+      "parameters": {
+        "rules": {
+          "rules": [
+            {
+              "outputKey": "approved",
+              "conditions": {
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.decision }}",
+                    "rightValue": "approved",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "outputKey": "denied",
+              "conditions": {
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.decision }}",
+                    "rightValue": "denied",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "route-decision",
+      "name": "Route by Decision",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [1360, 520]
+    },
+    {
+      "parameters": {
+        "method": "PUT",
+        "url": "={{ $env.HRIS_API_URL }}/api/employees/{{ $json.employee_id }}/leave-balance",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $env.HRIS_API_KEY }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"leave_type\": \"{{ $json.leave_type }}\",\n  \"deduct_days\": {{ $json.days_requested }},\n  \"reason\": \"Approved PTO: {{ $json.request_id }}\"\n}",
+        "options": {}
+      },
+      "id": "deduct-balance",
+      "name": "Deduct Leave Balance",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1580, 460]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.CALENDAR_API_URL }}/api/events",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $env.CALENDAR_API_KEY }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"title\": \"{{ $json.employee_name }} - {{ $json.leave_type.toUpperCase() }}\",\n  \"start\": \"{{ $json.start_date }}\",\n  \"end\": \"{{ $json.end_date }}\",\n  \"all_day\": true,\n  \"calendar\": \"team_calendar\",\n  \"attendees\": [\"{{ $json.employee_email }}\"],\n  \"show_as\": \"out_of_office\"\n}",
+        "options": {}
+      },
+      "id": "add-calendar",
+      "name": "Add to Team Calendar",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1800, 460]
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.employee_email }}",
+        "subject": "=✅ PTO Approved: {{ $json.start_date }} to {{ $json.end_date }}",
+        "emailType": "html",
+        "message": "=<div style=\"font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;\">\n<h2 style=\"color: #4CAF50;\">PTO Request Approved</h2>\n<p>Great news! Your time off request has been approved.</p>\n\n<div style=\"background: #e8f5e9; padding: 15px; border-radius: 4px; margin: 20px 0;\">\n<p><strong>Leave Type:</strong> {{ $json.leave_type }}</p>\n<p><strong>Dates:</strong> {{ $json.start_date }} to {{ $json.end_date }}</p>\n<p><strong>Days:</strong> {{ $json.days_requested }}</p>\n<p><strong>Remaining Balance:</strong> {{ $json.remaining_after_approval }} days</p>\n</div>\n\n{{ $json.comments ? `<p><strong>Manager's Note:</strong> ${$json.comments}</p>` : '' }}\n\n<p>Your time off has been added to the team calendar. Don't forget to:</p>\n<ul>\n<li>Set up an out-of-office reply</li>\n<li>Hand off any pending work</li>\n<li>Update your status in Slack</li>\n</ul>\n\n<p>Enjoy your time off! 🎉</p>\n</div>",
+        "options": {}
+      },
+      "id": "email-approved",
+      "name": "Email Approval Notice",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [2020, 460],
+      "credentials": {
+        "smtp": {
+          "id": "smtp-creds",
+          "name": "SMTP"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.employee_email }}",
+        "subject": "=PTO Request Denied: {{ $json.start_date }} to {{ $json.end_date }}",
+        "emailType": "html",
+        "message": "=<div style=\"font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;\">\n<h2 style=\"color: #f44336;\">PTO Request Denied</h2>\n<p>Unfortunately, your time off request has been denied.</p>\n\n<div style=\"background: #ffebee; padding: 15px; border-radius: 4px; margin: 20px 0;\">\n<p><strong>Leave Type:</strong> {{ $json.leave_type }}</p>\n<p><strong>Dates Requested:</strong> {{ $json.start_date }} to {{ $json.end_date }}</p>\n<p><strong>Reason:</strong> {{ $json.comments || 'No reason provided' }}</p>\n</div>\n\n<p>Please speak with your manager if you have questions or would like to discuss alternative dates.</p>\n\n<p><a href=\"{{ $env.PTO_PORTAL_URL }}/new-request\">Submit a New Request</a></p>\n</div>",
+        "options": {}
+      },
+      "id": "email-denied",
+      "name": "Email Denial Notice",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [1580, 600],
+      "credentials": {
+        "smtp": {
+          "id": "smtp-creds",
+          "name": "SMTP"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "channel": "={{ $env.SLACK_HR_CHANNEL }}",
+        "text": "=🏖️ *PTO {{ $json.decision === 'approved' ? 'Approved' : 'Denied' }}*",
+        "otherOptions": {},
+        "attachments": [
+          {
+            "color": "={{ $json.decision === 'approved' ? '#4caf50' : '#f44336' }}",
+            "fields": {
+              "item": [
+                {
+                  "title": "Employee",
+                  "value": "={{ $json.employee_name }}",
+                  "short": true
+                },
+                {
+                  "title": "Leave Type",
+                  "value": "={{ $json.leave_type }}",
+                  "short": true
+                },
+                {
+                  "title": "Dates",
+                  "value": "={{ $json.start_date }} to {{ $json.end_date }}",
+                  "short": true
+                },
+                {
+                  "title": "Days",
+                  "value": "={{ $json.days_requested }}",
+                  "short": true
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "id": "slack-decision",
+      "name": "Slack Decision Notification",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.2,
+      "position": [2240, 520],
+      "credentials": {
+        "slackApi": {
+          "id": "slack-creds",
+          "name": "Slack API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ success: true, request_id: $json.request_id, status: $json.decision }) }}",
+        "options": {}
+      },
+      "id": "respond-decision",
+      "name": "Respond Decision",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [2460, 520]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $env.HRIS_API_URL }}/api/leave?date={{ new Date().toISOString().split('T')[0] }}&upcoming=7",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $env.HRIS_API_KEY }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "fetch-leave-today",
+      "name": "Fetch Today's Leave",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [920, 740]
+    },
+    {
+      "parameters": {
+        "jsCode": "const data = $input.first().json;\nconst today = new Date().toISOString().split('T')[0];\n\nconst summary = {\n  date: today,\n  out_today: data.out_today || [],\n  returning_today: data.returning_today || [],\n  starting_leave_tomorrow: data.starting_tomorrow || [],\n  upcoming_week: data.upcoming_week || []\n};\n\nsummary.out_today_count = summary.out_today.length;\nsummary.returning_count = summary.returning_today.length;\n\nreturn [{ json: summary }];"
+      },
+      "id": "compile-daily",
+      "name": "Compile Daily Summary",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1140, 740]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "has-leave",
+              "leftValue": "={{ $json.out_today_count + $json.returning_count }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "check-any-leave",
+      "name": "Any Leave Activity?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [1360, 740]
+    },
+    {
+      "parameters": {
+        "channel": "={{ $env.SLACK_GENERAL_CHANNEL }}",
+        "text": "=📅 *Daily Leave Update - {{ $json.date }}*",
+        "otherOptions": {},
+        "attachments": [
+          {
+            "color": "#2196f3",
+            "fields": {
+              "item": [
+                {
+                  "title": "🏖️ Out Today",
+                  "value": "={{ $json.out_today.length > 0 ? $json.out_today.map(e => e.name).join(', ') : 'No one' }}",
+                  "short": false
+                },
+                {
+                  "title": "👋 Returning Today",
+                  "value": "={{ $json.returning_today.length > 0 ? $json.returning_today.map(e => e.name).join(', ') : 'No one' }}",
+                  "short": false
+                },
+                {
+                  "title": "📆 Starting Leave Tomorrow",
+                  "value": "={{ $json.starting_leave_tomorrow.length > 0 ? $json.starting_leave_tomorrow.map(e => e.name).join(', ') : 'No one' }}",
+                  "short": false
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "id": "slack-daily",
+      "name": "Slack Daily Leave Update",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.2,
+      "position": [1580, 740],
+      "credentials": {
+        "slackApi": {
+          "id": "slack-creds",
+          "name": "Slack API"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "PTO Request Webhook": {
+      "main": [
+        [
+          {
+            "node": "Set Request Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Approval Action Webhook": {
+      "main": [
+        [
+          {
+            "node": "Set Approval Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Daily Leave Check": {
+      "main": [
+        [
+          {
+            "node": "Set Daily Check",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Request Data": {
+      "main": [
+        [
+          {
+            "node": "Route by Action",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Approval Data": {
+      "main": [
+        [
+          {
+            "node": "Route by Action",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Daily Check": {
+      "main": [
+        [
+          {
+            "node": "Route by Action",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route by Action": {
+      "main": [
+        [
+          {
+            "node": "Fetch Leave Balance",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Fetch Leave Request",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Fetch Today's Leave",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Leave Balance": {
+      "main": [
+        [
+          {
+            "node": "Validate Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Request": {
+      "main": [
+        [
+          {
+            "node": "Has Sufficient Balance?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Has Sufficient Balance?": {
+      "main": [
+        [
+          {
+            "node": "Save Leave Request",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Email Insufficient Balance",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save Leave Request": {
+      "main": [
+        [
+          {
+            "node": "Fetch Manager",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Manager": {
+      "main": [
+        [
+          {
+            "node": "Email Manager for Approval",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Email Manager for Approval": {
+      "main": [
+        [
+          {
+            "node": "Email Employee Confirmation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Email Employee Confirmation": {
+      "main": [
+        [
+          {
+            "node": "Respond Request Submitted",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Email Insufficient Balance": {
+      "main": [
+        [
+          {
+            "node": "Respond Insufficient Balance",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Leave Request": {
+      "main": [
+        [
+          {
+            "node": "Update Request Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Request Status": {
+      "main": [
+        [
+          {
+            "node": "Route by Decision",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route by Decision": {
+      "main": [
+        [
+          {
+            "node": "Deduct Leave Balance",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Email Denial Notice",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Deduct Leave Balance": {
+      "main": [
+        [
+          {
+            "node": "Add to Team Calendar",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add to Team Calendar": {
+      "main": [
+        [
+          {
+            "node": "Email Approval Notice",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Email Approval Notice": {
+      "main": [
+        [
+          {
+            "node": "Slack Decision Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Email Denial Notice": {
+      "main": [
+        [
+          {
+            "node": "Slack Decision Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Slack Decision Notification": {
+      "main": [
+        [
+          {
+            "node": "Respond Decision",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Today's Leave": {
+      "main": [
+        [
+          {
+            "node": "Compile Daily Summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Compile Daily Summary": {
+      "main": [
+        [
+          {
+            "node": "Any Leave Activity?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Any Leave Activity?": {
+      "main": [
+        [
+          {
+            "node": "Slack Daily Leave Update",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "pto-v1",
+  "meta": {
+    "instanceId": "n8n-workflows-library"
+  },
+  "id": "pto-leave-management",
+  "tags": [
+    {
+      "id": "hr",
+      "name": "HR"
+    },
+    {
+      "id": "pto",
+      "name": "PTO"
+    },
+    {
+      "id": "leave",
+      "name": "Leave Management"
+    }
+  ]
+}

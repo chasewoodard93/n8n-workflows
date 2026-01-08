@@ -1,0 +1,725 @@
+{
+  "name": "Employee Onboarding Automation",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "new-hire",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "hire-webhook",
+      "name": "New Hire Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "employee_id",
+              "name": "employee_id",
+              "value": "=EMP-{{ Date.now() }}",
+              "type": "string"
+            },
+            {
+              "id": "first_name",
+              "name": "first_name",
+              "value": "={{ $json.body.first_name }}",
+              "type": "string"
+            },
+            {
+              "id": "last_name",
+              "name": "last_name",
+              "value": "={{ $json.body.last_name }}",
+              "type": "string"
+            },
+            {
+              "id": "personal_email",
+              "name": "personal_email",
+              "value": "={{ $json.body.personal_email }}",
+              "type": "string"
+            },
+            {
+              "id": "department",
+              "name": "department",
+              "value": "={{ $json.body.department }}",
+              "type": "string"
+            },
+            {
+              "id": "job_title",
+              "name": "job_title",
+              "value": "={{ $json.body.job_title }}",
+              "type": "string"
+            },
+            {
+              "id": "manager_id",
+              "name": "manager_id",
+              "value": "={{ $json.body.manager_id }}",
+              "type": "string"
+            },
+            {
+              "id": "start_date",
+              "name": "start_date",
+              "value": "={{ $json.body.start_date }}",
+              "type": "string"
+            },
+            {
+              "id": "employment_type",
+              "name": "employment_type",
+              "value": "={{ $json.body.employment_type }}",
+              "type": "string"
+            },
+            {
+              "id": "location",
+              "name": "location",
+              "value": "={{ $json.body.location }}",
+              "type": "string"
+            },
+            {
+              "id": "salary",
+              "name": "salary",
+              "value": "={{ $json.body.salary }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "set-employee",
+      "name": "Set Employee Data",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.HRIS_API_URL }}/api/employees",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $env.HRIS_API_KEY }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json) }}",
+        "options": {}
+      },
+      "id": "create-employee-record",
+      "name": "Create Employee Record",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [680, 300]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $env.HRIS_API_URL }}/api/employees/{{ $json.manager_id }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $env.HRIS_API_KEY }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "fetch-manager",
+      "name": "Fetch Manager Details",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [900, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "const employee = $input.first().json;\n\n// Generate work email\nconst workEmail = `${employee.first_name.toLowerCase()}.${employee.last_name.toLowerCase()}@${process.env.COMPANY_DOMAIN || 'company.com'}`;\n\n// Generate username\nconst username = `${employee.first_name.toLowerCase()}${employee.last_name.charAt(0).toLowerCase()}`;\n\n// Generate temporary password\nconst tempPassword = `Welcome${Date.now().toString(36).toUpperCase()}!`;\n\nreturn [{\n  json: {\n    ...employee,\n    work_email: workEmail,\n    username: username,\n    temp_password: tempPassword,\n    onboarding_status: 'in_progress',\n    onboarding_started: new Date().toISOString()\n  }\n}];"
+      },
+      "id": "generate-credentials",
+      "name": "Generate Credentials",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1120, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.IDENTITY_API_URL }}/api/users",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $env.IDENTITY_API_KEY }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"username\": \"{{ $json.username }}\",\n  \"email\": \"{{ $json.work_email }}\",\n  \"first_name\": \"{{ $json.first_name }}\",\n  \"last_name\": \"{{ $json.last_name }}\",\n  \"department\": \"{{ $json.department }}\",\n  \"job_title\": \"{{ $json.job_title }}\",\n  \"manager_email\": \"{{ $json.manager.email }}\",\n  \"temporary_password\": \"{{ $json.temp_password }}\",\n  \"require_password_change\": true\n}",
+        "options": {}
+      },
+      "id": "create-identity",
+      "name": "Create Identity Account",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1340, 200]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.EMAIL_PROVIDER_API }}/api/mailboxes",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $env.EMAIL_PROVIDER_KEY }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"email\": \"{{ $json.work_email }}\",\n  \"display_name\": \"{{ $json.first_name }} {{ $json.last_name }}\",\n  \"department\": \"{{ $json.department }}\",\n  \"quota_gb\": 50\n}",
+        "options": {}
+      },
+      "id": "create-email",
+      "name": "Create Email Account",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1340, 340]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.SLACK_API_URL }}/api/users.admin.invite",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $env.SLACK_ADMIN_TOKEN }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"email\": \"{{ $json.work_email }}\",\n  \"real_name\": \"{{ $json.first_name }} {{ $json.last_name }}\",\n  \"channels\": \"{{ $env.DEFAULT_SLACK_CHANNELS }}\"\n}",
+        "options": {}
+      },
+      "id": "invite-slack",
+      "name": "Invite to Slack",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1340, 480]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.IT_TICKETING_URL }}/api/tickets",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $env.IT_TICKETING_KEY }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"type\": \"equipment_request\",\n  \"subject\": \"New Hire Equipment: {{ $json.first_name }} {{ $json.last_name }}\",\n  \"description\": \"Please prepare equipment for new hire:\\n\\nName: {{ $json.first_name }} {{ $json.last_name }}\\nDepartment: {{ $json.department }}\\nStart Date: {{ $json.start_date }}\\nLocation: {{ $json.location }}\\nJob Title: {{ $json.job_title }}\",\n  \"priority\": \"high\",\n  \"due_date\": \"{{ $json.start_date }}\",\n  \"category\": \"onboarding\"\n}",
+        "options": {}
+      },
+      "id": "create-equipment-ticket",
+      "name": "Create Equipment Ticket",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1340, 620]
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "mergeByFields": {
+          "values": []
+        },
+        "options": {}
+      },
+      "id": "merge-accounts",
+      "name": "Merge Account Results",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [1560, 400]
+    },
+    {
+      "parameters": {
+        "jsCode": "const employee = $input.first().json;\n\n// Determine required documents based on employment type and location\nconst documents = [\n  { name: 'W-4 Tax Withholding', required: true, category: 'tax' },\n  { name: 'I-9 Employment Eligibility', required: true, category: 'legal' },\n  { name: 'Direct Deposit Form', required: true, category: 'payroll' },\n  { name: 'Emergency Contact Form', required: true, category: 'hr' },\n  { name: 'Employee Handbook Acknowledgment', required: true, category: 'policy' },\n  { name: 'Confidentiality Agreement', required: true, category: 'legal' },\n  { name: 'Non-Compete Agreement', required: employee.employment_type === 'full_time', category: 'legal' },\n  { name: 'Benefits Enrollment', required: employee.employment_type === 'full_time', category: 'benefits' },\n  { name: 'Remote Work Agreement', required: employee.location === 'remote', category: 'policy' }\n];\n\nreturn [{\n  json: {\n    ...employee,\n    required_documents: documents.filter(d => d.required),\n    documents_pending: documents.filter(d => d.required).length,\n    documents_completed: 0\n  }\n}];"
+      },
+      "id": "determine-documents",
+      "name": "Determine Required Documents",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1780, 400]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.DOCUSIGN_API_URL }}/envelopes",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $env.DOCUSIGN_ACCESS_TOKEN }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"templateId\": \"{{ $env.ONBOARDING_TEMPLATE_ID }}\",\n  \"templateRoles\": [\n    {\n      \"email\": \"{{ $json.personal_email }}\",\n      \"name\": \"{{ $json.first_name }} {{ $json.last_name }}\",\n      \"roleName\": \"New Hire\"\n    },\n    {\n      \"email\": \"{{ $json.manager.email }}\",\n      \"name\": \"{{ $json.manager.name }}\",\n      \"roleName\": \"Manager\"\n    }\n  ],\n  \"status\": \"sent\",\n  \"emailSubject\": \"Onboarding Documents - {{ $json.first_name }} {{ $json.last_name }}\"\n}",
+        "options": {}
+      },
+      "id": "send-documents",
+      "name": "Send Documents for Signature",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [2000, 400]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "Create a personalized welcome email for a new employee:\n\nEmployee Name: {{ $json.first_name }} {{ $json.last_name }}\nJob Title: {{ $json.job_title }}\nDepartment: {{ $json.department }}\nManager: {{ $json.manager.name }}\nStart Date: {{ $json.start_date }}\nLocation: {{ $json.location }}\nWork Email: {{ $json.work_email }}\n\nThe email should:\n1. Welcome them warmly to the company\n2. Provide their new work email and temporary password instructions\n3. Outline what to expect on their first day\n4. Mention the onboarding documents they need to complete\n5. Introduce their manager\n6. Provide helpful resources and contacts\n\nTone: Warm, professional, and excited. Make them feel valued.",
+        "options": {
+          "systemMessage": "You are an HR specialist creating personalized onboarding communications. Write engaging, informative welcome messages."
+        }
+      },
+      "id": "ai-welcome-email",
+      "name": "AI Generate Welcome Email",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.4,
+      "position": [2220, 400]
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "claude-sonnet-4-20250514",
+          "mode": "list",
+          "cachedResultName": "claude-sonnet-4-20250514"
+        },
+        "options": {
+          "temperature": 0.6
+        }
+      },
+      "id": "anthropic-model",
+      "name": "Claude Sonnet",
+      "type": "@n8n/n8n-nodes-langchain.lmChatAnthropic",
+      "typeVersion": 1.2,
+      "position": [2240, 600]
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.personal_email }}",
+        "subject": "=Welcome to the Team, {{ $json.first_name }}! 🎉",
+        "emailType": "html",
+        "message": "=<div style=\"font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;\">\n{{ $json.text || $json.response }}\n\n<div style=\"background: #e3f2fd; padding: 20px; border-radius: 8px; margin: 20px 0;\">\n<h3>Your Account Details</h3>\n<p><strong>Work Email:</strong> {{ $json.work_email }}</p>\n<p><strong>Username:</strong> {{ $json.username }}</p>\n<p><strong>Temporary Password:</strong> {{ $json.temp_password }}</p>\n<p style=\"color: #d32f2f;\"><em>Please change your password upon first login.</em></p>\n</div>\n\n<h3>Next Steps</h3>\n<ol>\n<li>Complete your onboarding documents (sent separately via DocuSign)</li>\n<li>Log in to your email and change your password</li>\n<li>Join our Slack workspace</li>\n<li>Review the employee handbook</li>\n</ol>\n\n<p>If you have any questions before your start date, please reach out to HR at {{ $env.HR_EMAIL }}.</p>\n\n<p>We're excited to have you join us!</p>\n</div>",
+        "options": {}
+      },
+      "id": "send-welcome-email",
+      "name": "Send Welcome Email",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [2440, 400],
+      "credentials": {
+        "smtp": {
+          "id": "smtp-creds",
+          "name": "SMTP"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.manager.email }}",
+        "subject": "=New Team Member Starting: {{ $json.first_name }} {{ $json.last_name }}",
+        "emailType": "html",
+        "message": "=<div style=\"font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;\">\n<h2>New Team Member Alert</h2>\n<p>A new team member will be joining your team soon!</p>\n\n<div style=\"background: #f5f5f5; padding: 20px; border-radius: 8px; margin: 20px 0;\">\n<p><strong>Name:</strong> {{ $json.first_name }} {{ $json.last_name }}</p>\n<p><strong>Title:</strong> {{ $json.job_title }}</p>\n<p><strong>Start Date:</strong> {{ $json.start_date }}</p>\n<p><strong>Location:</strong> {{ $json.location }}</p>\n<p><strong>Work Email:</strong> {{ $json.work_email }}</p>\n</div>\n\n<h3>Manager Checklist</h3>\n<ul>\n<li>Schedule a welcome meeting for their first day</li>\n<li>Prepare their workspace/equipment</li>\n<li>Assign an onboarding buddy</li>\n<li>Create 30-60-90 day plan</li>\n<li>Schedule introductions with key team members</li>\n<li>Add to relevant meetings and calendar invites</li>\n</ul>\n\n<p>IT is preparing their equipment and accounts. You'll be notified when everything is ready.</p>\n\n<p><a href=\"{{ $env.ONBOARDING_PORTAL_URL }}/manager/{{ $json.employee_id }}\" style=\"background: #1976d2; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px;\">View Onboarding Dashboard</a></p>\n</div>",
+        "options": {}
+      },
+      "id": "notify-manager",
+      "name": "Notify Manager",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [2440, 560],
+      "credentials": {
+        "smtp": {
+          "id": "smtp-creds",
+          "name": "SMTP"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "channel": "={{ $env.SLACK_HR_CHANNEL }}",
+        "text": "=👋 *New Hire Onboarding Started*",
+        "otherOptions": {},
+        "attachments": [
+          {
+            "color": "#4caf50",
+            "fields": {
+              "item": [
+                {
+                  "title": "Name",
+                  "value": "={{ $json.first_name }} {{ $json.last_name }}",
+                  "short": true
+                },
+                {
+                  "title": "Title",
+                  "value": "={{ $json.job_title }}",
+                  "short": true
+                },
+                {
+                  "title": "Department",
+                  "value": "={{ $json.department }}",
+                  "short": true
+                },
+                {
+                  "title": "Start Date",
+                  "value": "={{ $json.start_date }}",
+                  "short": true
+                },
+                {
+                  "title": "Manager",
+                  "value": "={{ $json.manager.name }}",
+                  "short": true
+                },
+                {
+                  "title": "Location",
+                  "value": "={{ $json.location }}",
+                  "short": true
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "id": "slack-hr-notify",
+      "name": "Slack HR Notification",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.2,
+      "position": [2660, 400],
+      "credentials": {
+        "slackApi": {
+          "id": "slack-creds",
+          "name": "Slack API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.CALENDAR_API_URL }}/api/events",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $env.CALENDAR_API_KEY }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"title\": \"{{ $json.first_name }} {{ $json.last_name }} - First Day\",\n  \"start\": \"{{ $json.start_date }}T09:00:00\",\n  \"end\": \"{{ $json.start_date }}T17:00:00\",\n  \"attendees\": [\n    \"{{ $json.work_email }}\",\n    \"{{ $json.manager.email }}\",\n    \"{{ $env.HR_EMAIL }}\"\n  ],\n  \"description\": \"First day onboarding for {{ $json.first_name }}. Welcome to the team!\"\n}",
+        "options": {}
+      },
+      "id": "create-calendar-event",
+      "name": "Create First Day Event",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [2660, 560]
+    },
+    {
+      "parameters": {
+        "method": "PUT",
+        "url": "={{ $env.HRIS_API_URL }}/api/employees/{{ $json.employee_id }}/onboarding",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $env.HRIS_API_KEY }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"status\": \"in_progress\",\n  \"accounts_created\": true,\n  \"documents_sent\": true,\n  \"manager_notified\": true,\n  \"welcome_email_sent\": true,\n  \"equipment_requested\": true\n}",
+        "options": {}
+      },
+      "id": "update-onboarding-status",
+      "name": "Update Onboarding Status",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [2880, 400]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ success: true, employee_id: $json.employee_id, work_email: $json.work_email, status: 'onboarding_started' }) }}",
+        "options": {}
+      },
+      "id": "respond-success",
+      "name": "Respond Success",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [3100, 400]
+    }
+  ],
+  "connections": {
+    "New Hire Webhook": {
+      "main": [
+        [
+          {
+            "node": "Set Employee Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Employee Data": {
+      "main": [
+        [
+          {
+            "node": "Create Employee Record",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Employee Record": {
+      "main": [
+        [
+          {
+            "node": "Fetch Manager Details",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Manager Details": {
+      "main": [
+        [
+          {
+            "node": "Generate Credentials",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Credentials": {
+      "main": [
+        [
+          {
+            "node": "Create Identity Account",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Create Email Account",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Invite to Slack",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Create Equipment Ticket",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Identity Account": {
+      "main": [
+        [
+          {
+            "node": "Merge Account Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Email Account": {
+      "main": [
+        [
+          {
+            "node": "Merge Account Results",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Invite to Slack": {
+      "main": [
+        [
+          {
+            "node": "Merge Account Results",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "Create Equipment Ticket": {
+      "main": [
+        [
+          {
+            "node": "Merge Account Results",
+            "type": "main",
+            "index": 3
+          }
+        ]
+      ]
+    },
+    "Merge Account Results": {
+      "main": [
+        [
+          {
+            "node": "Determine Required Documents",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Determine Required Documents": {
+      "main": [
+        [
+          {
+            "node": "Send Documents for Signature",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Documents for Signature": {
+      "main": [
+        [
+          {
+            "node": "AI Generate Welcome Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Generate Welcome Email": {
+      "main": [
+        [
+          {
+            "node": "Send Welcome Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Claude Sonnet": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Generate Welcome Email",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Welcome Email": {
+      "main": [
+        [
+          {
+            "node": "Notify Manager",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Notify Manager": {
+      "main": [
+        [
+          {
+            "node": "Slack HR Notification",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Create First Day Event",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Slack HR Notification": {
+      "main": [
+        [
+          {
+            "node": "Update Onboarding Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Onboarding Status": {
+      "main": [
+        [
+          {
+            "node": "Respond Success",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "onboarding-v1",
+  "meta": {
+    "instanceId": "n8n-workflows-library"
+  },
+  "id": "employee-onboarding",
+  "tags": [
+    {
+      "id": "hr",
+      "name": "HR"
+    },
+    {
+      "id": "onboarding",
+      "name": "Onboarding"
+    }
+  ]
+}

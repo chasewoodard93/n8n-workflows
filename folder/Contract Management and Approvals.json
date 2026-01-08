@@ -1,0 +1,1051 @@
+{
+  "name": "Contract Management and Approvals",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "contract-submit",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "contract-webhook",
+      "name": "Contract Submission Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 8
+            }
+          ]
+        }
+      },
+      "id": "daily-check",
+      "name": "Daily Contract Check",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [240, 520]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "contract-signed",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "signed-webhook",
+      "name": "Contract Signed Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [240, 740]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "action",
+              "name": "action",
+              "value": "new_contract",
+              "type": "string"
+            },
+            {
+              "id": "contract_id",
+              "name": "contract_id",
+              "value": "=CTR-{{ Date.now() }}",
+              "type": "string"
+            },
+            {
+              "id": "contract_type",
+              "name": "contract_type",
+              "value": "={{ $json.body.contract_type }}",
+              "type": "string"
+            },
+            {
+              "id": "party_name",
+              "name": "party_name",
+              "value": "={{ $json.body.party_name }}",
+              "type": "string"
+            },
+            {
+              "id": "party_email",
+              "name": "party_email",
+              "value": "={{ $json.body.party_email }}",
+              "type": "string"
+            },
+            {
+              "id": "value",
+              "name": "value",
+              "value": "={{ $json.body.value }}",
+              "type": "number"
+            },
+            {
+              "id": "start_date",
+              "name": "start_date",
+              "value": "={{ $json.body.start_date }}",
+              "type": "string"
+            },
+            {
+              "id": "end_date",
+              "name": "end_date",
+              "value": "={{ $json.body.end_date }}",
+              "type": "string"
+            },
+            {
+              "id": "department",
+              "name": "department",
+              "value": "={{ $json.body.department }}",
+              "type": "string"
+            },
+            {
+              "id": "requestor_id",
+              "name": "requestor_id",
+              "value": "={{ $json.body.requestor_id }}",
+              "type": "string"
+            },
+            {
+              "id": "terms",
+              "name": "terms",
+              "value": "={{ $json.body.terms }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "set-contract",
+      "name": "Set Contract Data",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "action",
+              "name": "action",
+              "value": "daily_check",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "set-daily",
+      "name": "Set Daily Check",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [460, 520]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "action",
+              "name": "action",
+              "value": "signed",
+              "type": "string"
+            },
+            {
+              "id": "contract_id",
+              "name": "contract_id",
+              "value": "={{ $json.body.contract_id }}",
+              "type": "string"
+            },
+            {
+              "id": "signed_by",
+              "name": "signed_by",
+              "value": "={{ $json.body.signed_by }}",
+              "type": "string"
+            },
+            {
+              "id": "signed_at",
+              "name": "signed_at",
+              "value": "={{ $json.body.signed_at }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "set-signed",
+      "name": "Set Signed Data",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [460, 740]
+    },
+    {
+      "parameters": {
+        "rules": {
+          "rules": [
+            {
+              "outputKey": "new",
+              "conditions": {
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.action }}",
+                    "rightValue": "new_contract",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "outputKey": "daily",
+              "conditions": {
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.action }}",
+                    "rightValue": "daily_check",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "outputKey": "signed",
+              "conditions": {
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.action }}",
+                    "rightValue": "signed",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "route-action",
+      "name": "Route by Action",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [680, 520]
+    },
+    {
+      "parameters": {
+        "jsCode": "const contract = $input.first().json;\n\n// Determine approval chain based on contract type and value\nlet approvalChain = [];\nlet riskLevel = 'low';\n\n// Value-based approvals\nif (contract.value > 100000) {\n  approvalChain.push({ role: 'legal', required: true });\n  approvalChain.push({ role: 'cfo', required: true });\n  approvalChain.push({ role: 'ceo', required: true });\n  riskLevel = 'high';\n} else if (contract.value > 25000) {\n  approvalChain.push({ role: 'legal', required: true });\n  approvalChain.push({ role: 'department_head', required: true });\n  riskLevel = 'medium';\n} else if (contract.value > 5000) {\n  approvalChain.push({ role: 'legal', required: contract.contract_type !== 'standard' });\n  approvalChain.push({ role: 'manager', required: true });\n  riskLevel = 'low';\n} else {\n  approvalChain.push({ role: 'manager', required: true });\n  riskLevel = 'minimal';\n}\n\n// Contract type specific requirements\nconst requiresLegalReview = ['custom', 'partnership', 'licensing', 'merger', 'acquisition'];\nif (requiresLegalReview.includes(contract.contract_type) && !approvalChain.find(a => a.role === 'legal')) {\n  approvalChain.unshift({ role: 'legal', required: true });\n}\n\nreturn [{\n  json: {\n    ...contract,\n    approval_chain: approvalChain,\n    current_approval_step: 0,\n    risk_level: riskLevel,\n    status: 'pending_approval',\n    created_at: new Date().toISOString()\n  }\n}];"
+      },
+      "id": "determine-approvals",
+      "name": "Determine Approval Chain",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [920, 300]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "Review this contract submission and provide a risk assessment:\n\nContract Type: {{ $json.contract_type }}\nParty: {{ $json.party_name }}\nValue: ${{ $json.value }}\nTerm: {{ $json.start_date }} to {{ $json.end_date }}\nTerms Summary: {{ $json.terms }}\n\nProvide:\n1. Risk Assessment (Low/Medium/High/Critical)\n2. Key concerns or red flags\n3. Recommended modifications or clauses\n4. Compliance considerations\n5. Summary recommendation (Approve/Approve with conditions/Reject/Escalate)\n\nFormat as JSON with these fields.",
+        "options": {
+          "systemMessage": "You are a legal contract analyst. Provide thorough risk assessments focusing on liability, compliance, and business impact."
+        }
+      },
+      "id": "ai-contract-review",
+      "name": "AI Contract Review",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.4,
+      "position": [1140, 300]
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "claude-sonnet-4-20250514",
+          "mode": "list",
+          "cachedResultName": "claude-sonnet-4-20250514"
+        },
+        "options": {
+          "temperature": 0.3
+        }
+      },
+      "id": "anthropic-model",
+      "name": "Claude Sonnet",
+      "type": "@n8n/n8n-nodes-langchain.lmChatAnthropic",
+      "typeVersion": 1.2,
+      "position": [1160, 500]
+    },
+    {
+      "parameters": {
+        "jsCode": "const contract = $input.first().json;\nlet aiReview;\n\ntry {\n  aiReview = JSON.parse(contract.text || contract.response);\n} catch (e) {\n  aiReview = {\n    risk_assessment: 'Medium',\n    concerns: ['Unable to parse AI review'],\n    recommendation: 'Manual review required'\n  };\n}\n\nreturn [{\n  json: {\n    ...contract,\n    ai_review: aiReview\n  }\n}];"
+      },
+      "id": "parse-review",
+      "name": "Parse AI Review",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1360, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.CONTRACT_API_URL }}/api/contracts",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $env.CONTRACT_API_KEY }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json) }}",
+        "options": {}
+      },
+      "id": "save-contract",
+      "name": "Save Contract",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1580, 300]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $env.HRIS_API_URL }}/api/approvers?role={{ $json.approval_chain[0].role }}&department={{ $json.department }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $env.HRIS_API_KEY }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "fetch-approver",
+      "name": "Fetch First Approver",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1800, 300]
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.approver.email }}",
+        "subject": "=Contract Approval Required: {{ $json.party_name }} - ${{ $json.value.toLocaleString() }}",
+        "emailType": "html",
+        "message": "=<div style=\"font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;\">\n<h2>Contract Approval Request</h2>\n<p>A contract requires your approval.</p>\n\n<div style=\"background: {{ $json.risk_level === 'high' ? '#ffebee' : $json.risk_level === 'medium' ? '#fff3e0' : '#e8f5e9' }}; padding: 15px; border-radius: 4px; margin: 20px 0;\">\n<p><strong>Contract ID:</strong> {{ $json.contract_id }}</p>\n<p><strong>Type:</strong> {{ $json.contract_type }}</p>\n<p><strong>Party:</strong> {{ $json.party_name }}</p>\n<p><strong>Value:</strong> ${{ $json.value.toLocaleString() }}</p>\n<p><strong>Term:</strong> {{ $json.start_date }} to {{ $json.end_date }}</p>\n<p><strong>Risk Level:</strong> {{ $json.risk_level.toUpperCase() }}</p>\n</div>\n\n<h3>AI Risk Assessment</h3>\n<p><strong>Recommendation:</strong> {{ $json.ai_review.recommendation }}</p>\n{{ $json.ai_review.concerns?.length > 0 ? `<p><strong>Concerns:</strong></p><ul>${$json.ai_review.concerns.map(c => '<li>' + c + '</li>').join('')}</ul>` : '' }}\n\n<div style=\"margin: 20px 0;\">\n<a href=\"{{ $env.CONTRACT_PORTAL_URL }}/approve/{{ $json.contract_id }}?action=approve\" style=\"background: #4CAF50; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; margin-right: 10px;\">Approve</a>\n<a href=\"{{ $env.CONTRACT_PORTAL_URL }}/approve/{{ $json.contract_id }}?action=reject\" style=\"background: #f44336; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px;\">Reject</a>\n</div>\n\n<p><a href=\"{{ $env.CONTRACT_PORTAL_URL }}/contracts/{{ $json.contract_id }}\">View Full Contract</a></p>\n</div>",
+        "options": {}
+      },
+      "id": "email-approver",
+      "name": "Email Approver",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [2020, 300],
+      "credentials": {
+        "smtp": {
+          "id": "smtp-creds",
+          "name": "SMTP"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "channel": "={{ $env.SLACK_LEGAL_CHANNEL }}",
+        "text": "=📄 *New Contract Submitted*",
+        "otherOptions": {},
+        "attachments": [
+          {
+            "color": "={{ $json.risk_level === 'high' ? '#d32f2f' : $json.risk_level === 'medium' ? '#ff9800' : '#4caf50' }}",
+            "fields": {
+              "item": [
+                {
+                  "title": "Contract ID",
+                  "value": "={{ $json.contract_id }}",
+                  "short": true
+                },
+                {
+                  "title": "Party",
+                  "value": "={{ $json.party_name }}",
+                  "short": true
+                },
+                {
+                  "title": "Value",
+                  "value": "=${{ $json.value.toLocaleString() }}",
+                  "short": true
+                },
+                {
+                  "title": "Risk Level",
+                  "value": "={{ $json.risk_level.toUpperCase() }}",
+                  "short": true
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "id": "slack-contract",
+      "name": "Slack Contract Alert",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.2,
+      "position": [2240, 300],
+      "credentials": {
+        "slackApi": {
+          "id": "slack-creds",
+          "name": "Slack API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ success: true, contract_id: $json.contract_id, status: 'pending_approval' }) }}",
+        "options": {}
+      },
+      "id": "respond-submit",
+      "name": "Respond Contract Submitted",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [2460, 300]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $env.CONTRACT_API_URL }}/api/contracts?status=pending_approval,pending_signature&expiring_soon=true",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $env.CONTRACT_API_KEY }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "fetch-pending",
+      "name": "Fetch Pending Contracts",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [920, 520]
+    },
+    {
+      "parameters": {
+        "jsCode": "const contracts = $input.first().json.contracts || [];\nconst today = new Date();\n\nconst categorized = {\n  pending_approval: [],\n  pending_signature: [],\n  expiring_30_days: [],\n  expiring_60_days: [],\n  overdue_approval: []\n};\n\nfor (const contract of contracts) {\n  // Check pending approvals\n  if (contract.status === 'pending_approval') {\n    const submittedDate = new Date(contract.created_at);\n    const daysPending = Math.ceil((today - submittedDate) / (1000 * 60 * 60 * 24));\n    contract.days_pending = daysPending;\n    \n    if (daysPending > 5) {\n      categorized.overdue_approval.push(contract);\n    } else {\n      categorized.pending_approval.push(contract);\n    }\n  }\n  \n  // Check pending signatures\n  if (contract.status === 'pending_signature') {\n    categorized.pending_signature.push(contract);\n  }\n  \n  // Check expiring contracts\n  if (contract.status === 'active' && contract.end_date) {\n    const endDate = new Date(contract.end_date);\n    const daysUntilExpiry = Math.ceil((endDate - today) / (1000 * 60 * 60 * 24));\n    contract.days_until_expiry = daysUntilExpiry;\n    \n    if (daysUntilExpiry <= 30) {\n      categorized.expiring_30_days.push(contract);\n    } else if (daysUntilExpiry <= 60) {\n      categorized.expiring_60_days.push(contract);\n    }\n  }\n}\n\nreturn [{ json: categorized }];"
+      },
+      "id": "categorize-contracts",
+      "name": "Categorize Contracts",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1140, 520]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "has-overdue",
+              "leftValue": "={{ $json.overdue_approval.length }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "check-overdue",
+      "name": "Has Overdue Approvals?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [1360, 520]
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "overdue_approval",
+        "options": {}
+      },
+      "id": "split-overdue",
+      "name": "Split Overdue",
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [1580, 440]
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.current_approver_email }}",
+        "subject": "=URGENT: Contract Approval Overdue - {{ $json.party_name }}",
+        "emailType": "html",
+        "message": "=<div style=\"font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;\">\n<h2 style=\"color: #d32f2f;\">Contract Approval Overdue</h2>\n<p>The following contract has been pending your approval for {{ $json.days_pending }} days.</p>\n\n<div style=\"background: #ffebee; padding: 15px; border-radius: 4px; margin: 20px 0;\">\n<p><strong>Contract ID:</strong> {{ $json.contract_id }}</p>\n<p><strong>Party:</strong> {{ $json.party_name }}</p>\n<p><strong>Value:</strong> ${{ $json.value.toLocaleString() }}</p>\n<p><strong>Days Pending:</strong> {{ $json.days_pending }}</p>\n</div>\n\n<p>Please review and take action immediately.</p>\n\n<a href=\"{{ $env.CONTRACT_PORTAL_URL }}/approve/{{ $json.contract_id }}\" style=\"background: #d32f2f; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px;\">Review Now</a>\n</div>",
+        "options": {}
+      },
+      "id": "email-overdue-reminder",
+      "name": "Send Overdue Reminder",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [1800, 440],
+      "credentials": {
+        "smtp": {
+          "id": "smtp-creds",
+          "name": "SMTP"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "has-expiring",
+              "leftValue": "={{ $json.expiring_30_days.length + $json.expiring_60_days.length }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "check-expiring",
+      "name": "Has Expiring Contracts?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [1360, 620]
+    },
+    {
+      "parameters": {
+        "channel": "={{ $env.SLACK_LEGAL_CHANNEL }}",
+        "text": "=⏰ *Contract Expiration Alert*",
+        "otherOptions": {},
+        "attachments": [
+          {
+            "color": "#ff9800",
+            "fields": {
+              "item": [
+                {
+                  "title": "Expiring in 30 Days",
+                  "value": "={{ $json.expiring_30_days.length }} contracts",
+                  "short": true
+                },
+                {
+                  "title": "Expiring in 60 Days",
+                  "value": "={{ $json.expiring_60_days.length }} contracts",
+                  "short": true
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "id": "slack-expiring",
+      "name": "Slack Expiring Alert",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.2,
+      "position": [1580, 620],
+      "credentials": {
+        "slackApi": {
+          "id": "slack-creds",
+          "name": "Slack API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $env.CONTRACT_API_URL }}/api/contracts/{{ $json.contract_id }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $env.CONTRACT_API_KEY }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "fetch-signed-contract",
+      "name": "Fetch Signed Contract",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [920, 740]
+    },
+    {
+      "parameters": {
+        "method": "PUT",
+        "url": "={{ $env.CONTRACT_API_URL }}/api/contracts/{{ $json.contract_id }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $env.CONTRACT_API_KEY }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"status\": \"active\",\n  \"signed_by\": \"{{ $json.signed_by }}\",\n  \"signed_at\": \"{{ $json.signed_at }}\",\n  \"activated_at\": \"{{ new Date().toISOString() }}\"\n}",
+        "options": {}
+      },
+      "id": "activate-contract",
+      "name": "Activate Contract",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1140, 740]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.BOX_API_URL }}/2.0/files/content",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $env.BOX_ACCESS_TOKEN }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "attributes",
+              "value": "={\"name\": \"{{ $json.contract_id }}_signed.pdf\", \"parent\": {\"id\": \"{{ $env.BOX_CONTRACTS_FOLDER }}\"}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "archive-contract",
+      "name": "Archive to Box",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1360, 740]
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.requestor_email }}",
+        "subject": "=Contract Executed: {{ $json.party_name }}",
+        "emailType": "html",
+        "message": "=<div style=\"font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;\">\n<h2 style=\"color: #4CAF50;\">Contract Executed Successfully</h2>\n<p>The following contract has been fully executed and is now active.</p>\n\n<div style=\"background: #e8f5e9; padding: 15px; border-radius: 4px; margin: 20px 0;\">\n<p><strong>Contract ID:</strong> {{ $json.contract_id }}</p>\n<p><strong>Party:</strong> {{ $json.party_name }}</p>\n<p><strong>Value:</strong> ${{ $json.value.toLocaleString() }}</p>\n<p><strong>Effective Date:</strong> {{ $json.start_date }}</p>\n<p><strong>End Date:</strong> {{ $json.end_date }}</p>\n<p><strong>Signed By:</strong> {{ $json.signed_by }}</p>\n</div>\n\n<p>A copy has been archived in Box for your records.</p>\n\n<p><a href=\"{{ $env.CONTRACT_PORTAL_URL }}/contracts/{{ $json.contract_id }}\" style=\"background: #1976d2; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px;\">View Contract</a></p>\n</div>",
+        "options": {}
+      },
+      "id": "email-execution-notice",
+      "name": "Email Execution Notice",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [1580, 740],
+      "credentials": {
+        "smtp": {
+          "id": "smtp-creds",
+          "name": "SMTP"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "channel": "={{ $env.SLACK_LEGAL_CHANNEL }}",
+        "text": "=✅ *Contract Executed*",
+        "otherOptions": {},
+        "attachments": [
+          {
+            "color": "#4caf50",
+            "fields": {
+              "item": [
+                {
+                  "title": "Contract ID",
+                  "value": "={{ $json.contract_id }}",
+                  "short": true
+                },
+                {
+                  "title": "Party",
+                  "value": "={{ $json.party_name }}",
+                  "short": true
+                },
+                {
+                  "title": "Value",
+                  "value": "=${{ $json.value.toLocaleString() }}",
+                  "short": true
+                },
+                {
+                  "title": "Status",
+                  "value": "Active",
+                  "short": true
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "id": "slack-executed",
+      "name": "Slack Execution Alert",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.2,
+      "position": [1800, 740],
+      "credentials": {
+        "slackApi": {
+          "id": "slack-creds",
+          "name": "Slack API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ success: true, contract_id: $json.contract_id, status: 'active' }) }}",
+        "options": {}
+      },
+      "id": "respond-signed",
+      "name": "Respond Contract Signed",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [2020, 740]
+    }
+  ],
+  "connections": {
+    "Contract Submission Webhook": {
+      "main": [
+        [
+          {
+            "node": "Set Contract Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Daily Contract Check": {
+      "main": [
+        [
+          {
+            "node": "Set Daily Check",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Contract Signed Webhook": {
+      "main": [
+        [
+          {
+            "node": "Set Signed Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Contract Data": {
+      "main": [
+        [
+          {
+            "node": "Route by Action",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Daily Check": {
+      "main": [
+        [
+          {
+            "node": "Route by Action",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Signed Data": {
+      "main": [
+        [
+          {
+            "node": "Route by Action",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route by Action": {
+      "main": [
+        [
+          {
+            "node": "Determine Approval Chain",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Fetch Pending Contracts",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Fetch Signed Contract",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Determine Approval Chain": {
+      "main": [
+        [
+          {
+            "node": "AI Contract Review",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Contract Review": {
+      "main": [
+        [
+          {
+            "node": "Parse AI Review",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Claude Sonnet": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Contract Review",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse AI Review": {
+      "main": [
+        [
+          {
+            "node": "Save Contract",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save Contract": {
+      "main": [
+        [
+          {
+            "node": "Fetch First Approver",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch First Approver": {
+      "main": [
+        [
+          {
+            "node": "Email Approver",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Email Approver": {
+      "main": [
+        [
+          {
+            "node": "Slack Contract Alert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Slack Contract Alert": {
+      "main": [
+        [
+          {
+            "node": "Respond Contract Submitted",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Pending Contracts": {
+      "main": [
+        [
+          {
+            "node": "Categorize Contracts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Categorize Contracts": {
+      "main": [
+        [
+          {
+            "node": "Has Overdue Approvals?",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Has Expiring Contracts?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Has Overdue Approvals?": {
+      "main": [
+        [
+          {
+            "node": "Split Overdue",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Split Overdue": {
+      "main": [
+        [
+          {
+            "node": "Send Overdue Reminder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Has Expiring Contracts?": {
+      "main": [
+        [
+          {
+            "node": "Slack Expiring Alert",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Fetch Signed Contract": {
+      "main": [
+        [
+          {
+            "node": "Activate Contract",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Activate Contract": {
+      "main": [
+        [
+          {
+            "node": "Archive to Box",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Archive to Box": {
+      "main": [
+        [
+          {
+            "node": "Email Execution Notice",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Email Execution Notice": {
+      "main": [
+        [
+          {
+            "node": "Slack Execution Alert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Slack Execution Alert": {
+      "main": [
+        [
+          {
+            "node": "Respond Contract Signed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "contract-mgmt-v1",
+  "meta": {
+    "instanceId": "n8n-workflows-library"
+  },
+  "id": "contract-management",
+  "tags": [
+    {
+      "id": "legal",
+      "name": "Legal"
+    },
+    {
+      "id": "contracts",
+      "name": "Contracts"
+    },
+    {
+      "id": "approvals",
+      "name": "Approvals"
+    }
+  ]
+}
