@@ -1,0 +1,1146 @@
+{
+  "name": "Expense Approval and Reimbursement",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "expense-submit",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "expense-webhook",
+      "name": "Expense Submission Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "expense-approve",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "approval-webhook",
+      "name": "Approval Action Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [240, 520]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 9
+            }
+          ]
+        }
+      },
+      "id": "daily-check",
+      "name": "Daily Pending Check",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [240, 740]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "action",
+              "name": "action",
+              "value": "submit",
+              "type": "string"
+            },
+            {
+              "id": "employee_id",
+              "name": "employee_id",
+              "value": "={{ $json.body.employee_id }}",
+              "type": "string"
+            },
+            {
+              "id": "employee_name",
+              "name": "employee_name",
+              "value": "={{ $json.body.employee_name }}",
+              "type": "string"
+            },
+            {
+              "id": "employee_email",
+              "name": "employee_email",
+              "value": "={{ $json.body.employee_email }}",
+              "type": "string"
+            },
+            {
+              "id": "department",
+              "name": "department",
+              "value": "={{ $json.body.department }}",
+              "type": "string"
+            },
+            {
+              "id": "expense_type",
+              "name": "expense_type",
+              "value": "={{ $json.body.expense_type }}",
+              "type": "string"
+            },
+            {
+              "id": "amount",
+              "name": "amount",
+              "value": "={{ $json.body.amount }}",
+              "type": "number"
+            },
+            {
+              "id": "currency",
+              "name": "currency",
+              "value": "={{ $json.body.currency || 'USD' }}",
+              "type": "string"
+            },
+            {
+              "id": "description",
+              "name": "description",
+              "value": "={{ $json.body.description }}",
+              "type": "string"
+            },
+            {
+              "id": "receipt_urls",
+              "name": "receipt_urls",
+              "value": "={{ $json.body.receipt_urls }}",
+              "type": "array"
+            },
+            {
+              "id": "expense_date",
+              "name": "expense_date",
+              "value": "={{ $json.body.expense_date }}",
+              "type": "string"
+            },
+            {
+              "id": "project_code",
+              "name": "project_code",
+              "value": "={{ $json.body.project_code }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "set-submission",
+      "name": "Set Submission Data",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "action",
+              "name": "action",
+              "value": "approve_action",
+              "type": "string"
+            },
+            {
+              "id": "expense_id",
+              "name": "expense_id",
+              "value": "={{ $json.body.expense_id }}",
+              "type": "string"
+            },
+            {
+              "id": "approver_id",
+              "name": "approver_id",
+              "value": "={{ $json.body.approver_id }}",
+              "type": "string"
+            },
+            {
+              "id": "decision",
+              "name": "decision",
+              "value": "={{ $json.body.decision }}",
+              "type": "string"
+            },
+            {
+              "id": "comments",
+              "name": "comments",
+              "value": "={{ $json.body.comments }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "set-approval",
+      "name": "Set Approval Data",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [460, 520]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "action",
+              "name": "action",
+              "value": "daily_check",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "set-daily",
+      "name": "Set Daily Check",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [460, 740]
+    },
+    {
+      "parameters": {
+        "rules": {
+          "rules": [
+            {
+              "outputKey": "submit",
+              "conditions": {
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.action }}",
+                    "rightValue": "submit",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "outputKey": "approve",
+              "conditions": {
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.action }}",
+                    "rightValue": "approve_action",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "outputKey": "daily",
+              "conditions": {
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.action }}",
+                    "rightValue": "daily_check",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "route-action",
+      "name": "Route by Action",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [680, 520]
+    },
+    {
+      "parameters": {
+        "jsCode": "const expense = $input.first().json;\n\n// Generate expense ID\nconst expenseId = `EXP-${Date.now()}`;\n\n// Determine approval chain based on amount and department\nlet approvalLevel = 'manager';\nlet approvers = [];\n\nif (expense.amount > 5000) {\n  approvalLevel = 'director';\n} else if (expense.amount > 1000) {\n  approvalLevel = 'manager';\n} else {\n  approvalLevel = 'auto_approve';\n}\n\n// Expense categories that require additional review\nconst sensitiveCategories = ['travel', 'entertainment', 'gifts', 'conference'];\nconst requiresFinanceReview = sensitiveCategories.includes(expense.expense_type.toLowerCase()) || expense.amount > 2500;\n\nreturn [{\n  json: {\n    expense_id: expenseId,\n    ...expense,\n    submitted_at: new Date().toISOString(),\n    status: approvalLevel === 'auto_approve' ? 'approved' : 'pending_approval',\n    approval_level: approvalLevel,\n    requires_finance_review: requiresFinanceReview,\n    approval_chain: [],\n    current_approver_level: 0\n  }\n}];"
+      },
+      "id": "process-submission",
+      "name": "Process Expense Submission",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [920, 300]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $env.HR_API_URL }}/api/employees/{{ $json.employee_id }}/manager",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $env.HR_API_KEY }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "fetch-manager",
+      "name": "Fetch Manager Info",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1140, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "auto-approve",
+              "leftValue": "={{ $json.approval_level }}",
+              "rightValue": "auto_approve",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "check-auto-approve",
+      "name": "Auto Approve?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [1360, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.EXPENSE_API_URL }}/api/expenses",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $env.EXPENSE_API_KEY }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json) }}",
+        "options": {}
+      },
+      "id": "save-expense",
+      "name": "Save Expense Record",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1580, 200]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.EXPENSE_API_URL }}/api/expenses",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $env.EXPENSE_API_KEY }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json) }}",
+        "options": {}
+      },
+      "id": "save-expense-pending",
+      "name": "Save Pending Expense",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1580, 400]
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.manager.email }}",
+        "subject": "=Expense Approval Required: {{ $json.currency }} {{ $json.amount }} from {{ $json.employee_name }}",
+        "emailType": "html",
+        "message": "=<div style=\"font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;\">\n<h2>Expense Approval Request</h2>\n<p>{{ $json.employee_name }} has submitted an expense that requires your approval.</p>\n\n<div style=\"background: #f5f5f5; padding: 15px; border-radius: 4px; margin: 20px 0;\">\n<p><strong>Expense ID:</strong> {{ $json.expense_id }}</p>\n<p><strong>Employee:</strong> {{ $json.employee_name }} ({{ $json.department }})</p>\n<p><strong>Amount:</strong> {{ $json.currency }} {{ $json.amount.toFixed(2) }}</p>\n<p><strong>Type:</strong> {{ $json.expense_type }}</p>\n<p><strong>Date:</strong> {{ $json.expense_date }}</p>\n<p><strong>Description:</strong> {{ $json.description }}</p>\n{{ $json.project_code ? `<p><strong>Project:</strong> ${$json.project_code}</p>` : '' }}\n</div>\n\n<p><strong>Receipts:</strong> {{ $json.receipt_urls.length }} attached</p>\n\n<div style=\"margin: 20px 0;\">\n<a href=\"{{ $env.EXPENSE_PORTAL_URL }}/approve/{{ $json.expense_id }}?action=approve\" style=\"background: #4CAF50; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; margin-right: 10px;\">Approve</a>\n<a href=\"{{ $env.EXPENSE_PORTAL_URL }}/approve/{{ $json.expense_id }}?action=reject\" style=\"background: #f44336; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px;\">Reject</a>\n</div>\n\n<p><a href=\"{{ $env.EXPENSE_PORTAL_URL }}/expenses/{{ $json.expense_id }}\">View Full Details</a></p>\n</div>",
+        "options": {}
+      },
+      "id": "email-approver",
+      "name": "Email Approver",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [1800, 400],
+      "credentials": {
+        "smtp": {
+          "id": "smtp-creds",
+          "name": "SMTP"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "channel": "={{ $env.SLACK_FINANCE_CHANNEL }}",
+        "text": "=📝 *Expense Submitted*",
+        "otherOptions": {},
+        "attachments": [
+          {
+            "color": "#2196f3",
+            "fields": {
+              "item": [
+                {
+                  "title": "Employee",
+                  "value": "={{ $json.employee_name }}",
+                  "short": true
+                },
+                {
+                  "title": "Amount",
+                  "value": "={{ $json.currency }} {{ $json.amount.toFixed(2) }}",
+                  "short": true
+                },
+                {
+                  "title": "Type",
+                  "value": "={{ $json.expense_type }}",
+                  "short": true
+                },
+                {
+                  "title": "Status",
+                  "value": "={{ $json.status }}",
+                  "short": true
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "id": "slack-submission",
+      "name": "Slack Expense Submitted",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.2,
+      "position": [2020, 300],
+      "credentials": {
+        "slackApi": {
+          "id": "slack-creds",
+          "name": "Slack API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.employee_email }}",
+        "subject": "=Expense {{ $json.expense_id }} Submitted Successfully",
+        "emailType": "html",
+        "message": "=<div style=\"font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;\">\n<h2>Expense Submitted</h2>\n<p>Your expense report has been submitted successfully.</p>\n\n<div style=\"background: #e3f2fd; padding: 15px; border-radius: 4px; margin: 20px 0;\">\n<p><strong>Expense ID:</strong> {{ $json.expense_id }}</p>\n<p><strong>Amount:</strong> {{ $json.currency }} {{ $json.amount.toFixed(2) }}</p>\n<p><strong>Type:</strong> {{ $json.expense_type }}</p>\n<p><strong>Status:</strong> {{ $json.status === 'approved' ? 'Auto-Approved' : 'Pending Approval' }}</p>\n</div>\n\n{{ $json.status === 'approved' ? '<p style=\"color: #4CAF50;\">Your expense has been auto-approved and will be processed for reimbursement.</p>' : '<p>Your expense is awaiting manager approval. You will be notified once a decision is made.</p>' }}\n\n<p><a href=\"{{ $env.EXPENSE_PORTAL_URL }}/my-expenses/{{ $json.expense_id }}\">Track Your Expense</a></p>\n</div>",
+        "options": {}
+      },
+      "id": "email-employee-confirm",
+      "name": "Email Employee Confirmation",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [2020, 200],
+      "credentials": {
+        "smtp": {
+          "id": "smtp-creds",
+          "name": "SMTP"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $env.EXPENSE_API_URL }}/api/expenses/{{ $json.expense_id }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $env.EXPENSE_API_KEY }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "fetch-expense",
+      "name": "Fetch Expense Details",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [920, 520]
+    },
+    {
+      "parameters": {
+        "jsCode": "const expense = $input.first().json;\nconst approval = $input.first().json;\n\nconst decision = approval.decision; // 'approved' or 'rejected'\nconst comments = approval.comments;\nconst approverId = approval.approver_id;\n\n// Update approval chain\nconst approvalEntry = {\n  approver_id: approverId,\n  decision: decision,\n  comments: comments,\n  timestamp: new Date().toISOString()\n};\n\nexpense.approval_chain = expense.approval_chain || [];\nexpense.approval_chain.push(approvalEntry);\n\n// Determine next status\nif (decision === 'rejected') {\n  expense.status = 'rejected';\n} else if (expense.requires_finance_review && !expense.finance_approved) {\n  expense.status = 'pending_finance_review';\n} else {\n  expense.status = 'approved';\n}\n\nreturn [{ json: expense }];"
+      },
+      "id": "process-approval",
+      "name": "Process Approval Decision",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1140, 520]
+    },
+    {
+      "parameters": {
+        "method": "PUT",
+        "url": "={{ $env.EXPENSE_API_URL }}/api/expenses/{{ $json.expense_id }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $env.EXPENSE_API_KEY }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json) }}",
+        "options": {}
+      },
+      "id": "update-expense",
+      "name": "Update Expense Status",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1360, 520]
+    },
+    {
+      "parameters": {
+        "rules": {
+          "rules": [
+            {
+              "outputKey": "approved",
+              "conditions": {
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.status }}",
+                    "rightValue": "approved",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "outputKey": "rejected",
+              "conditions": {
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.status }}",
+                    "rightValue": "rejected",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "outputKey": "finance_review",
+              "conditions": {
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.status }}",
+                    "rightValue": "pending_finance_review",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "route-decision",
+      "name": "Route by Decision",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [1580, 520]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.PAYROLL_API_URL }}/api/reimbursements",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $env.PAYROLL_API_KEY }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"employee_id\": \"{{ $json.employee_id }}\",\n  \"expense_id\": \"{{ $json.expense_id }}\",\n  \"amount\": {{ $json.amount }},\n  \"currency\": \"{{ $json.currency }}\",\n  \"description\": \"Expense reimbursement: {{ $json.expense_type }}\",\n  \"payment_method\": \"direct_deposit\",\n  \"scheduled_date\": \"{{ new Date(Date.now() + 7*24*60*60*1000).toISOString().split('T')[0] }}\"\n}",
+        "options": {}
+      },
+      "id": "schedule-reimbursement",
+      "name": "Schedule Reimbursement",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1800, 460]
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.employee_email }}",
+        "subject": "=Expense {{ $json.expense_id }} Approved - Reimbursement Scheduled",
+        "emailType": "html",
+        "message": "=<div style=\"font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;\">\n<h2 style=\"color: #4CAF50;\">Expense Approved</h2>\n<p>Great news! Your expense has been approved.</p>\n\n<div style=\"background: #e8f5e9; padding: 15px; border-radius: 4px; margin: 20px 0;\">\n<p><strong>Expense ID:</strong> {{ $json.expense_id }}</p>\n<p><strong>Amount:</strong> {{ $json.currency }} {{ $json.amount.toFixed(2) }}</p>\n<p><strong>Type:</strong> {{ $json.expense_type }}</p>\n<p><strong>Reimbursement Method:</strong> Direct Deposit</p>\n<p><strong>Expected Payment Date:</strong> {{ new Date(Date.now() + 7*24*60*60*1000).toLocaleDateString() }}</p>\n</div>\n\n<p>The reimbursement will be deposited to your account on file.</p>\n</div>",
+        "options": {}
+      },
+      "id": "email-approved",
+      "name": "Email Approval Notice",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [2020, 460],
+      "credentials": {
+        "smtp": {
+          "id": "smtp-creds",
+          "name": "SMTP"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.employee_email }}",
+        "subject": "=Expense {{ $json.expense_id }} Rejected",
+        "emailType": "html",
+        "message": "=<div style=\"font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;\">\n<h2 style=\"color: #f44336;\">Expense Rejected</h2>\n<p>Unfortunately, your expense has been rejected.</p>\n\n<div style=\"background: #ffebee; padding: 15px; border-radius: 4px; margin: 20px 0;\">\n<p><strong>Expense ID:</strong> {{ $json.expense_id }}</p>\n<p><strong>Amount:</strong> {{ $json.currency }} {{ $json.amount.toFixed(2) }}</p>\n<p><strong>Type:</strong> {{ $json.expense_type }}</p>\n<p><strong>Reason:</strong> {{ $json.approval_chain[$json.approval_chain.length - 1].comments || 'No reason provided' }}</p>\n</div>\n\n<p>If you believe this was in error or have questions, please contact your manager or the finance team.</p>\n<p><a href=\"{{ $env.EXPENSE_PORTAL_URL }}/my-expenses/{{ $json.expense_id }}\">View Details</a></p>\n</div>",
+        "options": {}
+      },
+      "id": "email-rejected",
+      "name": "Email Rejection Notice",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [1800, 600],
+      "credentials": {
+        "smtp": {
+          "id": "smtp-creds",
+          "name": "SMTP"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $env.FINANCE_TEAM_EMAIL }}",
+        "subject": "=Finance Review Required: Expense {{ $json.expense_id }} - {{ $json.currency }} {{ $json.amount }}",
+        "emailType": "html",
+        "message": "=<div style=\"font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;\">\n<h2>Finance Review Required</h2>\n<p>An expense has been manager-approved and requires finance team review.</p>\n\n<div style=\"background: #fff3e0; padding: 15px; border-radius: 4px; margin: 20px 0;\">\n<p><strong>Expense ID:</strong> {{ $json.expense_id }}</p>\n<p><strong>Employee:</strong> {{ $json.employee_name }} ({{ $json.department }})</p>\n<p><strong>Amount:</strong> {{ $json.currency }} {{ $json.amount.toFixed(2) }}</p>\n<p><strong>Type:</strong> {{ $json.expense_type }}</p>\n<p><strong>Description:</strong> {{ $json.description }}</p>\n<p><strong>Manager Approved:</strong> Yes</p>\n</div>\n\n<div style=\"margin: 20px 0;\">\n<a href=\"{{ $env.EXPENSE_PORTAL_URL }}/finance-review/{{ $json.expense_id }}\" style=\"background: #ff9800; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px;\">Review Expense</a>\n</div>\n</div>",
+        "options": {}
+      },
+      "id": "email-finance",
+      "name": "Email Finance Team",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [1800, 740],
+      "credentials": {
+        "smtp": {
+          "id": "smtp-creds",
+          "name": "SMTP"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "channel": "={{ $env.SLACK_FINANCE_CHANNEL }}",
+        "text": "=✅ *Expense Approved*",
+        "otherOptions": {},
+        "attachments": [
+          {
+            "color": "#4caf50",
+            "fields": {
+              "item": [
+                {
+                  "title": "Expense ID",
+                  "value": "={{ $json.expense_id }}",
+                  "short": true
+                },
+                {
+                  "title": "Employee",
+                  "value": "={{ $json.employee_name }}",
+                  "short": true
+                },
+                {
+                  "title": "Amount",
+                  "value": "={{ $json.currency }} {{ $json.amount.toFixed(2) }}",
+                  "short": true
+                },
+                {
+                  "title": "Reimbursement",
+                  "value": "Scheduled",
+                  "short": true
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "id": "slack-approved",
+      "name": "Slack Expense Approved",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.2,
+      "position": [2240, 460],
+      "credentials": {
+        "slackApi": {
+          "id": "slack-creds",
+          "name": "Slack API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $env.EXPENSE_API_URL }}/api/expenses?status=pending_approval&older_than=3d",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $env.EXPENSE_API_KEY }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "fetch-pending",
+      "name": "Fetch Pending Expenses",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [920, 740]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "has-pending",
+              "leftValue": "={{ $json.expenses.length }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "check-pending",
+      "name": "Has Pending Expenses?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [1140, 740]
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "expenses",
+        "options": {}
+      },
+      "id": "split-pending",
+      "name": "Split Pending Expenses",
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [1360, 740]
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.approver_email }}",
+        "subject": "=Reminder: Expense {{ $json.expense_id }} Awaiting Your Approval",
+        "emailType": "html",
+        "message": "=<div style=\"font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;\">\n<h2>Expense Approval Reminder</h2>\n<p>This is a reminder that an expense from {{ $json.employee_name }} is awaiting your approval.</p>\n\n<div style=\"background: #fff3e0; padding: 15px; border-radius: 4px; margin: 20px 0;\">\n<p><strong>Expense ID:</strong> {{ $json.expense_id }}</p>\n<p><strong>Employee:</strong> {{ $json.employee_name }}</p>\n<p><strong>Amount:</strong> {{ $json.currency }} {{ $json.amount.toFixed(2) }}</p>\n<p><strong>Submitted:</strong> {{ new Date($json.submitted_at).toLocaleDateString() }}</p>\n<p><strong>Days Pending:</strong> {{ Math.ceil((Date.now() - new Date($json.submitted_at)) / (1000*60*60*24)) }}</p>\n</div>\n\n<div style=\"margin: 20px 0;\">\n<a href=\"{{ $env.EXPENSE_PORTAL_URL }}/approve/{{ $json.expense_id }}\" style=\"background: #ff9800; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px;\">Review Now</a>\n</div>\n</div>",
+        "options": {}
+      },
+      "id": "email-reminder",
+      "name": "Send Approval Reminder",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [1580, 740],
+      "credentials": {
+        "smtp": {
+          "id": "smtp-creds",
+          "name": "SMTP"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ success: true, expense_id: $json.expense_id, status: $json.status }) }}",
+        "options": {}
+      },
+      "id": "respond-submit",
+      "name": "Respond Submission",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [2240, 300]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ success: true, expense_id: $json.expense_id, status: $json.status }) }}",
+        "options": {}
+      },
+      "id": "respond-approval",
+      "name": "Respond Approval",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [2240, 600]
+    }
+  ],
+  "connections": {
+    "Expense Submission Webhook": {
+      "main": [
+        [
+          {
+            "node": "Set Submission Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Approval Action Webhook": {
+      "main": [
+        [
+          {
+            "node": "Set Approval Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Daily Pending Check": {
+      "main": [
+        [
+          {
+            "node": "Set Daily Check",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Submission Data": {
+      "main": [
+        [
+          {
+            "node": "Route by Action",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Approval Data": {
+      "main": [
+        [
+          {
+            "node": "Route by Action",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Daily Check": {
+      "main": [
+        [
+          {
+            "node": "Route by Action",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route by Action": {
+      "main": [
+        [
+          {
+            "node": "Process Expense Submission",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Fetch Expense Details",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Fetch Pending Expenses",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Process Expense Submission": {
+      "main": [
+        [
+          {
+            "node": "Fetch Manager Info",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Manager Info": {
+      "main": [
+        [
+          {
+            "node": "Auto Approve?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Auto Approve?": {
+      "main": [
+        [
+          {
+            "node": "Save Expense Record",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Save Pending Expense",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save Expense Record": {
+      "main": [
+        [
+          {
+            "node": "Email Employee Confirmation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save Pending Expense": {
+      "main": [
+        [
+          {
+            "node": "Email Approver",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Email Approver": {
+      "main": [
+        [
+          {
+            "node": "Slack Expense Submitted",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Slack Expense Submitted": {
+      "main": [
+        [
+          {
+            "node": "Respond Submission",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Email Employee Confirmation": {
+      "main": [
+        [
+          {
+            "node": "Slack Expense Submitted",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Expense Details": {
+      "main": [
+        [
+          {
+            "node": "Process Approval Decision",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Process Approval Decision": {
+      "main": [
+        [
+          {
+            "node": "Update Expense Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Expense Status": {
+      "main": [
+        [
+          {
+            "node": "Route by Decision",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route by Decision": {
+      "main": [
+        [
+          {
+            "node": "Schedule Reimbursement",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Email Rejection Notice",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Email Finance Team",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Reimbursement": {
+      "main": [
+        [
+          {
+            "node": "Email Approval Notice",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Email Approval Notice": {
+      "main": [
+        [
+          {
+            "node": "Slack Expense Approved",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Email Rejection Notice": {
+      "main": [
+        [
+          {
+            "node": "Respond Approval",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Slack Expense Approved": {
+      "main": [
+        [
+          {
+            "node": "Respond Approval",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Pending Expenses": {
+      "main": [
+        [
+          {
+            "node": "Has Pending Expenses?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Has Pending Expenses?": {
+      "main": [
+        [
+          {
+            "node": "Split Pending Expenses",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Split Pending Expenses": {
+      "main": [
+        [
+          {
+            "node": "Send Approval Reminder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "expense-approval-v1",
+  "meta": {
+    "instanceId": "n8n-workflows-library"
+  },
+  "id": "expense-approval-reimbursement",
+  "tags": [
+    {
+      "id": "finance",
+      "name": "Finance"
+    },
+    {
+      "id": "expenses",
+      "name": "Expenses"
+    },
+    {
+      "id": "approval",
+      "name": "Approval"
+    }
+  ]
+}

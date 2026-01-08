@@ -1,0 +1,1115 @@
+{
+  "name": "Payment Reminders and Collections",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 9
+            }
+          ]
+        }
+      },
+      "id": "daily-trigger",
+      "name": "Daily Collections Check",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "payment-promise",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "promise-webhook",
+      "name": "Payment Promise Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [240, 520]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "escalate-account",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "escalate-webhook",
+      "name": "Escalation Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [240, 740]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $env.ACCOUNTING_API_URL }}/api/invoices?status=overdue",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $env.ACCOUNTING_API_KEY }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "fetch-overdue",
+      "name": "Fetch Overdue Invoices",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "action",
+              "name": "action",
+              "value": "payment_promise",
+              "type": "string"
+            },
+            {
+              "id": "invoice_id",
+              "name": "invoice_id",
+              "value": "={{ $json.body.invoice_id }}",
+              "type": "string"
+            },
+            {
+              "id": "customer_id",
+              "name": "customer_id",
+              "value": "={{ $json.body.customer_id }}",
+              "type": "string"
+            },
+            {
+              "id": "promise_date",
+              "name": "promise_date",
+              "value": "={{ $json.body.promise_date }}",
+              "type": "string"
+            },
+            {
+              "id": "promise_amount",
+              "name": "promise_amount",
+              "value": "={{ $json.body.promise_amount }}",
+              "type": "number"
+            },
+            {
+              "id": "notes",
+              "name": "notes",
+              "value": "={{ $json.body.notes }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "set-promise",
+      "name": "Set Promise Data",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [460, 520]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "action",
+              "name": "action",
+              "value": "escalate",
+              "type": "string"
+            },
+            {
+              "id": "customer_id",
+              "name": "customer_id",
+              "value": "={{ $json.body.customer_id }}",
+              "type": "string"
+            },
+            {
+              "id": "escalation_type",
+              "name": "escalation_type",
+              "value": "={{ $json.body.escalation_type }}",
+              "type": "string"
+            },
+            {
+              "id": "reason",
+              "name": "reason",
+              "value": "={{ $json.body.reason }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "set-escalate",
+      "name": "Set Escalation Data",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [460, 740]
+    },
+    {
+      "parameters": {
+        "jsCode": "const invoices = $input.first().json.invoices || [];\nconst today = new Date();\n\nconst categorized = {\n  reminder_1: [],      // 1-7 days overdue\n  reminder_2: [],      // 8-14 days overdue\n  reminder_3: [],      // 15-30 days overdue\n  collections_soft: [], // 31-60 days overdue\n  collections_hard: [], // 61-90 days overdue\n  external_collections: [], // 90+ days overdue\n  total_overdue: 0,\n  accounts_at_risk: 0\n};\n\nfor (const inv of invoices) {\n  const dueDate = new Date(inv.due_date);\n  const daysOverdue = Math.ceil((today - dueDate) / (1000 * 60 * 60 * 24));\n  \n  inv.days_overdue = daysOverdue;\n  categorized.total_overdue += inv.amount_due;\n  \n  // Check if there's an active payment promise\n  if (inv.payment_promise && new Date(inv.payment_promise.date) > today) {\n    inv.has_active_promise = true;\n    continue; // Skip reminder if promise is active\n  }\n  \n  if (daysOverdue <= 7) {\n    categorized.reminder_1.push(inv);\n  } else if (daysOverdue <= 14) {\n    categorized.reminder_2.push(inv);\n  } else if (daysOverdue <= 30) {\n    categorized.reminder_3.push(inv);\n  } else if (daysOverdue <= 60) {\n    categorized.collections_soft.push(inv);\n    categorized.accounts_at_risk++;\n  } else if (daysOverdue <= 90) {\n    categorized.collections_hard.push(inv);\n    categorized.accounts_at_risk++;\n  } else {\n    categorized.external_collections.push(inv);\n    categorized.accounts_at_risk++;\n  }\n}\n\nreturn [{ json: categorized }];"
+      },
+      "id": "categorize-overdue",
+      "name": "Categorize by Aging",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [680, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "has-any",
+              "leftValue": "={{ $json.reminder_1.length + $json.reminder_2.length + $json.reminder_3.length + $json.collections_soft.length + $json.collections_hard.length }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "check-any-overdue",
+      "name": "Any Overdue?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [900, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "const data = $input.first().json;\nconst allReminders = [];\n\n// Process each category with appropriate template\nconst categories = [\n  { key: 'reminder_1', template: 'friendly_reminder', urgency: 'low' },\n  { key: 'reminder_2', template: 'second_reminder', urgency: 'medium' },\n  { key: 'reminder_3', template: 'final_reminder', urgency: 'high' },\n  { key: 'collections_soft', template: 'collections_notice', urgency: 'urgent' },\n  { key: 'collections_hard', template: 'final_notice', urgency: 'critical' }\n];\n\nfor (const cat of categories) {\n  for (const inv of data[cat.key]) {\n    allReminders.push({\n      json: {\n        ...inv,\n        template: cat.template,\n        urgency: cat.urgency,\n        category: cat.key\n      }\n    });\n  }\n}\n\nreturn allReminders;"
+      },
+      "id": "prepare-reminders",
+      "name": "Prepare All Reminders",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1120, 200]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "Generate a payment reminder email based on the urgency level and template type.\n\nInvoice Details:\n- Invoice Number: {{ $json.invoice_number }}\n- Customer: {{ $json.customer_name }}\n- Amount Due: {{ $json.currency }} {{ $json.amount_due }}\n- Original Due Date: {{ $json.due_date }}\n- Days Overdue: {{ $json.days_overdue }}\n- Template Type: {{ $json.template }}\n- Urgency: {{ $json.urgency }}\n\nTemplate Guidelines:\n- friendly_reminder (1-7 days): Polite, assume oversight, offer help\n- second_reminder (8-14 days): Firmer tone, request action, mention importance\n- final_reminder (15-30 days): Urgent, warn of consequences, request immediate contact\n- collections_notice (31-60 days): Formal, mention potential service impact, offer payment plan\n- final_notice (61-90 days): Legal tone, final warning before external collections\n\nGenerate:\n1. Subject line appropriate to urgency\n2. Email body with appropriate tone\n3. Clear call to action\n4. Payment link reference\n5. Contact information for payment arrangements\n\nReturn as JSON with 'subject' and 'body' fields.",
+        "options": {
+          "systemMessage": "You are a professional collections specialist. Write effective collection communications that maintain customer relationships while ensuring payment recovery. Adjust tone based on urgency level."
+        }
+      },
+      "id": "ai-reminder-content",
+      "name": "AI Generate Reminder",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.4,
+      "position": [1340, 200]
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "claude-sonnet-4-20250514",
+          "mode": "list",
+          "cachedResultName": "claude-sonnet-4-20250514"
+        },
+        "options": {
+          "temperature": 0.4
+        }
+      },
+      "id": "anthropic-model",
+      "name": "Claude Sonnet",
+      "type": "@n8n/n8n-nodes-langchain.lmChatAnthropic",
+      "typeVersion": 1.2,
+      "position": [1360, 400]
+    },
+    {
+      "parameters": {
+        "jsCode": "const item = $input.first().json;\nlet aiContent;\n\ntry {\n  aiContent = JSON.parse(item.text || item.response);\n} catch (e) {\n  // Fallback if JSON parsing fails\n  aiContent = {\n    subject: `Payment Reminder: Invoice ${item.invoice_number} - ${item.currency} ${item.amount_due} Overdue`,\n    body: item.text || item.response\n  };\n}\n\nreturn [{\n  json: {\n    ...item,\n    email_subject: aiContent.subject,\n    email_body: aiContent.body\n  }\n}];"
+      },
+      "id": "parse-ai-response",
+      "name": "Parse AI Response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1560, 200]
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.customer_email }}",
+        "subject": "={{ $json.email_subject }}",
+        "emailType": "html",
+        "message": "=<div style=\"font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;\">\n{{ $json.email_body }}\n\n<div style=\"margin: 20px 0; padding: 15px; background: {{ $json.urgency === 'critical' ? '#ffebee' : $json.urgency === 'urgent' ? '#fff3e0' : '#e3f2fd' }}; border-radius: 4px;\">\n<p><strong>Invoice:</strong> {{ $json.invoice_number }}</p>\n<p><strong>Amount Due:</strong> {{ $json.currency }} {{ $json.amount_due.toFixed(2) }}</p>\n<p><strong>Days Overdue:</strong> {{ $json.days_overdue }}</p>\n</div>\n\n<p style=\"margin: 20px 0;\">\n<a href=\"{{ $env.PAYMENT_PORTAL_URL }}/pay/{{ $json.invoice_id }}\" style=\"background: {{ $json.urgency === 'critical' ? '#d32f2f' : $json.urgency === 'urgent' ? '#f57c00' : '#1976d2' }}; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px;\">Pay Now</a>\n</p>\n\n<p style=\"font-size: 12px; color: #666;\">If you have already made this payment, please disregard this notice. For payment arrangements, contact us at {{ $env.COLLECTIONS_EMAIL }} or {{ $env.COLLECTIONS_PHONE }}.</p>\n</div>",
+        "options": {}
+      },
+      "id": "send-reminder-email",
+      "name": "Send Reminder Email",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [1780, 200],
+      "credentials": {
+        "smtp": {
+          "id": "smtp-creds",
+          "name": "SMTP"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.ACCOUNTING_API_URL }}/api/invoices/{{ $json.invoice_id }}/collection-activity",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $env.ACCOUNTING_API_KEY }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"activity_type\": \"reminder_sent\",\n  \"template\": \"{{ $json.template }}\",\n  \"urgency\": \"{{ $json.urgency }}\",\n  \"channel\": \"email\",\n  \"timestamp\": \"{{ new Date().toISOString() }}\",\n  \"days_overdue\": {{ $json.days_overdue }}\n}",
+        "options": {}
+      },
+      "id": "log-activity",
+      "name": "Log Collection Activity",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [2000, 200]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "needs-call",
+              "leftValue": "={{ $json.urgency }}",
+              "rightValue": "urgent",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "check-needs-call",
+      "name": "Needs Phone Call?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [2000, 360]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.CRM_API_URL }}/api/tasks",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $env.CRM_API_KEY }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"type\": \"collection_call\",\n  \"subject\": \"Collection Call: {{ $json.customer_name }} - {{ $json.invoice_number }}\",\n  \"description\": \"Follow up on overdue invoice {{ $json.invoice_number }} ({{ $json.days_overdue }} days overdue, {{ $json.currency }} {{ $json.amount_due }})\",\n  \"customer_id\": \"{{ $json.customer_id }}\",\n  \"invoice_id\": \"{{ $json.invoice_id }}\",\n  \"priority\": \"{{ $json.urgency === 'critical' ? 'high' : 'medium' }}\",\n  \"due_date\": \"{{ new Date().toISOString().split('T')[0] }}\",\n  \"assigned_to\": \"collections_team\"\n}",
+        "options": {}
+      },
+      "id": "create-call-task",
+      "name": "Create Call Task",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [2220, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "const data = $input.first().json;\n\n// Check for accounts that need external collections\nconst externalCollections = data.external_collections || [];\n\nif (externalCollections.length === 0) {\n  return [{ json: { has_external: false } }];\n}\n\nreturn externalCollections.map(inv => ({\n  json: {\n    ...inv,\n    has_external: true,\n    requires_escalation: true\n  }\n}));"
+      },
+      "id": "check-external",
+      "name": "Check External Collections",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1120, 400]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "has-external",
+              "leftValue": "={{ $json.has_external }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "route-external",
+      "name": "Has External Collections?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [1340, 400]
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $env.COLLECTIONS_MANAGER_EMAIL }}",
+        "subject": "=External Collections Review: {{ $json.customer_name }} - {{ $json.currency }} {{ $json.amount_due }}",
+        "emailType": "html",
+        "message": "=<div style=\"font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;\">\n<h2 style=\"color: #d32f2f;\">External Collections Review Required</h2>\n<p>The following account has exceeded 90 days overdue and requires review for external collections referral.</p>\n\n<div style=\"background: #ffebee; padding: 15px; border-radius: 4px; margin: 20px 0;\">\n<p><strong>Customer:</strong> {{ $json.customer_name }}</p>\n<p><strong>Invoice:</strong> {{ $json.invoice_number }}</p>\n<p><strong>Amount Due:</strong> {{ $json.currency }} {{ $json.amount_due.toFixed(2) }}</p>\n<p><strong>Days Overdue:</strong> {{ $json.days_overdue }}</p>\n<p><strong>Original Due Date:</strong> {{ $json.due_date }}</p>\n</div>\n\n<h3>Collection History</h3>\n<p>Previous collection attempts and communications are logged in the system.</p>\n\n<div style=\"margin: 20px 0;\">\n<a href=\"{{ $env.COLLECTIONS_PORTAL_URL }}/review/{{ $json.customer_id }}\" style=\"background: #d32f2f; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px;\">Review Account</a>\n</div>\n\n<p>Please review and determine if this account should be referred to external collections.</p>\n</div>",
+        "options": {}
+      },
+      "id": "email-collections-manager",
+      "name": "Email Collections Manager",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [1560, 460],
+      "credentials": {
+        "smtp": {
+          "id": "smtp-creds",
+          "name": "SMTP"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.ACCOUNTING_API_URL }}/api/invoices/{{ $json.invoice_id }}/payment-promise",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $env.ACCOUNTING_API_KEY }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"promise_date\": \"{{ $json.promise_date }}\",\n  \"promise_amount\": {{ $json.promise_amount }},\n  \"notes\": \"{{ $json.notes }}\",\n  \"created_at\": \"{{ new Date().toISOString() }}\",\n  \"status\": \"active\"\n}",
+        "options": {}
+      },
+      "id": "save-promise",
+      "name": "Save Payment Promise",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [680, 520]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.CRM_API_URL }}/api/tasks",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $env.CRM_API_KEY }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"type\": \"payment_promise_followup\",\n  \"subject\": \"Payment Promise Follow-up: {{ $json.customer_id }}\",\n  \"description\": \"Follow up on payment promise of {{ $json.promise_amount }} due {{ $json.promise_date }}\",\n  \"customer_id\": \"{{ $json.customer_id }}\",\n  \"invoice_id\": \"{{ $json.invoice_id }}\",\n  \"due_date\": \"{{ $json.promise_date }}\",\n  \"assigned_to\": \"collections_team\"\n}",
+        "options": {}
+      },
+      "id": "create-followup-task",
+      "name": "Create Follow-up Task",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [900, 520]
+    },
+    {
+      "parameters": {
+        "channel": "={{ $env.SLACK_FINANCE_CHANNEL }}",
+        "text": "=📝 *Payment Promise Recorded*",
+        "otherOptions": {},
+        "attachments": [
+          {
+            "color": "#ff9800",
+            "fields": {
+              "item": [
+                {
+                  "title": "Customer",
+                  "value": "={{ $json.customer_id }}",
+                  "short": true
+                },
+                {
+                  "title": "Promise Amount",
+                  "value": "={{ $json.promise_amount }}",
+                  "short": true
+                },
+                {
+                  "title": "Promise Date",
+                  "value": "={{ $json.promise_date }}",
+                  "short": true
+                },
+                {
+                  "title": "Invoice",
+                  "value": "={{ $json.invoice_id }}",
+                  "short": true
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "id": "slack-promise",
+      "name": "Slack Promise Notification",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.2,
+      "position": [1120, 520],
+      "credentials": {
+        "slackApi": {
+          "id": "slack-creds",
+          "name": "Slack API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ success: true, message: 'Payment promise recorded', promise_date: $json.promise_date }) }}",
+        "options": {}
+      },
+      "id": "respond-promise",
+      "name": "Respond Promise Saved",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [1340, 520]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $env.ACCOUNTING_API_URL }}/api/customers/{{ $json.customer_id }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $env.ACCOUNTING_API_KEY }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "fetch-customer-escalate",
+      "name": "Fetch Customer for Escalation",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [680, 740]
+    },
+    {
+      "parameters": {
+        "rules": {
+          "rules": [
+            {
+              "outputKey": "service_suspension",
+              "conditions": {
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.escalation_type }}",
+                    "rightValue": "service_suspension",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "outputKey": "legal_action",
+              "conditions": {
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.escalation_type }}",
+                    "rightValue": "legal_action",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "outputKey": "external_collections",
+              "conditions": {
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.escalation_type }}",
+                    "rightValue": "external_collections",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "route-escalation",
+      "name": "Route Escalation Type",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [900, 740]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.SERVICE_API_URL }}/api/customers/{{ $json.customer_id }}/suspend",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $env.SERVICE_API_KEY }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"reason\": \"non_payment\",\n  \"details\": \"{{ $json.reason }}\",\n  \"suspended_at\": \"{{ new Date().toISOString() }}\"\n}",
+        "options": {}
+      },
+      "id": "suspend-service",
+      "name": "Suspend Service",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1120, 640]
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $env.LEGAL_TEAM_EMAIL }}",
+        "subject": "=Legal Review Required: {{ $json.customer.name }} - Collections",
+        "emailType": "html",
+        "message": "=<div style=\"font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;\">\n<h2>Legal Action Review Required</h2>\n<p>A customer account has been escalated for potential legal action.</p>\n\n<div style=\"background: #ffebee; padding: 15px; border-radius: 4px; margin: 20px 0;\">\n<p><strong>Customer:</strong> {{ $json.customer.name }}</p>\n<p><strong>Total Outstanding:</strong> {{ $json.customer.total_outstanding }}</p>\n<p><strong>Escalation Reason:</strong> {{ $json.reason }}</p>\n</div>\n\n<p>Please review the account and determine appropriate legal action.</p>\n\n<a href=\"{{ $env.LEGAL_PORTAL_URL }}/review/{{ $json.customer_id }}\" style=\"background: #d32f2f; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px;\">Review Case</a>\n</div>",
+        "options": {}
+      },
+      "id": "email-legal",
+      "name": "Email Legal Team",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [1120, 760],
+      "credentials": {
+        "smtp": {
+          "id": "smtp-creds",
+          "name": "SMTP"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.COLLECTIONS_AGENCY_API_URL }}/api/accounts",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $env.COLLECTIONS_AGENCY_KEY }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"customer\": {\n    \"name\": \"{{ $json.customer.name }}\",\n    \"email\": \"{{ $json.customer.email }}\",\n    \"phone\": \"{{ $json.customer.phone }}\",\n    \"address\": {{ JSON.stringify($json.customer.address) }}\n  },\n  \"outstanding_amount\": {{ $json.customer.total_outstanding }},\n  \"invoices\": {{ JSON.stringify($json.customer.overdue_invoices) }},\n  \"referral_date\": \"{{ new Date().toISOString() }}\",\n  \"notes\": \"{{ $json.reason }}\"\n}",
+        "options": {}
+      },
+      "id": "refer-external",
+      "name": "Refer to External Collections",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1120, 880]
+    },
+    {
+      "parameters": {
+        "channel": "={{ $env.SLACK_FINANCE_CHANNEL }}",
+        "text": "=⚠️ *Account Escalated*",
+        "otherOptions": {},
+        "attachments": [
+          {
+            "color": "#d32f2f",
+            "fields": {
+              "item": [
+                {
+                  "title": "Customer",
+                  "value": "={{ $json.customer.name }}",
+                  "short": true
+                },
+                {
+                  "title": "Escalation Type",
+                  "value": "={{ $json.escalation_type }}",
+                  "short": true
+                },
+                {
+                  "title": "Reason",
+                  "value": "={{ $json.reason }}",
+                  "short": false
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "id": "slack-escalation",
+      "name": "Slack Escalation Alert",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.2,
+      "position": [1340, 740],
+      "credentials": {
+        "slackApi": {
+          "id": "slack-creds",
+          "name": "Slack API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ success: true, escalation_type: $json.escalation_type, status: 'processed' }) }}",
+        "options": {}
+      },
+      "id": "respond-escalation",
+      "name": "Respond Escalation",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [1560, 740]
+    },
+    {
+      "parameters": {
+        "jsCode": "const data = $input.first().json;\n\nconst summary = {\n  report_date: new Date().toISOString().split('T')[0],\n  total_overdue: data.total_overdue,\n  accounts_at_risk: data.accounts_at_risk,\n  reminders_sent: {\n    friendly: data.reminder_1.length,\n    second: data.reminder_2.length,\n    final: data.reminder_3.length\n  },\n  collections: {\n    soft: data.collections_soft.length,\n    hard: data.collections_hard.length,\n    external: data.external_collections.length\n  }\n};\n\nreturn [{ json: summary }];"
+      },
+      "id": "generate-summary",
+      "name": "Generate Daily Summary",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1120, 300]
+    },
+    {
+      "parameters": {
+        "channel": "={{ $env.SLACK_FINANCE_CHANNEL }}",
+        "text": "=📊 *Daily Collections Summary*",
+        "otherOptions": {},
+        "attachments": [
+          {
+            "color": "={{ $json.accounts_at_risk > 0 ? '#ff9800' : '#4caf50' }}",
+            "fields": {
+              "item": [
+                {
+                  "title": "Total Overdue",
+                  "value": "=${{ $json.total_overdue.toFixed(2) }}",
+                  "short": true
+                },
+                {
+                  "title": "Accounts at Risk",
+                  "value": "={{ $json.accounts_at_risk }}",
+                  "short": true
+                },
+                {
+                  "title": "Reminders Sent",
+                  "value": "={{ $json.reminders_sent.friendly + $json.reminders_sent.second + $json.reminders_sent.final }}",
+                  "short": true
+                },
+                {
+                  "title": "In Collections",
+                  "value": "={{ $json.collections.soft + $json.collections.hard + $json.collections.external }}",
+                  "short": true
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "id": "slack-summary",
+      "name": "Slack Daily Summary",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.2,
+      "position": [2220, 100],
+      "credentials": {
+        "slackApi": {
+          "id": "slack-creds",
+          "name": "Slack API"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Daily Collections Check": {
+      "main": [
+        [
+          {
+            "node": "Fetch Overdue Invoices",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Payment Promise Webhook": {
+      "main": [
+        [
+          {
+            "node": "Set Promise Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Escalation Webhook": {
+      "main": [
+        [
+          {
+            "node": "Set Escalation Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Overdue Invoices": {
+      "main": [
+        [
+          {
+            "node": "Categorize by Aging",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Promise Data": {
+      "main": [
+        [
+          {
+            "node": "Save Payment Promise",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Escalation Data": {
+      "main": [
+        [
+          {
+            "node": "Fetch Customer for Escalation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Categorize by Aging": {
+      "main": [
+        [
+          {
+            "node": "Any Overdue?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Any Overdue?": {
+      "main": [
+        [
+          {
+            "node": "Prepare All Reminders",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Check External Collections",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Generate Daily Summary",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Prepare All Reminders": {
+      "main": [
+        [
+          {
+            "node": "AI Generate Reminder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Generate Reminder": {
+      "main": [
+        [
+          {
+            "node": "Parse AI Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Claude Sonnet": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Generate Reminder",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse AI Response": {
+      "main": [
+        [
+          {
+            "node": "Send Reminder Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Reminder Email": {
+      "main": [
+        [
+          {
+            "node": "Log Collection Activity",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log Collection Activity": {
+      "main": [
+        [
+          {
+            "node": "Check Needs Phone Call?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Needs Phone Call?": {
+      "main": [
+        [
+          {
+            "node": "Create Call Task",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Check External Collections": {
+      "main": [
+        [
+          {
+            "node": "Has External Collections?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Has External Collections?": {
+      "main": [
+        [
+          {
+            "node": "Email Collections Manager",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Save Payment Promise": {
+      "main": [
+        [
+          {
+            "node": "Create Follow-up Task",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Follow-up Task": {
+      "main": [
+        [
+          {
+            "node": "Slack Promise Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Slack Promise Notification": {
+      "main": [
+        [
+          {
+            "node": "Respond Promise Saved",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Customer for Escalation": {
+      "main": [
+        [
+          {
+            "node": "Route Escalation Type",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route Escalation Type": {
+      "main": [
+        [
+          {
+            "node": "Suspend Service",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Email Legal Team",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Refer to External Collections",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Suspend Service": {
+      "main": [
+        [
+          {
+            "node": "Slack Escalation Alert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Email Legal Team": {
+      "main": [
+        [
+          {
+            "node": "Slack Escalation Alert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Refer to External Collections": {
+      "main": [
+        [
+          {
+            "node": "Slack Escalation Alert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Slack Escalation Alert": {
+      "main": [
+        [
+          {
+            "node": "Respond Escalation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Daily Summary": {
+      "main": [
+        [
+          {
+            "node": "Slack Daily Summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "collections-v1",
+  "meta": {
+    "instanceId": "n8n-workflows-library"
+  },
+  "id": "payment-reminders-collections",
+  "tags": [
+    {
+      "id": "finance",
+      "name": "Finance"
+    },
+    {
+      "id": "collections",
+      "name": "Collections"
+    },
+    {
+      "id": "ar",
+      "name": "Accounts Receivable"
+    }
+  ]
+}

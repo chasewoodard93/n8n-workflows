@@ -1,0 +1,1089 @@
+{
+  "name": "Invoice Processing and Accounts Receivable",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "invoice-created",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "invoice-webhook",
+      "name": "Invoice Created Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 8
+            }
+          ]
+        }
+      },
+      "id": "daily-check",
+      "name": "Daily Invoice Check",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [240, 520]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "payment-received",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "payment-webhook",
+      "name": "Payment Received Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [240, 740]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "trigger_type",
+              "name": "trigger_type",
+              "value": "new_invoice",
+              "type": "string"
+            },
+            {
+              "id": "invoice_id",
+              "name": "invoice_id",
+              "value": "={{ $json.body.invoice_id }}",
+              "type": "string"
+            },
+            {
+              "id": "customer_id",
+              "name": "customer_id",
+              "value": "={{ $json.body.customer_id }}",
+              "type": "string"
+            },
+            {
+              "id": "amount",
+              "name": "amount",
+              "value": "={{ $json.body.amount }}",
+              "type": "number"
+            },
+            {
+              "id": "due_date",
+              "name": "due_date",
+              "value": "={{ $json.body.due_date }}",
+              "type": "string"
+            },
+            {
+              "id": "line_items",
+              "name": "line_items",
+              "value": "={{ $json.body.line_items }}",
+              "type": "array"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "set-new-invoice",
+      "name": "Set New Invoice Data",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "trigger_type",
+              "name": "trigger_type",
+              "value": "daily_check",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "set-daily",
+      "name": "Set Daily Check",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [460, 520]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "trigger_type",
+              "name": "trigger_type",
+              "value": "payment_received",
+              "type": "string"
+            },
+            {
+              "id": "payment_id",
+              "name": "payment_id",
+              "value": "={{ $json.body.payment_id }}",
+              "type": "string"
+            },
+            {
+              "id": "invoice_id",
+              "name": "invoice_id",
+              "value": "={{ $json.body.invoice_id }}",
+              "type": "string"
+            },
+            {
+              "id": "amount_paid",
+              "name": "amount_paid",
+              "value": "={{ $json.body.amount }}",
+              "type": "number"
+            },
+            {
+              "id": "payment_method",
+              "name": "payment_method",
+              "value": "={{ $json.body.payment_method }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "set-payment",
+      "name": "Set Payment Data",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [460, 740]
+    },
+    {
+      "parameters": {
+        "rules": {
+          "rules": [
+            {
+              "outputKey": "new_invoice",
+              "conditions": {
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.trigger_type }}",
+                    "rightValue": "new_invoice",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "outputKey": "daily_check",
+              "conditions": {
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.trigger_type }}",
+                    "rightValue": "daily_check",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "outputKey": "payment",
+              "conditions": {
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.trigger_type }}",
+                    "rightValue": "payment_received",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "route-trigger",
+      "name": "Route by Trigger Type",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [680, 520]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $env.ACCOUNTING_API_URL }}/api/customers/{{ $json.customer_id }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $env.ACCOUNTING_API_KEY }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "fetch-customer",
+      "name": "Fetch Customer Details",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [920, 300]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $env.ACCOUNTING_API_URL }}/api/invoices?status=outstanding",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $env.ACCOUNTING_API_KEY }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "fetch-outstanding",
+      "name": "Fetch Outstanding Invoices",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [920, 520]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $env.ACCOUNTING_API_URL }}/api/invoices/{{ $json.invoice_id }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $env.ACCOUNTING_API_KEY }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "fetch-invoice-payment",
+      "name": "Fetch Invoice for Payment",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [920, 740]
+    },
+    {
+      "parameters": {
+        "jsCode": "const invoice = $input.first().json;\nconst customer = invoice.customer;\n\n// Generate invoice number if not present\nconst invoiceNumber = invoice.invoice_number || `INV-${Date.now()}`;\n\n// Calculate tax and totals\nconst subtotal = invoice.line_items.reduce((sum, item) => sum + (item.quantity * item.unit_price), 0);\nconst taxRate = invoice.tax_rate || 0;\nconst taxAmount = subtotal * (taxRate / 100);\nconst total = subtotal + taxAmount;\n\nreturn [{\n  json: {\n    invoice_number: invoiceNumber,\n    invoice_id: invoice.invoice_id,\n    customer: {\n      id: customer.id,\n      name: customer.name,\n      email: customer.email,\n      billing_address: customer.billing_address,\n      payment_terms: customer.payment_terms || 'Net 30'\n    },\n    line_items: invoice.line_items,\n    subtotal: subtotal,\n    tax_rate: taxRate,\n    tax_amount: taxAmount,\n    total: total,\n    currency: invoice.currency || 'USD',\n    due_date: invoice.due_date,\n    issue_date: new Date().toISOString().split('T')[0],\n    status: 'pending',\n    notes: invoice.notes || ''\n  }\n}];"
+      },
+      "id": "process-invoice",
+      "name": "Process Invoice Data",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1140, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "const invoices = $input.first().json.invoices || [];\nconst today = new Date();\nconst results = {\n  overdue: [],\n  due_soon: [],\n  current: [],\n  total_outstanding: 0,\n  total_overdue: 0\n};\n\nfor (const inv of invoices) {\n  const dueDate = new Date(inv.due_date);\n  const daysUntilDue = Math.ceil((dueDate - today) / (1000 * 60 * 60 * 24));\n  \n  results.total_outstanding += inv.amount_due;\n  \n  if (daysUntilDue < 0) {\n    inv.days_overdue = Math.abs(daysUntilDue);\n    results.overdue.push(inv);\n    results.total_overdue += inv.amount_due;\n  } else if (daysUntilDue <= 7) {\n    inv.days_until_due = daysUntilDue;\n    results.due_soon.push(inv);\n  } else {\n    inv.days_until_due = daysUntilDue;\n    results.current.push(inv);\n  }\n}\n\n// Sort overdue by days overdue (most overdue first)\nresults.overdue.sort((a, b) => b.days_overdue - a.days_overdue);\n\nreturn [{ json: results }];"
+      },
+      "id": "categorize-invoices",
+      "name": "Categorize by Status",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1140, 520]
+    },
+    {
+      "parameters": {
+        "jsCode": "const payment = $input.first().json;\nconst invoice = payment.invoice;\n\nconst amountPaid = payment.amount_paid;\nconst previouslyPaid = invoice.amount_paid || 0;\nconst totalPaid = previouslyPaid + amountPaid;\nconst amountDue = invoice.total - totalPaid;\n\nreturn [{\n  json: {\n    payment_id: payment.payment_id,\n    invoice_id: invoice.id,\n    invoice_number: invoice.invoice_number,\n    customer: invoice.customer,\n    payment_amount: amountPaid,\n    payment_method: payment.payment_method,\n    payment_date: new Date().toISOString(),\n    invoice_total: invoice.total,\n    total_paid: totalPaid,\n    amount_remaining: amountDue,\n    is_fully_paid: amountDue <= 0,\n    status: amountDue <= 0 ? 'paid' : 'partial'\n  }\n}];"
+      },
+      "id": "process-payment",
+      "name": "Process Payment",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1140, 740]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "Generate a professional invoice email for this invoice:\n\nInvoice Number: {{ $json.invoice_number }}\nCustomer: {{ $json.customer.name }}\nAmount Due: {{ $json.currency }} {{ $json.total.toFixed(2) }}\nDue Date: {{ $json.due_date }}\nPayment Terms: {{ $json.customer.payment_terms }}\n\nLine Items:\n{{ $json.line_items.map(item => `- ${item.description}: ${item.quantity} x ${item.unit_price} = ${(item.quantity * item.unit_price).toFixed(2)}`).join('\\n') }}\n\nSubtotal: {{ $json.subtotal.toFixed(2) }}\nTax ({{ $json.tax_rate }}%): {{ $json.tax_amount.toFixed(2) }}\nTotal: {{ $json.total.toFixed(2) }}\n\nGenerate:\n1. Professional email subject line\n2. Email body with invoice summary\n3. Payment instructions\n4. Thank you message\n\nTone: Professional, friendly, clear. Include payment link placeholder.",
+        "options": {
+          "systemMessage": "You are a professional accounts receivable specialist. Write clear, professional invoice communications."
+        }
+      },
+      "id": "ai-invoice-email",
+      "name": "AI Generate Invoice Email",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.4,
+      "position": [1360, 300]
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "claude-sonnet-4-20250514",
+          "mode": "list",
+          "cachedResultName": "claude-sonnet-4-20250514"
+        },
+        "options": {
+          "temperature": 0.4
+        }
+      },
+      "id": "anthropic-model",
+      "name": "Claude Sonnet",
+      "type": "@n8n/n8n-nodes-langchain.lmChatAnthropic",
+      "typeVersion": 1.2,
+      "position": [1380, 500]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.ACCOUNTING_API_URL }}/api/invoices",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $env.ACCOUNTING_API_KEY }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json) }}",
+        "options": {}
+      },
+      "id": "save-invoice",
+      "name": "Save Invoice to System",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1580, 300]
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.customer.email }}",
+        "subject": "=Invoice {{ $json.invoice_number }} - {{ $json.currency }} {{ $json.total.toFixed(2) }} Due {{ $json.due_date }}",
+        "emailType": "html",
+        "message": "=<div style=\"font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;\">\n<h2>Invoice {{ $json.invoice_number }}</h2>\n<p>Dear {{ $json.customer.name }},</p>\n<p>Please find below your invoice details:</p>\n\n<table style=\"width: 100%; border-collapse: collapse; margin: 20px 0;\">\n<tr style=\"background: #f5f5f5;\">\n<th style=\"padding: 10px; text-align: left; border: 1px solid #ddd;\">Description</th>\n<th style=\"padding: 10px; text-align: right; border: 1px solid #ddd;\">Qty</th>\n<th style=\"padding: 10px; text-align: right; border: 1px solid #ddd;\">Price</th>\n<th style=\"padding: 10px; text-align: right; border: 1px solid #ddd;\">Total</th>\n</tr>\n{{ $json.line_items.map(item => `<tr><td style=\"padding: 10px; border: 1px solid #ddd;\">${item.description}</td><td style=\"padding: 10px; text-align: right; border: 1px solid #ddd;\">${item.quantity}</td><td style=\"padding: 10px; text-align: right; border: 1px solid #ddd;\">${item.unit_price.toFixed(2)}</td><td style=\"padding: 10px; text-align: right; border: 1px solid #ddd;\">${(item.quantity * item.unit_price).toFixed(2)}</td></tr>`).join('') }}\n<tr><td colspan=\"3\" style=\"padding: 10px; text-align: right; border: 1px solid #ddd;\"><strong>Subtotal</strong></td><td style=\"padding: 10px; text-align: right; border: 1px solid #ddd;\">{{ $json.currency }} {{ $json.subtotal.toFixed(2) }}</td></tr>\n<tr><td colspan=\"3\" style=\"padding: 10px; text-align: right; border: 1px solid #ddd;\">Tax ({{ $json.tax_rate }}%)</td><td style=\"padding: 10px; text-align: right; border: 1px solid #ddd;\">{{ $json.currency }} {{ $json.tax_amount.toFixed(2) }}</td></tr>\n<tr style=\"background: #f5f5f5;\"><td colspan=\"3\" style=\"padding: 10px; text-align: right; border: 1px solid #ddd;\"><strong>Total Due</strong></td><td style=\"padding: 10px; text-align: right; border: 1px solid #ddd;\"><strong>{{ $json.currency }} {{ $json.total.toFixed(2) }}</strong></td></tr>\n</table>\n\n<p><strong>Due Date:</strong> {{ $json.due_date }}</p>\n<p><strong>Payment Terms:</strong> {{ $json.customer.payment_terms }}</p>\n\n<p style=\"margin: 20px 0;\"><a href=\"{{ $env.PAYMENT_PORTAL_URL }}/pay/{{ $json.invoice_id }}\" style=\"background: #4CAF50; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px;\">Pay Now</a></p>\n\n<p>Thank you for your business!</p>\n</div>",
+        "options": {}
+      },
+      "id": "send-invoice-email",
+      "name": "Send Invoice Email",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [1800, 300],
+      "credentials": {
+        "smtp": {
+          "id": "smtp-creds",
+          "name": "SMTP"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "has-overdue",
+              "leftValue": "={{ $json.overdue.length }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "check-overdue",
+      "name": "Has Overdue Invoices?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [1360, 520]
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "overdue",
+        "options": {}
+      },
+      "id": "split-overdue",
+      "name": "Split Overdue Invoices",
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [1580, 420]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "Generate a professional overdue invoice reminder for:\n\nInvoice Number: {{ $json.invoice_number }}\nCustomer: {{ $json.customer_name }}\nOriginal Amount: {{ $json.currency }} {{ $json.total }}\nAmount Due: {{ $json.currency }} {{ $json.amount_due }}\nOriginal Due Date: {{ $json.due_date }}\nDays Overdue: {{ $json.days_overdue }}\n\nGenerate an appropriate reminder based on how overdue:\n- 1-14 days: Friendly reminder\n- 15-30 days: Firm but professional\n- 31-60 days: Urgent, mention potential consequences\n- 60+ days: Final notice, mention collections\n\nProvide:\n1. Email subject\n2. Email body\n3. Recommended follow-up action",
+        "options": {
+          "systemMessage": "You are a professional collections specialist. Write firm but respectful overdue notices that maintain customer relationships while ensuring payment."
+        }
+      },
+      "id": "ai-overdue-reminder",
+      "name": "AI Generate Overdue Reminder",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.4,
+      "position": [1800, 420]
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.customer_email }}",
+        "subject": "=Payment Reminder: Invoice {{ $json.invoice_number }} - {{ $json.days_overdue }} Days Overdue",
+        "emailType": "html",
+        "message": "=<div style=\"font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;\">\n<h2 style=\"color: #d32f2f;\">Payment Reminder</h2>\n<p>Dear {{ $json.customer_name }},</p>\n<p>This is a reminder that the following invoice is now <strong>{{ $json.days_overdue }} days overdue</strong>:</p>\n\n<div style=\"background: #fff3e0; padding: 15px; border-radius: 4px; margin: 20px 0;\">\n<p><strong>Invoice Number:</strong> {{ $json.invoice_number }}</p>\n<p><strong>Amount Due:</strong> {{ $json.currency }} {{ $json.amount_due }}</p>\n<p><strong>Original Due Date:</strong> {{ $json.due_date }}</p>\n</div>\n\n<p>Please arrange payment at your earliest convenience to avoid any service interruptions.</p>\n\n<p style=\"margin: 20px 0;\"><a href=\"{{ $env.PAYMENT_PORTAL_URL }}/pay/{{ $json.invoice_id }}\" style=\"background: #d32f2f; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px;\">Pay Now</a></p>\n\n<p>If you have already made this payment, please disregard this notice and accept our thanks.</p>\n<p>If you have any questions or need to discuss payment arrangements, please contact us.</p>\n</div>",
+        "options": {}
+      },
+      "id": "send-overdue-email",
+      "name": "Send Overdue Reminder",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [2020, 420],
+      "credentials": {
+        "smtp": {
+          "id": "smtp-creds",
+          "name": "SMTP"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "PUT",
+        "url": "={{ $env.ACCOUNTING_API_URL }}/api/invoices/{{ $json.invoice_id }}/payment",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $env.ACCOUNTING_API_KEY }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"payment_id\": \"{{ $json.payment_id }}\",\n  \"amount\": {{ $json.payment_amount }},\n  \"payment_method\": \"{{ $json.payment_method }}\",\n  \"payment_date\": \"{{ $json.payment_date }}\",\n  \"status\": \"{{ $json.status }}\",\n  \"amount_remaining\": {{ $json.amount_remaining }}\n}",
+        "options": {}
+      },
+      "id": "update-invoice-payment",
+      "name": "Update Invoice Payment Status",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1360, 740]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "is-paid",
+              "leftValue": "={{ $json.is_fully_paid }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "check-fully-paid",
+      "name": "Is Fully Paid?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [1580, 740]
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.customer.email }}",
+        "subject": "=Payment Received - Invoice {{ $json.invoice_number }} Paid in Full",
+        "emailType": "html",
+        "message": "=<div style=\"font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;\">\n<h2 style=\"color: #4CAF50;\">✓ Payment Received</h2>\n<p>Dear {{ $json.customer.name }},</p>\n<p>Thank you! We have received your payment and invoice {{ $json.invoice_number }} is now <strong>paid in full</strong>.</p>\n\n<div style=\"background: #e8f5e9; padding: 15px; border-radius: 4px; margin: 20px 0;\">\n<p><strong>Payment Amount:</strong> {{ $json.currency || 'USD' }} {{ $json.payment_amount.toFixed(2) }}</p>\n<p><strong>Payment Method:</strong> {{ $json.payment_method }}</p>\n<p><strong>Payment Date:</strong> {{ $json.payment_date.split('T')[0] }}</p>\n<p><strong>Invoice Total:</strong> {{ $json.currency || 'USD' }} {{ $json.invoice_total.toFixed(2) }}</p>\n</div>\n\n<p>A receipt has been attached for your records.</p>\n<p>Thank you for your business!</p>\n</div>",
+        "options": {}
+      },
+      "id": "send-payment-confirmation",
+      "name": "Send Payment Confirmation",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [1800, 640],
+      "credentials": {
+        "smtp": {
+          "id": "smtp-creds",
+          "name": "SMTP"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.customer.email }}",
+        "subject": "=Partial Payment Received - Invoice {{ $json.invoice_number }}",
+        "emailType": "html",
+        "message": "=<div style=\"font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;\">\n<h2>Payment Received</h2>\n<p>Dear {{ $json.customer.name }},</p>\n<p>Thank you for your payment toward invoice {{ $json.invoice_number }}.</p>\n\n<div style=\"background: #fff3e0; padding: 15px; border-radius: 4px; margin: 20px 0;\">\n<p><strong>Payment Received:</strong> {{ $json.currency || 'USD' }} {{ $json.payment_amount.toFixed(2) }}</p>\n<p><strong>Invoice Total:</strong> {{ $json.currency || 'USD' }} {{ $json.invoice_total.toFixed(2) }}</p>\n<p><strong>Total Paid:</strong> {{ $json.currency || 'USD' }} {{ $json.total_paid.toFixed(2) }}</p>\n<p><strong>Remaining Balance:</strong> {{ $json.currency || 'USD' }} {{ $json.amount_remaining.toFixed(2) }}</p>\n</div>\n\n<p>Please remit the remaining balance at your earliest convenience.</p>\n\n<p style=\"margin: 20px 0;\"><a href=\"{{ $env.PAYMENT_PORTAL_URL }}/pay/{{ $json.invoice_id }}\" style=\"background: #ff9800; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px;\">Pay Remaining Balance</a></p>\n</div>",
+        "options": {}
+      },
+      "id": "send-partial-confirmation",
+      "name": "Send Partial Payment Notice",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [1800, 840],
+      "credentials": {
+        "smtp": {
+          "id": "smtp-creds",
+          "name": "SMTP"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "channel": "={{ $env.SLACK_FINANCE_CHANNEL }}",
+        "text": "=💰 *Payment Received*",
+        "otherOptions": {},
+        "attachments": [
+          {
+            "color": "#4caf50",
+            "fields": {
+              "item": [
+                {
+                  "title": "Invoice",
+                  "value": "={{ $json.invoice_number }}",
+                  "short": true
+                },
+                {
+                  "title": "Customer",
+                  "value": "={{ $json.customer.name }}",
+                  "short": true
+                },
+                {
+                  "title": "Amount",
+                  "value": "={{ $json.payment_amount.toFixed(2) }}",
+                  "short": true
+                },
+                {
+                  "title": "Status",
+                  "value": "={{ $json.is_fully_paid ? 'Paid in Full' : 'Partial Payment' }}",
+                  "short": true
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "id": "slack-payment",
+      "name": "Slack Payment Notification",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.2,
+      "position": [2020, 740],
+      "credentials": {
+        "slackApi": {
+          "id": "slack-creds",
+          "name": "Slack API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "channel": "={{ $env.SLACK_FINANCE_CHANNEL }}",
+        "text": "=📄 *New Invoice Created*",
+        "otherOptions": {},
+        "attachments": [
+          {
+            "color": "#2196f3",
+            "fields": {
+              "item": [
+                {
+                  "title": "Invoice",
+                  "value": "={{ $json.invoice_number }}",
+                  "short": true
+                },
+                {
+                  "title": "Customer",
+                  "value": "={{ $json.customer.name }}",
+                  "short": true
+                },
+                {
+                  "title": "Amount",
+                  "value": "={{ $json.currency }} {{ $json.total.toFixed(2) }}",
+                  "short": true
+                },
+                {
+                  "title": "Due Date",
+                  "value": "={{ $json.due_date }}",
+                  "short": true
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "id": "slack-invoice",
+      "name": "Slack Invoice Notification",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.2,
+      "position": [2020, 300],
+      "credentials": {
+        "slackApi": {
+          "id": "slack-creds",
+          "name": "Slack API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ success: true, invoice_number: $json.invoice_number, status: 'sent' }) }}",
+        "options": {}
+      },
+      "id": "respond-invoice",
+      "name": "Respond Invoice Created",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [2240, 300]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ success: true, payment_id: $json.payment_id, status: $json.status }) }}",
+        "options": {}
+      },
+      "id": "respond-payment",
+      "name": "Respond Payment Processed",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [2240, 740]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Generate AR aging summary\nconst data = $input.first().json;\n\nconst summary = {\n  report_date: new Date().toISOString().split('T')[0],\n  total_outstanding: data.total_outstanding,\n  total_overdue: data.total_overdue,\n  overdue_count: data.overdue.length,\n  due_soon_count: data.due_soon.length,\n  current_count: data.current.length,\n  aging_buckets: {\n    current: data.current.reduce((sum, inv) => sum + inv.amount_due, 0),\n    due_1_7_days: data.due_soon.reduce((sum, inv) => sum + inv.amount_due, 0),\n    overdue_1_30: data.overdue.filter(inv => inv.days_overdue <= 30).reduce((sum, inv) => sum + inv.amount_due, 0),\n    overdue_31_60: data.overdue.filter(inv => inv.days_overdue > 30 && inv.days_overdue <= 60).reduce((sum, inv) => sum + inv.amount_due, 0),\n    overdue_61_90: data.overdue.filter(inv => inv.days_overdue > 60 && inv.days_overdue <= 90).reduce((sum, inv) => sum + inv.amount_due, 0),\n    overdue_90_plus: data.overdue.filter(inv => inv.days_overdue > 90).reduce((sum, inv) => sum + inv.amount_due, 0)\n  },\n  high_risk_accounts: data.overdue.filter(inv => inv.days_overdue > 60).map(inv => ({\n    customer: inv.customer_name,\n    invoice: inv.invoice_number,\n    amount: inv.amount_due,\n    days_overdue: inv.days_overdue\n  }))\n};\n\nreturn [{ json: summary }];"
+      },
+      "id": "generate-ar-summary",
+      "name": "Generate AR Aging Summary",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1580, 620]
+    },
+    {
+      "parameters": {
+        "channel": "={{ $env.SLACK_FINANCE_CHANNEL }}",
+        "text": "=📊 *Daily AR Aging Report*",
+        "otherOptions": {},
+        "attachments": [
+          {
+            "color": "={{ $json.total_overdue > 0 ? '#ff9800' : '#4caf50' }}",
+            "fields": {
+              "item": [
+                {
+                  "title": "Total Outstanding",
+                  "value": "=${{ $json.total_outstanding.toFixed(2) }}",
+                  "short": true
+                },
+                {
+                  "title": "Total Overdue",
+                  "value": "=${{ $json.total_overdue.toFixed(2) }}",
+                  "short": true
+                },
+                {
+                  "title": "Overdue Invoices",
+                  "value": "={{ $json.overdue_count }}",
+                  "short": true
+                },
+                {
+                  "title": "Due This Week",
+                  "value": "={{ $json.due_soon_count }}",
+                  "short": true
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "id": "slack-ar-summary",
+      "name": "Slack AR Summary",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.2,
+      "position": [1800, 620],
+      "credentials": {
+        "slackApi": {
+          "id": "slack-creds",
+          "name": "Slack API"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Invoice Created Webhook": {
+      "main": [
+        [
+          {
+            "node": "Set New Invoice Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Daily Invoice Check": {
+      "main": [
+        [
+          {
+            "node": "Set Daily Check",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Payment Received Webhook": {
+      "main": [
+        [
+          {
+            "node": "Set Payment Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set New Invoice Data": {
+      "main": [
+        [
+          {
+            "node": "Route by Trigger Type",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Daily Check": {
+      "main": [
+        [
+          {
+            "node": "Route by Trigger Type",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Payment Data": {
+      "main": [
+        [
+          {
+            "node": "Route by Trigger Type",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route by Trigger Type": {
+      "main": [
+        [
+          {
+            "node": "Fetch Customer Details",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Fetch Outstanding Invoices",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Fetch Invoice for Payment",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Customer Details": {
+      "main": [
+        [
+          {
+            "node": "Process Invoice Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Outstanding Invoices": {
+      "main": [
+        [
+          {
+            "node": "Categorize by Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Invoice for Payment": {
+      "main": [
+        [
+          {
+            "node": "Process Payment",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Process Invoice Data": {
+      "main": [
+        [
+          {
+            "node": "AI Generate Invoice Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Generate Invoice Email": {
+      "main": [
+        [
+          {
+            "node": "Save Invoice to System",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Claude Sonnet": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Generate Invoice Email",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "AI Generate Overdue Reminder",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save Invoice to System": {
+      "main": [
+        [
+          {
+            "node": "Send Invoice Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Invoice Email": {
+      "main": [
+        [
+          {
+            "node": "Slack Invoice Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Slack Invoice Notification": {
+      "main": [
+        [
+          {
+            "node": "Respond Invoice Created",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Categorize by Status": {
+      "main": [
+        [
+          {
+            "node": "Check Overdue Invoices?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Overdue Invoices?": {
+      "main": [
+        [
+          {
+            "node": "Split Overdue Invoices",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Generate AR Aging Summary",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Generate AR Aging Summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Overdue Invoices": {
+      "main": [
+        [
+          {
+            "node": "AI Generate Overdue Reminder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Generate Overdue Reminder": {
+      "main": [
+        [
+          {
+            "node": "Send Overdue Reminder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate AR Aging Summary": {
+      "main": [
+        [
+          {
+            "node": "Slack AR Summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Process Payment": {
+      "main": [
+        [
+          {
+            "node": "Update Invoice Payment Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Invoice Payment Status": {
+      "main": [
+        [
+          {
+            "node": "Is Fully Paid?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Fully Paid?": {
+      "main": [
+        [
+          {
+            "node": "Send Payment Confirmation",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send Partial Payment Notice",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Payment Confirmation": {
+      "main": [
+        [
+          {
+            "node": "Slack Payment Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Partial Payment Notice": {
+      "main": [
+        [
+          {
+            "node": "Slack Payment Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Slack Payment Notification": {
+      "main": [
+        [
+          {
+            "node": "Respond Payment Processed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "invoice-ar-v1",
+  "meta": {
+    "instanceId": "n8n-workflows-library"
+  },
+  "id": "invoice-processing-ar",
+  "tags": [
+    {
+      "id": "finance",
+      "name": "Finance"
+    },
+    {
+      "id": "invoicing",
+      "name": "Invoicing"
+    },
+    {
+      "id": "ar",
+      "name": "Accounts Receivable"
+    }
+  ]
+}
