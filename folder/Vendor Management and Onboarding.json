@@ -1,0 +1,1047 @@
+{
+  "name": "Vendor Management and Onboarding",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "vendor-onboard",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "onboard-webhook",
+      "name": "Vendor Onboarding Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 8,
+              "triggerAtDay": 1
+            }
+          ]
+        }
+      },
+      "id": "monthly-review",
+      "name": "Monthly Vendor Review",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [240, 520]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "vendor-evaluation",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "eval-webhook",
+      "name": "Vendor Evaluation Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [240, 740]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "action",
+              "name": "action",
+              "value": "onboard",
+              "type": "string"
+            },
+            {
+              "id": "vendor_id",
+              "name": "vendor_id",
+              "value": "=VND-{{ Date.now() }}",
+              "type": "string"
+            },
+            {
+              "id": "company_name",
+              "name": "company_name",
+              "value": "={{ $json.body.company_name }}",
+              "type": "string"
+            },
+            {
+              "id": "contact_name",
+              "name": "contact_name",
+              "value": "={{ $json.body.contact_name }}",
+              "type": "string"
+            },
+            {
+              "id": "contact_email",
+              "name": "contact_email",
+              "value": "={{ $json.body.contact_email }}",
+              "type": "string"
+            },
+            {
+              "id": "contact_phone",
+              "name": "contact_phone",
+              "value": "={{ $json.body.contact_phone }}",
+              "type": "string"
+            },
+            {
+              "id": "category",
+              "name": "category",
+              "value": "={{ $json.body.category }}",
+              "type": "string"
+            },
+            {
+              "id": "products_services",
+              "name": "products_services",
+              "value": "={{ $json.body.products_services }}",
+              "type": "string"
+            },
+            {
+              "id": "payment_terms",
+              "name": "payment_terms",
+              "value": "={{ $json.body.payment_terms }}",
+              "type": "string"
+            },
+            {
+              "id": "tax_id",
+              "name": "tax_id",
+              "value": "={{ $json.body.tax_id }}",
+              "type": "string"
+            },
+            {
+              "id": "requested_by",
+              "name": "requested_by",
+              "value": "={{ $json.body.requested_by }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "set-onboard",
+      "name": "Set Onboard Data",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "action",
+              "name": "action",
+              "value": "monthly_review",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "set-review",
+      "name": "Set Monthly Review",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [460, 520]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "action",
+              "name": "action",
+              "value": "evaluation",
+              "type": "string"
+            },
+            {
+              "id": "vendor_id",
+              "name": "vendor_id",
+              "value": "={{ $json.body.vendor_id }}",
+              "type": "string"
+            },
+            {
+              "id": "evaluator_id",
+              "name": "evaluator_id",
+              "value": "={{ $json.body.evaluator_id }}",
+              "type": "string"
+            },
+            {
+              "id": "quality_score",
+              "name": "quality_score",
+              "value": "={{ $json.body.quality_score }}",
+              "type": "number"
+            },
+            {
+              "id": "delivery_score",
+              "name": "delivery_score",
+              "value": "={{ $json.body.delivery_score }}",
+              "type": "number"
+            },
+            {
+              "id": "price_score",
+              "name": "price_score",
+              "value": "={{ $json.body.price_score }}",
+              "type": "number"
+            },
+            {
+              "id": "service_score",
+              "name": "service_score",
+              "value": "={{ $json.body.service_score }}",
+              "type": "number"
+            },
+            {
+              "id": "comments",
+              "name": "comments",
+              "value": "={{ $json.body.comments }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "set-eval",
+      "name": "Set Evaluation Data",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [460, 740]
+    },
+    {
+      "parameters": {
+        "rules": {
+          "rules": [
+            {
+              "outputKey": "onboard",
+              "conditions": {
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.action }}",
+                    "rightValue": "onboard",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "outputKey": "review",
+              "conditions": {
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.action }}",
+                    "rightValue": "monthly_review",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "outputKey": "evaluation",
+              "conditions": {
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.action }}",
+                    "rightValue": "evaluation",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "route-action",
+      "name": "Route by Action",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [680, 520]
+    },
+    {
+      "parameters": {
+        "jsCode": "const vendor = $input.first().json;\n\n// Determine required documents based on vendor type\nconst requiredDocs = [\n  { name: 'W-9 Tax Form', required: true },\n  { name: 'Certificate of Insurance', required: true },\n  { name: 'Business License', required: true },\n  { name: 'Bank Account Info', required: true }\n];\n\n// Additional requirements for certain categories\nconst categoryDocs = {\n  'technology': [{ name: 'SOC 2 Report', required: true }, { name: 'Security Questionnaire', required: true }],\n  'construction': [{ name: 'OSHA Compliance', required: true }, { name: 'Workers Comp Certificate', required: true }],\n  'food': [{ name: 'Health Department License', required: true }, { name: 'Food Safety Certification', required: true }],\n  'professional_services': [{ name: 'Professional License', required: true }, { name: 'E&O Insurance', required: true }]\n};\n\nconst additionalDocs = categoryDocs[vendor.category] || [];\n\nreturn [{\n  json: {\n    ...vendor,\n    required_documents: [...requiredDocs, ...additionalDocs],\n    documents_pending: requiredDocs.length + additionalDocs.length,\n    documents_received: 0,\n    status: 'pending_documents',\n    onboarding_started: new Date().toISOString()\n  }\n}];"
+      },
+      "id": "determine-requirements",
+      "name": "Determine Requirements",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [920, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.VENDOR_API_URL }}/api/vendors",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $env.VENDOR_API_KEY }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json) }}",
+        "options": {}
+      },
+      "id": "create-vendor",
+      "name": "Create Vendor Record",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1140, 300]
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.contact_email }}",
+        "subject": "=Welcome! Vendor Onboarding - {{ $env.COMPANY_NAME }}",
+        "emailType": "html",
+        "message": "=<div style=\"font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;\">\n<h2>Welcome to {{ $env.COMPANY_NAME }}!</h2>\n<p>Dear {{ $json.contact_name }},</p>\n<p>Thank you for your interest in becoming an approved vendor. To complete your registration, please provide the following documents:</p>\n\n<div style=\"background: #f5f5f5; padding: 15px; border-radius: 4px; margin: 20px 0;\">\n<h3>Required Documents</h3>\n<ul>\n{{ $json.required_documents.map(doc => '<li>' + doc.name + (doc.required ? ' *' : '') + '</li>').join('') }}\n</ul>\n<p style=\"font-size: 12px;\">* Required documents</p>\n</div>\n\n<p><strong>Your Vendor ID:</strong> {{ $json.vendor_id }}</p>\n\n<p>Please upload your documents through our vendor portal:</p>\n\n<p style=\"margin: 20px 0;\"><a href=\"{{ $env.VENDOR_PORTAL_URL }}/onboarding/{{ $json.vendor_id }}\" style=\"background: #1976d2; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px;\">Complete Onboarding</a></p>\n\n<p>If you have any questions, please contact our procurement team at {{ $env.PROCUREMENT_EMAIL }}.</p>\n\n<p>Best regards,<br>Procurement Team</p>\n</div>",
+        "options": {}
+      },
+      "id": "email-vendor-welcome",
+      "name": "Email Vendor Welcome",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [1360, 300],
+      "credentials": {
+        "smtp": {
+          "id": "smtp-creds",
+          "name": "SMTP"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $env.PROCUREMENT_EMAIL }}",
+        "subject": "=New Vendor Onboarding: {{ $json.company_name }}",
+        "emailType": "html",
+        "message": "=<div style=\"font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;\">\n<h2>New Vendor Registration</h2>\n<p>A new vendor has started the onboarding process.</p>\n\n<div style=\"background: #e3f2fd; padding: 15px; border-radius: 4px; margin: 20px 0;\">\n<p><strong>Vendor ID:</strong> {{ $json.vendor_id }}</p>\n<p><strong>Company:</strong> {{ $json.company_name }}</p>\n<p><strong>Contact:</strong> {{ $json.contact_name }} ({{ $json.contact_email }})</p>\n<p><strong>Category:</strong> {{ $json.category }}</p>\n<p><strong>Products/Services:</strong> {{ $json.products_services }}</p>\n<p><strong>Requested By:</strong> {{ $json.requested_by }}</p>\n</div>\n\n<p>Documents required: {{ $json.documents_pending }}</p>\n\n<p><a href=\"{{ $env.VENDOR_PORTAL_URL }}/admin/vendors/{{ $json.vendor_id }}\">View Vendor Profile</a></p>\n</div>",
+        "options": {}
+      },
+      "id": "email-procurement",
+      "name": "Email Procurement Team",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [1580, 300],
+      "credentials": {
+        "smtp": {
+          "id": "smtp-creds",
+          "name": "SMTP"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "channel": "={{ $env.SLACK_PROCUREMENT_CHANNEL }}",
+        "text": "=📋 *New Vendor Onboarding*",
+        "otherOptions": {},
+        "attachments": [
+          {
+            "color": "#2196f3",
+            "fields": {
+              "item": [
+                {
+                  "title": "Company",
+                  "value": "={{ $json.company_name }}",
+                  "short": true
+                },
+                {
+                  "title": "Category",
+                  "value": "={{ $json.category }}",
+                  "short": true
+                },
+                {
+                  "title": "Contact",
+                  "value": "={{ $json.contact_name }}",
+                  "short": true
+                },
+                {
+                  "title": "Documents Needed",
+                  "value": "={{ $json.documents_pending }}",
+                  "short": true
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "id": "slack-onboard",
+      "name": "Slack Onboarding Notice",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.2,
+      "position": [1800, 300],
+      "credentials": {
+        "slackApi": {
+          "id": "slack-creds",
+          "name": "Slack API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ success: true, vendor_id: $json.vendor_id, status: 'pending_documents' }) }}",
+        "options": {}
+      },
+      "id": "respond-onboard",
+      "name": "Respond Onboarding Started",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [2020, 300]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $env.VENDOR_API_URL }}/api/vendors?status=active",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $env.VENDOR_API_KEY }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "fetch-vendors",
+      "name": "Fetch Active Vendors",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [920, 520]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $env.VENDOR_API_URL }}/api/vendors/performance-summary",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $env.VENDOR_API_KEY }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "fetch-performance",
+      "name": "Fetch Performance Data",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [920, 660]
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "mergeByFields": {
+          "values": []
+        },
+        "options": {}
+      },
+      "id": "merge-data",
+      "name": "Merge Vendor Data",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [1140, 580]
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\nconst vendors = items[0]?.json?.vendors || [];\nconst performance = items[1]?.json?.performance || {};\n\nconst analysis = {\n  total_vendors: vendors.length,\n  by_category: {},\n  expiring_contracts: [],\n  expiring_insurance: [],\n  low_performers: [],\n  top_performers: [],\n  requires_attention: []\n};\n\nconst today = new Date();\nconst thirtyDays = new Date(today.getTime() + 30 * 24 * 60 * 60 * 1000);\n\nfor (const vendor of vendors) {\n  // Category count\n  analysis.by_category[vendor.category] = (analysis.by_category[vendor.category] || 0) + 1;\n  \n  // Check contract expiration\n  if (vendor.contract_end_date) {\n    const contractEnd = new Date(vendor.contract_end_date);\n    if (contractEnd <= thirtyDays) {\n      analysis.expiring_contracts.push({\n        vendor_id: vendor.id,\n        name: vendor.company_name,\n        expires: vendor.contract_end_date,\n        days_remaining: Math.ceil((contractEnd - today) / (1000 * 60 * 60 * 24))\n      });\n    }\n  }\n  \n  // Check insurance expiration\n  if (vendor.insurance_expiry) {\n    const insuranceEnd = new Date(vendor.insurance_expiry);\n    if (insuranceEnd <= thirtyDays) {\n      analysis.expiring_insurance.push({\n        vendor_id: vendor.id,\n        name: vendor.company_name,\n        expires: vendor.insurance_expiry\n      });\n    }\n  }\n  \n  // Performance analysis\n  const vendorPerf = performance[vendor.id];\n  if (vendorPerf) {\n    const avgScore = (vendorPerf.quality + vendorPerf.delivery + vendorPerf.price + vendorPerf.service) / 4;\n    vendor.avg_score = avgScore;\n    \n    if (avgScore < 3) {\n      analysis.low_performers.push({ ...vendor, avg_score: avgScore });\n      analysis.requires_attention.push({ ...vendor, reason: 'Low performance score' });\n    } else if (avgScore >= 4.5) {\n      analysis.top_performers.push({ ...vendor, avg_score: avgScore });\n    }\n  }\n}\n\n// Sort performers\nanalysis.low_performers.sort((a, b) => a.avg_score - b.avg_score);\nanalysis.top_performers.sort((a, b) => b.avg_score - a.avg_score);\n\nreturn [{ json: analysis }];"
+      },
+      "id": "analyze-vendors",
+      "name": "Analyze Vendor Data",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1360, 580]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "needs-attention",
+              "leftValue": "={{ $json.requires_attention.length + $json.expiring_contracts.length + $json.expiring_insurance.length }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "check-attention",
+      "name": "Needs Attention?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [1580, 580]
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $env.PROCUREMENT_MANAGER_EMAIL }}",
+        "subject": "=Monthly Vendor Review - Action Required",
+        "emailType": "html",
+        "message": "=<div style=\"font-family: Arial, sans-serif; max-width: 700px; margin: 0 auto;\">\n<h1>Monthly Vendor Review</h1>\n<p>The following items require your attention:</p>\n\n{{ $json.expiring_contracts.length > 0 ? `<h2 style=\"color: #ff9800;\">Expiring Contracts (${$json.expiring_contracts.length})</h2><table style=\"width: 100%; border-collapse: collapse;\"><tr style=\"background: #fff3e0;\"><th style=\"padding: 8px; border: 1px solid #ddd;\">Vendor</th><th style=\"padding: 8px; border: 1px solid #ddd;\">Expires</th><th style=\"padding: 8px; border: 1px solid #ddd;\">Days Left</th></tr>${$json.expiring_contracts.map(v => '<tr><td style=\"padding: 8px; border: 1px solid #ddd;\">' + v.name + '</td><td style=\"padding: 8px; border: 1px solid #ddd;\">' + v.expires + '</td><td style=\"padding: 8px; border: 1px solid #ddd;\">' + v.days_remaining + '</td></tr>').join('')}</table>` : '' }}\n\n{{ $json.expiring_insurance.length > 0 ? `<h2 style=\"color: #ff9800;\">Expiring Insurance (${$json.expiring_insurance.length})</h2><ul>${$json.expiring_insurance.map(v => '<li>' + v.name + ' - Expires: ' + v.expires + '</li>').join('')}</ul>` : '' }}\n\n{{ $json.low_performers.length > 0 ? `<h2 style=\"color: #d32f2f;\">Low Performing Vendors</h2><table style=\"width: 100%; border-collapse: collapse;\"><tr style=\"background: #ffebee;\"><th style=\"padding: 8px; border: 1px solid #ddd;\">Vendor</th><th style=\"padding: 8px; border: 1px solid #ddd;\">Score</th></tr>${$json.low_performers.map(v => '<tr><td style=\"padding: 8px; border: 1px solid #ddd;\">' + v.company_name + '</td><td style=\"padding: 8px; border: 1px solid #ddd;\">' + v.avg_score.toFixed(1) + '/5</td></tr>').join('')}</table>` : '' }}\n\n<h2>Summary</h2>\n<ul>\n<li>Total Active Vendors: {{ $json.total_vendors }}</li>\n<li>Top Performers: {{ $json.top_performers.length }}</li>\n<li>Low Performers: {{ $json.low_performers.length }}</li>\n</ul>\n\n<p><a href=\"{{ $env.VENDOR_PORTAL_URL }}/admin/review\" style=\"background: #1976d2; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px;\">View Full Report</a></p>\n</div>",
+        "options": {}
+      },
+      "id": "email-review",
+      "name": "Email Monthly Review",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [1800, 500],
+      "credentials": {
+        "smtp": {
+          "id": "smtp-creds",
+          "name": "SMTP"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "channel": "={{ $env.SLACK_PROCUREMENT_CHANNEL }}",
+        "text": "=📊 *Monthly Vendor Review*",
+        "otherOptions": {},
+        "attachments": [
+          {
+            "color": "={{ $json.requires_attention.length > 0 ? '#ff9800' : '#4caf50' }}",
+            "fields": {
+              "item": [
+                {
+                  "title": "Total Vendors",
+                  "value": "={{ $json.total_vendors }}",
+                  "short": true
+                },
+                {
+                  "title": "Expiring Contracts",
+                  "value": "={{ $json.expiring_contracts.length }}",
+                  "short": true
+                },
+                {
+                  "title": "Top Performers",
+                  "value": "={{ $json.top_performers.length }}",
+                  "short": true
+                },
+                {
+                  "title": "Low Performers",
+                  "value": "={{ $json.low_performers.length }}",
+                  "short": true
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "id": "slack-review",
+      "name": "Slack Monthly Review",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.2,
+      "position": [1800, 660],
+      "credentials": {
+        "slackApi": {
+          "id": "slack-creds",
+          "name": "Slack API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $env.VENDOR_API_URL }}/api/vendors/{{ $json.vendor_id }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $env.VENDOR_API_KEY }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "fetch-vendor-eval",
+      "name": "Fetch Vendor for Eval",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [920, 740]
+    },
+    {
+      "parameters": {
+        "jsCode": "const evaluation = $input.first().json;\nconst vendor = evaluation.vendor;\n\n// Calculate overall score\nconst overallScore = (\n  evaluation.quality_score + \n  evaluation.delivery_score + \n  evaluation.price_score + \n  evaluation.service_score\n) / 4;\n\n// Determine rating category\nlet rating;\nif (overallScore >= 4.5) rating = 'Excellent';\nelse if (overallScore >= 4) rating = 'Good';\nelse if (overallScore >= 3) rating = 'Satisfactory';\nelse if (overallScore >= 2) rating = 'Needs Improvement';\nelse rating = 'Poor';\n\n// Check if score is declining\nconst previousScore = vendor.avg_performance_score || overallScore;\nconst scoreTrend = overallScore > previousScore ? 'improving' : \n                   overallScore < previousScore ? 'declining' : 'stable';\n\nreturn [{\n  json: {\n    vendor_id: evaluation.vendor_id,\n    vendor_name: vendor.company_name,\n    vendor_email: vendor.contact_email,\n    evaluator_id: evaluation.evaluator_id,\n    scores: {\n      quality: evaluation.quality_score,\n      delivery: evaluation.delivery_score,\n      price: evaluation.price_score,\n      service: evaluation.service_score\n    },\n    overall_score: overallScore,\n    rating: rating,\n    previous_score: previousScore,\n    score_trend: scoreTrend,\n    comments: evaluation.comments,\n    evaluated_at: new Date().toISOString(),\n    requires_review: overallScore < 3 || scoreTrend === 'declining'\n  }\n}];"
+      },
+      "id": "process-evaluation",
+      "name": "Process Evaluation",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1140, 740]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.VENDOR_API_URL }}/api/vendors/{{ $json.vendor_id }}/evaluations",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $env.VENDOR_API_KEY }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json) }}",
+        "options": {}
+      },
+      "id": "save-evaluation",
+      "name": "Save Evaluation",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1360, 740]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "needs-review",
+              "leftValue": "={{ $json.requires_review }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "check-review",
+      "name": "Requires Review?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [1580, 740]
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $env.PROCUREMENT_MANAGER_EMAIL }}",
+        "subject": "=Vendor Performance Alert: {{ $json.vendor_name }} - {{ $json.rating }}",
+        "emailType": "html",
+        "message": "=<div style=\"font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;\">\n<h2 style=\"color: {{ $json.overall_score < 3 ? '#d32f2f' : '#ff9800' }};\">Vendor Performance Alert</h2>\n<p>A vendor evaluation requires your attention.</p>\n\n<div style=\"background: {{ $json.overall_score < 3 ? '#ffebee' : '#fff3e0' }}; padding: 15px; border-radius: 4px; margin: 20px 0;\">\n<p><strong>Vendor:</strong> {{ $json.vendor_name }}</p>\n<p><strong>Overall Score:</strong> {{ $json.overall_score.toFixed(1) }}/5 ({{ $json.rating }})</p>\n<p><strong>Trend:</strong> {{ $json.score_trend }}</p>\n<p><strong>Previous Score:</strong> {{ $json.previous_score.toFixed(1) }}/5</p>\n</div>\n\n<h3>Score Breakdown</h3>\n<table style=\"width: 100%; border-collapse: collapse;\">\n<tr><td style=\"padding: 8px; border: 1px solid #ddd;\">Quality</td><td style=\"padding: 8px; border: 1px solid #ddd;\">{{ $json.scores.quality }}/5</td></tr>\n<tr><td style=\"padding: 8px; border: 1px solid #ddd;\">Delivery</td><td style=\"padding: 8px; border: 1px solid #ddd;\">{{ $json.scores.delivery }}/5</td></tr>\n<tr><td style=\"padding: 8px; border: 1px solid #ddd;\">Price</td><td style=\"padding: 8px; border: 1px solid #ddd;\">{{ $json.scores.price }}/5</td></tr>\n<tr><td style=\"padding: 8px; border: 1px solid #ddd;\">Service</td><td style=\"padding: 8px; border: 1px solid #ddd;\">{{ $json.scores.service }}/5</td></tr>\n</table>\n\n{{ $json.comments ? `<h3>Comments</h3><p>${$json.comments}</p>` : '' }}\n\n<p><a href=\"{{ $env.VENDOR_PORTAL_URL }}/admin/vendors/{{ $json.vendor_id }}/performance\" style=\"background: #1976d2; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px;\">Review Vendor</a></p>\n</div>",
+        "options": {}
+      },
+      "id": "email-eval-alert",
+      "name": "Email Evaluation Alert",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [1800, 680],
+      "credentials": {
+        "smtp": {
+          "id": "smtp-creds",
+          "name": "SMTP"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "channel": "={{ $env.SLACK_PROCUREMENT_CHANNEL }}",
+        "text": "=📝 *Vendor Evaluation Submitted*",
+        "otherOptions": {},
+        "attachments": [
+          {
+            "color": "={{ $json.overall_score >= 4 ? '#4caf50' : $json.overall_score >= 3 ? '#ff9800' : '#d32f2f' }}",
+            "fields": {
+              "item": [
+                {
+                  "title": "Vendor",
+                  "value": "={{ $json.vendor_name }}",
+                  "short": true
+                },
+                {
+                  "title": "Score",
+                  "value": "={{ $json.overall_score.toFixed(1) }}/5",
+                  "short": true
+                },
+                {
+                  "title": "Rating",
+                  "value": "={{ $json.rating }}",
+                  "short": true
+                },
+                {
+                  "title": "Trend",
+                  "value": "={{ $json.score_trend }}",
+                  "short": true
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "id": "slack-eval",
+      "name": "Slack Evaluation Notice",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.2,
+      "position": [1800, 840],
+      "credentials": {
+        "slackApi": {
+          "id": "slack-creds",
+          "name": "Slack API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ success: true, vendor_id: $json.vendor_id, overall_score: $json.overall_score, rating: $json.rating }) }}",
+        "options": {}
+      },
+      "id": "respond-eval",
+      "name": "Respond Evaluation Saved",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [2020, 740]
+    }
+  ],
+  "connections": {
+    "Vendor Onboarding Webhook": {
+      "main": [
+        [
+          {
+            "node": "Set Onboard Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Monthly Vendor Review": {
+      "main": [
+        [
+          {
+            "node": "Set Monthly Review",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Vendor Evaluation Webhook": {
+      "main": [
+        [
+          {
+            "node": "Set Evaluation Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Onboard Data": {
+      "main": [
+        [
+          {
+            "node": "Route by Action",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Monthly Review": {
+      "main": [
+        [
+          {
+            "node": "Route by Action",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Evaluation Data": {
+      "main": [
+        [
+          {
+            "node": "Route by Action",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route by Action": {
+      "main": [
+        [
+          {
+            "node": "Determine Requirements",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Fetch Active Vendors",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Fetch Performance Data",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Fetch Vendor for Eval",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Determine Requirements": {
+      "main": [
+        [
+          {
+            "node": "Create Vendor Record",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Vendor Record": {
+      "main": [
+        [
+          {
+            "node": "Email Vendor Welcome",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Email Vendor Welcome": {
+      "main": [
+        [
+          {
+            "node": "Email Procurement Team",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Email Procurement Team": {
+      "main": [
+        [
+          {
+            "node": "Slack Onboarding Notice",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Slack Onboarding Notice": {
+      "main": [
+        [
+          {
+            "node": "Respond Onboarding Started",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Active Vendors": {
+      "main": [
+        [
+          {
+            "node": "Merge Vendor Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Performance Data": {
+      "main": [
+        [
+          {
+            "node": "Merge Vendor Data",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge Vendor Data": {
+      "main": [
+        [
+          {
+            "node": "Analyze Vendor Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyze Vendor Data": {
+      "main": [
+        [
+          {
+            "node": "Needs Attention?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Needs Attention?": {
+      "main": [
+        [
+          {
+            "node": "Email Monthly Review",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Slack Monthly Review",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Email Monthly Review": {
+      "main": [
+        [
+          {
+            "node": "Slack Monthly Review",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Vendor for Eval": {
+      "main": [
+        [
+          {
+            "node": "Process Evaluation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Process Evaluation": {
+      "main": [
+        [
+          {
+            "node": "Save Evaluation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save Evaluation": {
+      "main": [
+        [
+          {
+            "node": "Requires Review?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Requires Review?": {
+      "main": [
+        [
+          {
+            "node": "Email Evaluation Alert",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Slack Evaluation Notice",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Email Evaluation Alert": {
+      "main": [
+        [
+          {
+            "node": "Slack Evaluation Notice",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Slack Evaluation Notice": {
+      "main": [
+        [
+          {
+            "node": "Respond Evaluation Saved",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "vendor-mgmt-v1",
+  "meta": {
+    "instanceId": "n8n-workflows-library"
+  },
+  "id": "vendor-management",
+  "tags": [
+    {
+      "id": "operations",
+      "name": "Operations"
+    },
+    {
+      "id": "vendors",
+      "name": "Vendors"
+    },
+    {
+      "id": "procurement",
+      "name": "Procurement"
+    }
+  ]
+}

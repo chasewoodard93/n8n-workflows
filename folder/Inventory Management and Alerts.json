@@ -1,0 +1,981 @@
+{
+  "name": "Inventory Management and Alerts",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 7
+            }
+          ]
+        }
+      },
+      "id": "daily-check",
+      "name": "Daily Inventory Check",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "inventory-update",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "update-webhook",
+      "name": "Inventory Update Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [240, 520]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "purchase-order",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "po-webhook",
+      "name": "Purchase Order Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [240, 740]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "action",
+              "name": "action",
+              "value": "daily_check",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "set-daily",
+      "name": "Set Daily Check",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "action",
+              "name": "action",
+              "value": "inventory_update",
+              "type": "string"
+            },
+            {
+              "id": "sku",
+              "name": "sku",
+              "value": "={{ $json.body.sku }}",
+              "type": "string"
+            },
+            {
+              "id": "product_name",
+              "name": "product_name",
+              "value": "={{ $json.body.product_name }}",
+              "type": "string"
+            },
+            {
+              "id": "quantity_change",
+              "name": "quantity_change",
+              "value": "={{ $json.body.quantity_change }}",
+              "type": "number"
+            },
+            {
+              "id": "change_type",
+              "name": "change_type",
+              "value": "={{ $json.body.change_type }}",
+              "type": "string"
+            },
+            {
+              "id": "location",
+              "name": "location",
+              "value": "={{ $json.body.location }}",
+              "type": "string"
+            },
+            {
+              "id": "reference",
+              "name": "reference",
+              "value": "={{ $json.body.reference }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "set-update",
+      "name": "Set Update Data",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [460, 520]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "action",
+              "name": "action",
+              "value": "purchase_order",
+              "type": "string"
+            },
+            {
+              "id": "po_number",
+              "name": "po_number",
+              "value": "=PO-{{ Date.now() }}",
+              "type": "string"
+            },
+            {
+              "id": "vendor_id",
+              "name": "vendor_id",
+              "value": "={{ $json.body.vendor_id }}",
+              "type": "string"
+            },
+            {
+              "id": "items",
+              "name": "items",
+              "value": "={{ $json.body.items }}",
+              "type": "array"
+            },
+            {
+              "id": "requested_by",
+              "name": "requested_by",
+              "value": "={{ $json.body.requested_by }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "set-po",
+      "name": "Set PO Data",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [460, 740]
+    },
+    {
+      "parameters": {
+        "rules": {
+          "rules": [
+            {
+              "outputKey": "daily",
+              "conditions": {
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.action }}",
+                    "rightValue": "daily_check",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "outputKey": "update",
+              "conditions": {
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.action }}",
+                    "rightValue": "inventory_update",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "outputKey": "po",
+              "conditions": {
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.action }}",
+                    "rightValue": "purchase_order",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "route-action",
+      "name": "Route by Action",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [680, 520]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $env.INVENTORY_API_URL }}/api/products?include_stock=true",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $env.INVENTORY_API_KEY }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "fetch-inventory",
+      "name": "Fetch All Inventory",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [920, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "const products = $input.first().json.products || [];\n\nconst analysis = {\n  low_stock: [],\n  out_of_stock: [],\n  overstock: [],\n  reorder_needed: [],\n  healthy: [],\n  total_value: 0,\n  total_items: 0\n};\n\nfor (const product of products) {\n  const currentStock = product.quantity_on_hand || 0;\n  const reorderPoint = product.reorder_point || 10;\n  const reorderQty = product.reorder_quantity || 50;\n  const maxStock = product.max_stock || 200;\n  const unitCost = product.unit_cost || 0;\n  \n  analysis.total_value += currentStock * unitCost;\n  analysis.total_items += currentStock;\n  \n  const stockItem = {\n    sku: product.sku,\n    name: product.name,\n    current_stock: currentStock,\n    reorder_point: reorderPoint,\n    reorder_quantity: reorderQty,\n    unit_cost: unitCost,\n    location: product.location,\n    vendor_id: product.primary_vendor_id\n  };\n  \n  if (currentStock === 0) {\n    stockItem.urgency = 'critical';\n    analysis.out_of_stock.push(stockItem);\n    analysis.reorder_needed.push(stockItem);\n  } else if (currentStock <= reorderPoint) {\n    stockItem.urgency = 'high';\n    analysis.low_stock.push(stockItem);\n    analysis.reorder_needed.push(stockItem);\n  } else if (currentStock > maxStock) {\n    stockItem.urgency = 'low';\n    analysis.overstock.push(stockItem);\n  } else {\n    analysis.healthy.push(stockItem);\n  }\n}\n\n// Sort by urgency\nanalysis.reorder_needed.sort((a, b) => a.current_stock - b.current_stock);\n\nreturn [{ json: analysis }];"
+      },
+      "id": "analyze-inventory",
+      "name": "Analyze Inventory Levels",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1140, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "needs-reorder",
+              "leftValue": "={{ $json.reorder_needed.length }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "check-reorder",
+      "name": "Needs Reorder?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [1360, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "const analysis = $input.first().json;\nconst reorderItems = analysis.reorder_needed;\n\n// Group by vendor for efficient ordering\nconst vendorOrders = {};\n\nfor (const item of reorderItems) {\n  const vendorId = item.vendor_id || 'default';\n  if (!vendorOrders[vendorId]) {\n    vendorOrders[vendorId] = {\n      vendor_id: vendorId,\n      items: [],\n      total_value: 0\n    };\n  }\n  \n  const orderQty = item.reorder_quantity;\n  const lineTotal = orderQty * item.unit_cost;\n  \n  vendorOrders[vendorId].items.push({\n    sku: item.sku,\n    name: item.name,\n    quantity: orderQty,\n    unit_cost: item.unit_cost,\n    line_total: lineTotal,\n    urgency: item.urgency\n  });\n  \n  vendorOrders[vendorId].total_value += lineTotal;\n}\n\nreturn Object.values(vendorOrders).map(order => ({ json: order }));"
+      },
+      "id": "prepare-orders",
+      "name": "Prepare Vendor Orders",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1580, 200]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.INVENTORY_API_URL }}/api/purchase-orders/draft",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $env.INVENTORY_API_KEY }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"vendor_id\": \"{{ $json.vendor_id }}\",\n  \"items\": {{ JSON.stringify($json.items) }},\n  \"total_value\": {{ $json.total_value }},\n  \"status\": \"draft\",\n  \"auto_generated\": true,\n  \"created_at\": \"{{ new Date().toISOString() }}\"\n}",
+        "options": {}
+      },
+      "id": "create-draft-po",
+      "name": "Create Draft PO",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1800, 200]
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $env.PURCHASING_EMAIL }}",
+        "subject": "=Inventory Alert: {{ $json.out_of_stock.length }} Out of Stock, {{ $json.low_stock.length }} Low Stock",
+        "emailType": "html",
+        "message": "=<div style=\"font-family: Arial, sans-serif; max-width: 700px; margin: 0 auto;\">\n<h1>Daily Inventory Alert</h1>\n<p>The following items require attention:</p>\n\n{{ $json.out_of_stock.length > 0 ? `<h2 style=\"color: #d32f2f;\">Out of Stock (${$json.out_of_stock.length})</h2><table style=\"width: 100%; border-collapse: collapse; margin: 10px 0;\"><tr style=\"background: #ffebee;\"><th style=\"padding: 8px; border: 1px solid #ddd;\">SKU</th><th style=\"padding: 8px; border: 1px solid #ddd;\">Product</th><th style=\"padding: 8px; border: 1px solid #ddd;\">Location</th></tr>${$json.out_of_stock.map(item => '<tr><td style=\"padding: 8px; border: 1px solid #ddd;\">' + item.sku + '</td><td style=\"padding: 8px; border: 1px solid #ddd;\">' + item.name + '</td><td style=\"padding: 8px; border: 1px solid #ddd;\">' + item.location + '</td></tr>').join('')}</table>` : '' }}\n\n{{ $json.low_stock.length > 0 ? `<h2 style=\"color: #ff9800;\">Low Stock (${$json.low_stock.length})</h2><table style=\"width: 100%; border-collapse: collapse; margin: 10px 0;\"><tr style=\"background: #fff3e0;\"><th style=\"padding: 8px; border: 1px solid #ddd;\">SKU</th><th style=\"padding: 8px; border: 1px solid #ddd;\">Product</th><th style=\"padding: 8px; border: 1px solid #ddd;\">Current</th><th style=\"padding: 8px; border: 1px solid #ddd;\">Reorder Point</th></tr>${$json.low_stock.map(item => '<tr><td style=\"padding: 8px; border: 1px solid #ddd;\">' + item.sku + '</td><td style=\"padding: 8px; border: 1px solid #ddd;\">' + item.name + '</td><td style=\"padding: 8px; border: 1px solid #ddd;\">' + item.current_stock + '</td><td style=\"padding: 8px; border: 1px solid #ddd;\">' + item.reorder_point + '</td></tr>').join('')}</table>` : '' }}\n\n<h3>Summary</h3>\n<ul>\n<li>Total Inventory Value: ${{ $json.total_value.toLocaleString() }}</li>\n<li>Total Items: {{ $json.total_items.toLocaleString() }}</li>\n<li>Items Needing Reorder: {{ $json.reorder_needed.length }}</li>\n</ul>\n\n<p>Draft purchase orders have been created for review.</p>\n\n<p><a href=\"{{ $env.INVENTORY_PORTAL_URL }}/purchase-orders/pending\" style=\"background: #1976d2; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px;\">Review Purchase Orders</a></p>\n</div>",
+        "options": {}
+      },
+      "id": "email-inventory-alert",
+      "name": "Email Inventory Alert",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [1580, 360],
+      "credentials": {
+        "smtp": {
+          "id": "smtp-creds",
+          "name": "SMTP"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "channel": "={{ $env.SLACK_OPS_CHANNEL }}",
+        "text": "=📦 *Daily Inventory Report*",
+        "otherOptions": {},
+        "attachments": [
+          {
+            "color": "={{ $json.out_of_stock.length > 0 ? '#d32f2f' : $json.low_stock.length > 0 ? '#ff9800' : '#4caf50' }}",
+            "fields": {
+              "item": [
+                {
+                  "title": "Out of Stock",
+                  "value": "={{ $json.out_of_stock.length }} items",
+                  "short": true
+                },
+                {
+                  "title": "Low Stock",
+                  "value": "={{ $json.low_stock.length }} items",
+                  "short": true
+                },
+                {
+                  "title": "Overstock",
+                  "value": "={{ $json.overstock.length }} items",
+                  "short": true
+                },
+                {
+                  "title": "Total Value",
+                  "value": "=${{ $json.total_value.toLocaleString() }}",
+                  "short": true
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "id": "slack-inventory",
+      "name": "Slack Inventory Report",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.2,
+      "position": [1800, 360],
+      "credentials": {
+        "slackApi": {
+          "id": "slack-creds",
+          "name": "Slack API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $env.INVENTORY_API_URL }}/api/products/{{ $json.sku }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $env.INVENTORY_API_KEY }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "fetch-product",
+      "name": "Fetch Product",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [920, 520]
+    },
+    {
+      "parameters": {
+        "jsCode": "const update = $input.first().json;\nconst product = update.product;\n\n// Calculate new quantity\nlet newQuantity = product.quantity_on_hand || 0;\n\nswitch (update.change_type) {\n  case 'receipt':\n  case 'return':\n  case 'adjustment_add':\n    newQuantity += Math.abs(update.quantity_change);\n    break;\n  case 'sale':\n  case 'transfer_out':\n  case 'damage':\n  case 'adjustment_subtract':\n    newQuantity -= Math.abs(update.quantity_change);\n    break;\n}\n\n// Ensure non-negative\nnewQuantity = Math.max(0, newQuantity);\n\n// Check if new quantity triggers alert\nconst reorderPoint = product.reorder_point || 10;\nconst triggerAlert = newQuantity <= reorderPoint && product.quantity_on_hand > reorderPoint;\n\nreturn [{\n  json: {\n    ...update,\n    product: product,\n    previous_quantity: product.quantity_on_hand,\n    new_quantity: newQuantity,\n    trigger_low_stock_alert: triggerAlert,\n    is_out_of_stock: newQuantity === 0,\n    timestamp: new Date().toISOString()\n  }\n}];"
+      },
+      "id": "calculate-change",
+      "name": "Calculate Quantity Change",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1140, 520]
+    },
+    {
+      "parameters": {
+        "method": "PUT",
+        "url": "={{ $env.INVENTORY_API_URL }}/api/products/{{ $json.sku }}/stock",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $env.INVENTORY_API_KEY }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"quantity_on_hand\": {{ $json.new_quantity }},\n  \"last_updated\": \"{{ $json.timestamp }}\",\n  \"change_type\": \"{{ $json.change_type }}\",\n  \"change_amount\": {{ $json.quantity_change }},\n  \"reference\": \"{{ $json.reference }}\",\n  \"location\": \"{{ $json.location }}\"\n}",
+        "options": {}
+      },
+      "id": "update-stock",
+      "name": "Update Stock Level",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1360, 520]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "low-stock",
+              "leftValue": "={{ $json.trigger_low_stock_alert || $json.is_out_of_stock }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "check-alert",
+      "name": "Trigger Alert?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [1580, 520]
+    },
+    {
+      "parameters": {
+        "channel": "={{ $env.SLACK_OPS_CHANNEL }}",
+        "text": "={{ $json.is_out_of_stock ? '🚨 *OUT OF STOCK*' : '⚠️ *Low Stock Alert*' }}",
+        "otherOptions": {},
+        "attachments": [
+          {
+            "color": "={{ $json.is_out_of_stock ? '#d32f2f' : '#ff9800' }}",
+            "fields": {
+              "item": [
+                {
+                  "title": "SKU",
+                  "value": "={{ $json.sku }}",
+                  "short": true
+                },
+                {
+                  "title": "Product",
+                  "value": "={{ $json.product_name }}",
+                  "short": true
+                },
+                {
+                  "title": "Current Stock",
+                  "value": "={{ $json.new_quantity }}",
+                  "short": true
+                },
+                {
+                  "title": "Reorder Point",
+                  "value": "={{ $json.product.reorder_point }}",
+                  "short": true
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "id": "slack-stock-alert",
+      "name": "Slack Stock Alert",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.2,
+      "position": [1800, 460],
+      "credentials": {
+        "slackApi": {
+          "id": "slack-creds",
+          "name": "Slack API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ success: true, sku: $json.sku, new_quantity: $json.new_quantity }) }}",
+        "options": {}
+      },
+      "id": "respond-update",
+      "name": "Respond Update Success",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [2020, 520]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $env.INVENTORY_API_URL }}/api/vendors/{{ $json.vendor_id }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $env.INVENTORY_API_KEY }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "fetch-vendor",
+      "name": "Fetch Vendor",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [920, 740]
+    },
+    {
+      "parameters": {
+        "jsCode": "const po = $input.first().json;\nconst vendor = po.vendor;\n\nlet totalValue = 0;\nconst lineItems = [];\n\nfor (const item of po.items) {\n  const lineTotal = item.quantity * item.unit_price;\n  totalValue += lineTotal;\n  \n  lineItems.push({\n    ...item,\n    line_total: lineTotal\n  });\n}\n\nreturn [{\n  json: {\n    po_number: po.po_number,\n    vendor: {\n      id: vendor.id,\n      name: vendor.name,\n      email: vendor.contact_email,\n      payment_terms: vendor.payment_terms\n    },\n    items: lineItems,\n    subtotal: totalValue,\n    tax: totalValue * 0.08, // 8% tax\n    total: totalValue * 1.08,\n    requested_by: po.requested_by,\n    status: 'pending_approval',\n    created_at: new Date().toISOString(),\n    expected_delivery: new Date(Date.now() + vendor.lead_time_days * 24 * 60 * 60 * 1000).toISOString().split('T')[0]\n  }\n}];"
+      },
+      "id": "process-po",
+      "name": "Process Purchase Order",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1140, 740]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.INVENTORY_API_URL }}/api/purchase-orders",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $env.INVENTORY_API_KEY }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json) }}",
+        "options": {}
+      },
+      "id": "save-po",
+      "name": "Save Purchase Order",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1360, 740]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "needs-approval",
+              "leftValue": "={{ $json.total }}",
+              "rightValue": 1000,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "check-approval",
+      "name": "Needs Approval?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [1580, 740]
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $env.PURCHASING_MANAGER_EMAIL }}",
+        "subject": "=PO Approval Required: {{ $json.po_number }} - ${{ $json.total.toFixed(2) }}",
+        "emailType": "html",
+        "message": "=<div style=\"font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;\">\n<h2>Purchase Order Approval Required</h2>\n\n<div style=\"background: #f5f5f5; padding: 15px; border-radius: 4px; margin: 20px 0;\">\n<p><strong>PO Number:</strong> {{ $json.po_number }}</p>\n<p><strong>Vendor:</strong> {{ $json.vendor.name }}</p>\n<p><strong>Total:</strong> ${{ $json.total.toFixed(2) }}</p>\n<p><strong>Requested By:</strong> {{ $json.requested_by }}</p>\n<p><strong>Expected Delivery:</strong> {{ $json.expected_delivery }}</p>\n</div>\n\n<h3>Line Items</h3>\n<table style=\"width: 100%; border-collapse: collapse;\">\n<tr style=\"background: #f5f5f5;\">\n<th style=\"padding: 8px; border: 1px solid #ddd;\">SKU</th>\n<th style=\"padding: 8px; border: 1px solid #ddd;\">Description</th>\n<th style=\"padding: 8px; border: 1px solid #ddd;\">Qty</th>\n<th style=\"padding: 8px; border: 1px solid #ddd;\">Unit Price</th>\n<th style=\"padding: 8px; border: 1px solid #ddd;\">Total</th>\n</tr>\n{{ $json.items.map(item => '<tr><td style=\"padding: 8px; border: 1px solid #ddd;\">' + item.sku + '</td><td style=\"padding: 8px; border: 1px solid #ddd;\">' + item.description + '</td><td style=\"padding: 8px; border: 1px solid #ddd;\">' + item.quantity + '</td><td style=\"padding: 8px; border: 1px solid #ddd;\">$' + item.unit_price.toFixed(2) + '</td><td style=\"padding: 8px; border: 1px solid #ddd;\">$' + item.line_total.toFixed(2) + '</td></tr>').join('') }}\n</table>\n\n<div style=\"margin: 20px 0;\">\n<a href=\"{{ $env.INVENTORY_PORTAL_URL }}/po/{{ $json.po_number }}/approve\" style=\"background: #4CAF50; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; margin-right: 10px;\">Approve</a>\n<a href=\"{{ $env.INVENTORY_PORTAL_URL }}/po/{{ $json.po_number }}/reject\" style=\"background: #f44336; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px;\">Reject</a>\n</div>\n</div>",
+        "options": {}
+      },
+      "id": "email-po-approval",
+      "name": "Email PO Approval Request",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [1800, 680],
+      "credentials": {
+        "smtp": {
+          "id": "smtp-creds",
+          "name": "SMTP"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.vendor.email }}",
+        "subject": "=Purchase Order {{ $json.po_number }} from {{ $env.COMPANY_NAME }}",
+        "emailType": "html",
+        "message": "=<div style=\"font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;\">\n<h2>Purchase Order</h2>\n<p>Please find our purchase order details below:</p>\n\n<div style=\"background: #e3f2fd; padding: 15px; border-radius: 4px; margin: 20px 0;\">\n<p><strong>PO Number:</strong> {{ $json.po_number }}</p>\n<p><strong>Date:</strong> {{ new Date().toLocaleDateString() }}</p>\n<p><strong>Payment Terms:</strong> {{ $json.vendor.payment_terms }}</p>\n</div>\n\n<table style=\"width: 100%; border-collapse: collapse;\">\n<tr style=\"background: #f5f5f5;\">\n<th style=\"padding: 8px; border: 1px solid #ddd;\">SKU</th>\n<th style=\"padding: 8px; border: 1px solid #ddd;\">Description</th>\n<th style=\"padding: 8px; border: 1px solid #ddd;\">Qty</th>\n<th style=\"padding: 8px; border: 1px solid #ddd;\">Unit Price</th>\n<th style=\"padding: 8px; border: 1px solid #ddd;\">Total</th>\n</tr>\n{{ $json.items.map(item => '<tr><td style=\"padding: 8px; border: 1px solid #ddd;\">' + item.sku + '</td><td style=\"padding: 8px; border: 1px solid #ddd;\">' + item.description + '</td><td style=\"padding: 8px; border: 1px solid #ddd;\">' + item.quantity + '</td><td style=\"padding: 8px; border: 1px solid #ddd;\">$' + item.unit_price.toFixed(2) + '</td><td style=\"padding: 8px; border: 1px solid #ddd;\">$' + item.line_total.toFixed(2) + '</td></tr>').join('') }}\n<tr><td colspan=\"4\" style=\"padding: 8px; border: 1px solid #ddd; text-align: right;\"><strong>Subtotal</strong></td><td style=\"padding: 8px; border: 1px solid #ddd;\">${{ $json.subtotal.toFixed(2) }}</td></tr>\n<tr><td colspan=\"4\" style=\"padding: 8px; border: 1px solid #ddd; text-align: right;\">Tax</td><td style=\"padding: 8px; border: 1px solid #ddd;\">${{ $json.tax.toFixed(2) }}</td></tr>\n<tr style=\"background: #f5f5f5;\"><td colspan=\"4\" style=\"padding: 8px; border: 1px solid #ddd; text-align: right;\"><strong>Total</strong></td><td style=\"padding: 8px; border: 1px solid #ddd;\"><strong>${{ $json.total.toFixed(2) }}</strong></td></tr>\n</table>\n\n<p>Please confirm receipt and expected delivery date.</p>\n</div>",
+        "options": {}
+      },
+      "id": "email-vendor",
+      "name": "Email Vendor PO",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [1800, 840],
+      "credentials": {
+        "smtp": {
+          "id": "smtp-creds",
+          "name": "SMTP"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ success: true, po_number: $json.po_number, status: $json.status }) }}",
+        "options": {}
+      },
+      "id": "respond-po",
+      "name": "Respond PO Created",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [2020, 740]
+    }
+  ],
+  "connections": {
+    "Daily Inventory Check": {
+      "main": [
+        [
+          {
+            "node": "Set Daily Check",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Inventory Update Webhook": {
+      "main": [
+        [
+          {
+            "node": "Set Update Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Purchase Order Webhook": {
+      "main": [
+        [
+          {
+            "node": "Set PO Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Daily Check": {
+      "main": [
+        [
+          {
+            "node": "Route by Action",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Update Data": {
+      "main": [
+        [
+          {
+            "node": "Route by Action",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set PO Data": {
+      "main": [
+        [
+          {
+            "node": "Route by Action",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route by Action": {
+      "main": [
+        [
+          {
+            "node": "Fetch All Inventory",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Fetch Product",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Fetch Vendor",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch All Inventory": {
+      "main": [
+        [
+          {
+            "node": "Analyze Inventory Levels",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyze Inventory Levels": {
+      "main": [
+        [
+          {
+            "node": "Needs Reorder?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Needs Reorder?": {
+      "main": [
+        [
+          {
+            "node": "Prepare Vendor Orders",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Email Inventory Alert",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Slack Inventory Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Vendor Orders": {
+      "main": [
+        [
+          {
+            "node": "Create Draft PO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Email Inventory Alert": {
+      "main": [
+        [
+          {
+            "node": "Slack Inventory Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Product": {
+      "main": [
+        [
+          {
+            "node": "Calculate Quantity Change",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calculate Quantity Change": {
+      "main": [
+        [
+          {
+            "node": "Update Stock Level",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Stock Level": {
+      "main": [
+        [
+          {
+            "node": "Trigger Alert?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Trigger Alert?": {
+      "main": [
+        [
+          {
+            "node": "Slack Stock Alert",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond Update Success",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Slack Stock Alert": {
+      "main": [
+        [
+          {
+            "node": "Respond Update Success",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Vendor": {
+      "main": [
+        [
+          {
+            "node": "Process Purchase Order",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Process Purchase Order": {
+      "main": [
+        [
+          {
+            "node": "Save Purchase Order",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save Purchase Order": {
+      "main": [
+        [
+          {
+            "node": "Needs Approval?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Needs Approval?": {
+      "main": [
+        [
+          {
+            "node": "Email PO Approval Request",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Email Vendor PO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Email PO Approval Request": {
+      "main": [
+        [
+          {
+            "node": "Respond PO Created",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Email Vendor PO": {
+      "main": [
+        [
+          {
+            "node": "Respond PO Created",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "inventory-v1",
+  "meta": {
+    "instanceId": "n8n-workflows-library"
+  },
+  "id": "inventory-management",
+  "tags": [
+    {
+      "id": "operations",
+      "name": "Operations"
+    },
+    {
+      "id": "inventory",
+      "name": "Inventory"
+    },
+    {
+      "id": "purchasing",
+      "name": "Purchasing"
+    }
+  ]
+}
