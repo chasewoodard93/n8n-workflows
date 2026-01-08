@@ -1,0 +1,1145 @@
+{
+  "name": "IT Ticket Routing and Management",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "ticket-create",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "ticket-webhook",
+      "name": "New Ticket Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "ticket-update",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "update-webhook",
+      "name": "Ticket Update Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [240, 520]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 15
+            }
+          ]
+        }
+      },
+      "id": "sla-check",
+      "name": "SLA Check Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [240, 740]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "action",
+              "name": "action",
+              "value": "new_ticket",
+              "type": "string"
+            },
+            {
+              "id": "ticket_id",
+              "name": "ticket_id",
+              "value": "=TKT-{{ Date.now() }}",
+              "type": "string"
+            },
+            {
+              "id": "subject",
+              "name": "subject",
+              "value": "={{ $json.body.subject }}",
+              "type": "string"
+            },
+            {
+              "id": "description",
+              "name": "description",
+              "value": "={{ $json.body.description }}",
+              "type": "string"
+            },
+            {
+              "id": "requester_id",
+              "name": "requester_id",
+              "value": "={{ $json.body.requester_id }}",
+              "type": "string"
+            },
+            {
+              "id": "requester_email",
+              "name": "requester_email",
+              "value": "={{ $json.body.requester_email }}",
+              "type": "string"
+            },
+            {
+              "id": "category",
+              "name": "category",
+              "value": "={{ $json.body.category }}",
+              "type": "string"
+            },
+            {
+              "id": "priority",
+              "name": "priority",
+              "value": "={{ $json.body.priority }}",
+              "type": "string"
+            },
+            {
+              "id": "source",
+              "name": "source",
+              "value": "={{ $json.body.source || 'portal' }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "set-ticket",
+      "name": "Set Ticket Data",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "action",
+              "name": "action",
+              "value": "update",
+              "type": "string"
+            },
+            {
+              "id": "ticket_id",
+              "name": "ticket_id",
+              "value": "={{ $json.body.ticket_id }}",
+              "type": "string"
+            },
+            {
+              "id": "update_type",
+              "name": "update_type",
+              "value": "={{ $json.body.update_type }}",
+              "type": "string"
+            },
+            {
+              "id": "new_status",
+              "name": "new_status",
+              "value": "={{ $json.body.new_status }}",
+              "type": "string"
+            },
+            {
+              "id": "comment",
+              "name": "comment",
+              "value": "={{ $json.body.comment }}",
+              "type": "string"
+            },
+            {
+              "id": "agent_id",
+              "name": "agent_id",
+              "value": "={{ $json.body.agent_id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "set-update",
+      "name": "Set Update Data",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [460, 520]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "action",
+              "name": "action",
+              "value": "sla_check",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "set-sla",
+      "name": "Set SLA Check",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [460, 740]
+    },
+    {
+      "parameters": {
+        "rules": {
+          "rules": [
+            {
+              "outputKey": "new",
+              "conditions": {
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.action }}",
+                    "rightValue": "new_ticket",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "outputKey": "update",
+              "conditions": {
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.action }}",
+                    "rightValue": "update",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "outputKey": "sla",
+              "conditions": {
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.action }}",
+                    "rightValue": "sla_check",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "route-action",
+      "name": "Route by Action",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [680, 520]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "Analyze this IT support ticket and classify it:\n\nSubject: {{ $json.subject }}\nDescription: {{ $json.description }}\nCategory (if provided): {{ $json.category }}\nPriority (if provided): {{ $json.priority }}\n\nDetermine:\n1. Category: hardware, software, network, security, access, email, printing, other\n2. Subcategory: more specific classification\n3. Priority: critical, high, medium, low\n4. Estimated complexity: simple, moderate, complex\n5. Suggested team: helpdesk, desktop_support, network_team, security_team, systems_admin\n6. Auto-resolution possible: true/false\n7. If auto-resolvable, provide step-by-step resolution\n8. Keywords for knowledge base search\n\nReturn as JSON.",
+        "options": {
+          "systemMessage": "You are an IT support specialist. Accurately classify tickets to ensure proper routing and SLA assignment."
+        }
+      },
+      "id": "ai-classify",
+      "name": "AI Classify Ticket",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.4,
+      "position": [920, 300]
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "claude-sonnet-4-20250514",
+          "mode": "list",
+          "cachedResultName": "claude-sonnet-4-20250514"
+        },
+        "options": {
+          "temperature": 0.2
+        }
+      },
+      "id": "anthropic-model",
+      "name": "Claude Sonnet",
+      "type": "@n8n/n8n-nodes-langchain.lmChatAnthropic",
+      "typeVersion": 1.2,
+      "position": [940, 500]
+    },
+    {
+      "parameters": {
+        "jsCode": "const ticket = $input.first().json;\nlet classification;\n\ntry {\n  classification = JSON.parse(ticket.text || ticket.response);\n} catch (e) {\n  classification = {\n    category: ticket.category || 'other',\n    priority: ticket.priority || 'medium',\n    suggested_team: 'helpdesk',\n    auto_resolution_possible: false\n  };\n}\n\n// Determine SLA based on priority\nconst slaHours = {\n  critical: { response: 0.25, resolution: 4 },\n  high: { response: 1, resolution: 8 },\n  medium: { response: 4, resolution: 24 },\n  low: { response: 8, resolution: 72 }\n};\n\nconst priority = classification.priority || 'medium';\nconst sla = slaHours[priority];\n\nconst now = new Date();\nconst responseDeadline = new Date(now.getTime() + sla.response * 60 * 60 * 1000);\nconst resolutionDeadline = new Date(now.getTime() + sla.resolution * 60 * 60 * 1000);\n\nreturn [{\n  json: {\n    ...ticket,\n    classification: classification,\n    category: classification.category,\n    subcategory: classification.subcategory,\n    priority: classification.priority,\n    assigned_team: classification.suggested_team,\n    auto_resolution_possible: classification.auto_resolution_possible,\n    auto_resolution_steps: classification.auto_resolution_steps,\n    sla: {\n      response_hours: sla.response,\n      resolution_hours: sla.resolution,\n      response_deadline: responseDeadline.toISOString(),\n      resolution_deadline: resolutionDeadline.toISOString()\n    },\n    status: 'new',\n    created_at: now.toISOString()\n  }\n}];"
+      },
+      "id": "process-classification",
+      "name": "Process Classification",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1140, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "auto-resolve",
+              "leftValue": "={{ $json.auto_resolution_possible }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "check-auto-resolve",
+      "name": "Can Auto-Resolve?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [1360, 300]
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.requester_email }}",
+        "subject": "=Re: {{ $json.subject }} [{{ $json.ticket_id }}]",
+        "emailType": "html",
+        "message": "=<div style=\"font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;\">\n<h2>Automated Resolution</h2>\n<p>Hi there,</p>\n<p>Based on your request, here are the steps to resolve your issue:</p>\n\n<div style=\"background: #e3f2fd; padding: 15px; border-radius: 4px; margin: 20px 0;\">\n<h3>Resolution Steps:</h3>\n<ol>\n{{ $json.auto_resolution_steps.map(step => `<li>${step}</li>`).join('') }}\n</ol>\n</div>\n\n<p>If these steps resolve your issue, no further action is needed and your ticket will be automatically closed in 24 hours.</p>\n\n<p>If you still need assistance, please reply to this email or click below:</p>\n\n<a href=\"{{ $env.IT_PORTAL_URL }}/tickets/{{ $json.ticket_id }}/escalate\" style=\"background: #1976d2; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px;\">I Still Need Help</a>\n\n<p style=\"margin-top: 20px; font-size: 12px; color: #666;\">Ticket ID: {{ $json.ticket_id }}</p>\n</div>",
+        "options": {}
+      },
+      "id": "send-auto-resolution",
+      "name": "Send Auto-Resolution",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [1580, 200],
+      "credentials": {
+        "smtp": {
+          "id": "smtp-creds",
+          "name": "SMTP"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.TICKETING_API_URL }}/api/tickets",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $env.TICKETING_API_KEY }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ ...$json, status: 'auto_resolved' }) }}",
+        "options": {}
+      },
+      "id": "save-auto-resolved",
+      "name": "Save Auto-Resolved Ticket",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1800, 200]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.TICKETING_API_URL }}/api/tickets",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $env.TICKETING_API_KEY }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json) }}",
+        "options": {}
+      },
+      "id": "save-ticket",
+      "name": "Save Ticket",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1580, 400]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $env.TICKETING_API_URL }}/api/agents?team={{ $json.assigned_team }}&available=true",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $env.TICKETING_API_KEY }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "find-agent",
+      "name": "Find Available Agent",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1800, 400]
+    },
+    {
+      "parameters": {
+        "jsCode": "const ticket = $input.first().json;\nconst agents = ticket.available_agents || [];\n\n// Round-robin or load-based assignment\nlet assignedAgent = null;\n\nif (agents.length > 0) {\n  // Sort by current workload (fewest open tickets)\n  agents.sort((a, b) => (a.open_tickets || 0) - (b.open_tickets || 0));\n  assignedAgent = agents[0];\n}\n\nreturn [{\n  json: {\n    ...ticket,\n    assigned_agent: assignedAgent,\n    assigned_agent_id: assignedAgent?.id,\n    assigned_agent_email: assignedAgent?.email,\n    status: assignedAgent ? 'assigned' : 'unassigned'\n  }\n}];"
+      },
+      "id": "assign-agent",
+      "name": "Assign Agent",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [2020, 400]
+    },
+    {
+      "parameters": {
+        "method": "PUT",
+        "url": "={{ $env.TICKETING_API_URL }}/api/tickets/{{ $json.ticket_id }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $env.TICKETING_API_KEY }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"assigned_agent_id\": \"{{ $json.assigned_agent_id }}\",\n  \"status\": \"{{ $json.status }}\"\n}",
+        "options": {}
+      },
+      "id": "update-assignment",
+      "name": "Update Assignment",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [2240, 400]
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.assigned_agent_email }}",
+        "subject": "=New Ticket Assigned: {{ $json.subject }} [{{ $json.ticket_id }}]",
+        "emailType": "html",
+        "message": "=<div style=\"font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;\">\n<h2>New Ticket Assigned to You</h2>\n\n<div style=\"background: {{ $json.priority === 'critical' ? '#ffebee' : $json.priority === 'high' ? '#fff3e0' : '#e3f2fd' }}; padding: 15px; border-radius: 4px; margin: 20px 0;\">\n<p><strong>Ticket ID:</strong> {{ $json.ticket_id }}</p>\n<p><strong>Priority:</strong> {{ $json.priority.toUpperCase() }}</p>\n<p><strong>Category:</strong> {{ $json.category }} / {{ $json.subcategory }}</p>\n<p><strong>Subject:</strong> {{ $json.subject }}</p>\n<p><strong>Requester:</strong> {{ $json.requester_email }}</p>\n</div>\n\n<h3>Description</h3>\n<p>{{ $json.description }}</p>\n\n<h3>SLA</h3>\n<p><strong>Response Due:</strong> {{ new Date($json.sla.response_deadline).toLocaleString() }}</p>\n<p><strong>Resolution Due:</strong> {{ new Date($json.sla.resolution_deadline).toLocaleString() }}</p>\n\n<p style=\"margin: 20px 0;\"><a href=\"{{ $env.IT_PORTAL_URL }}/agent/tickets/{{ $json.ticket_id }}\" style=\"background: #1976d2; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px;\">Open Ticket</a></p>\n</div>",
+        "options": {}
+      },
+      "id": "email-agent",
+      "name": "Email Assigned Agent",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [2460, 400],
+      "credentials": {
+        "smtp": {
+          "id": "smtp-creds",
+          "name": "SMTP"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.requester_email }}",
+        "subject": "=Ticket Received: {{ $json.subject }} [{{ $json.ticket_id }}]",
+        "emailType": "html",
+        "message": "=<div style=\"font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;\">\n<h2>We've Received Your Request</h2>\n<p>Thank you for contacting IT Support. Your ticket has been received and assigned to our team.</p>\n\n<div style=\"background: #f5f5f5; padding: 15px; border-radius: 4px; margin: 20px 0;\">\n<p><strong>Ticket ID:</strong> {{ $json.ticket_id }}</p>\n<p><strong>Subject:</strong> {{ $json.subject }}</p>\n<p><strong>Priority:</strong> {{ $json.priority }}</p>\n<p><strong>Status:</strong> {{ $json.status }}</p>\n</div>\n\n<p>You can expect a response within {{ $json.sla.response_hours }} hours.</p>\n\n<p><a href=\"{{ $env.IT_PORTAL_URL }}/tickets/{{ $json.ticket_id }}\">Track Your Ticket</a></p>\n\n<p style=\"font-size: 12px; color: #666;\">Please include your ticket ID ({{ $json.ticket_id }}) in any follow-up communications.</p>\n</div>",
+        "options": {}
+      },
+      "id": "email-requester",
+      "name": "Email Requester",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [2460, 280],
+      "credentials": {
+        "smtp": {
+          "id": "smtp-creds",
+          "name": "SMTP"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "channel": "={{ $json.priority === 'critical' ? $env.SLACK_IT_URGENT : $env.SLACK_IT_CHANNEL }}",
+        "text": "=🎫 *New Ticket{{ $json.priority === 'critical' ? ' - CRITICAL' : '' }}*",
+        "otherOptions": {},
+        "attachments": [
+          {
+            "color": "={{ $json.priority === 'critical' ? '#d32f2f' : $json.priority === 'high' ? '#ff9800' : '#2196f3' }}",
+            "fields": {
+              "item": [
+                {
+                  "title": "Ticket",
+                  "value": "={{ $json.ticket_id }}",
+                  "short": true
+                },
+                {
+                  "title": "Priority",
+                  "value": "={{ $json.priority.toUpperCase() }}",
+                  "short": true
+                },
+                {
+                  "title": "Category",
+                  "value": "={{ $json.category }}",
+                  "short": true
+                },
+                {
+                  "title": "Assigned To",
+                  "value": "={{ $json.assigned_agent?.name || 'Unassigned' }}",
+                  "short": true
+                },
+                {
+                  "title": "Subject",
+                  "value": "={{ $json.subject }}",
+                  "short": false
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "id": "slack-new-ticket",
+      "name": "Slack New Ticket",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.2,
+      "position": [2680, 340],
+      "credentials": {
+        "slackApi": {
+          "id": "slack-creds",
+          "name": "Slack API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ success: true, ticket_id: $json.ticket_id, status: $json.status }) }}",
+        "options": {}
+      },
+      "id": "respond-new",
+      "name": "Respond Ticket Created",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [2900, 340]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $env.TICKETING_API_URL }}/api/tickets/{{ $json.ticket_id }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $env.TICKETING_API_KEY }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "fetch-ticket",
+      "name": "Fetch Ticket",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [920, 520]
+    },
+    {
+      "parameters": {
+        "method": "PUT",
+        "url": "={{ $env.TICKETING_API_URL }}/api/tickets/{{ $json.ticket_id }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $env.TICKETING_API_KEY }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"status\": \"{{ $json.new_status }}\",\n  \"updated_by\": \"{{ $json.agent_id }}\",\n  \"updated_at\": \"{{ new Date().toISOString() }}\"\n}",
+        "options": {}
+      },
+      "id": "update-status",
+      "name": "Update Ticket Status",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1140, 520]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "is-resolved",
+              "leftValue": "={{ $json.new_status }}",
+              "rightValue": "resolved",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "check-resolved",
+      "name": "Is Resolved?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [1360, 520]
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.requester_email }}",
+        "subject": "=Ticket Resolved: {{ $json.subject }} [{{ $json.ticket_id }}]",
+        "emailType": "html",
+        "message": "=<div style=\"font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;\">\n<h2 style=\"color: #4CAF50;\">Your Ticket Has Been Resolved</h2>\n<p>Great news! Your support request has been resolved.</p>\n\n<div style=\"background: #e8f5e9; padding: 15px; border-radius: 4px; margin: 20px 0;\">\n<p><strong>Ticket ID:</strong> {{ $json.ticket_id }}</p>\n<p><strong>Subject:</strong> {{ $json.subject }}</p>\n<p><strong>Resolution:</strong> {{ $json.comment }}</p>\n</div>\n\n<p>If this issue persists or you need further assistance, please reply to this email or reopen your ticket.</p>\n\n<p>We'd appreciate your feedback:</p>\n<div style=\"margin: 20px 0;\">\n<a href=\"{{ $env.IT_PORTAL_URL }}/feedback/{{ $json.ticket_id }}?rating=5\" style=\"font-size: 24px; text-decoration: none;\">😊</a>\n<a href=\"{{ $env.IT_PORTAL_URL }}/feedback/{{ $json.ticket_id }}?rating=3\" style=\"font-size: 24px; text-decoration: none; margin-left: 10px;\">😐</a>\n<a href=\"{{ $env.IT_PORTAL_URL }}/feedback/{{ $json.ticket_id }}?rating=1\" style=\"font-size: 24px; text-decoration: none; margin-left: 10px;\">😞</a>\n</div>\n</div>",
+        "options": {}
+      },
+      "id": "email-resolved",
+      "name": "Email Resolution Notice",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [1580, 460],
+      "credentials": {
+        "smtp": {
+          "id": "smtp-creds",
+          "name": "SMTP"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ success: true, ticket_id: $json.ticket_id, status: $json.new_status }) }}",
+        "options": {}
+      },
+      "id": "respond-update",
+      "name": "Respond Update",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [1800, 520]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $env.TICKETING_API_URL }}/api/tickets?status=open,assigned,in_progress",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $env.TICKETING_API_KEY }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "fetch-open-tickets",
+      "name": "Fetch Open Tickets",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [920, 740]
+    },
+    {
+      "parameters": {
+        "jsCode": "const tickets = $input.first().json.tickets || [];\nconst now = new Date();\n\nconst slaStatus = {\n  breached_response: [],\n  breached_resolution: [],\n  at_risk_response: [],\n  at_risk_resolution: [],\n  on_track: []\n};\n\nfor (const ticket of tickets) {\n  const responseDeadline = new Date(ticket.sla?.response_deadline);\n  const resolutionDeadline = new Date(ticket.sla?.resolution_deadline);\n  \n  // Check response SLA\n  if (!ticket.first_response_at) {\n    if (now > responseDeadline) {\n      slaStatus.breached_response.push(ticket);\n    } else if ((responseDeadline - now) < 30 * 60 * 1000) { // 30 min warning\n      slaStatus.at_risk_response.push(ticket);\n    }\n  }\n  \n  // Check resolution SLA\n  if (ticket.status !== 'resolved' && ticket.status !== 'closed') {\n    if (now > resolutionDeadline) {\n      slaStatus.breached_resolution.push(ticket);\n    } else if ((resolutionDeadline - now) < 60 * 60 * 1000) { // 1 hour warning\n      slaStatus.at_risk_resolution.push(ticket);\n    } else {\n      slaStatus.on_track.push(ticket);\n    }\n  }\n}\n\nreturn [{ json: slaStatus }];"
+      },
+      "id": "check-sla-status",
+      "name": "Check SLA Status",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1140, 740]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "has-breaches",
+              "leftValue": "={{ $json.breached_response.length + $json.breached_resolution.length }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "check-breaches",
+      "name": "Any SLA Breaches?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [1360, 740]
+    },
+    {
+      "parameters": {
+        "channel": "={{ $env.SLACK_IT_URGENT }}",
+        "text": "=🚨 *SLA Breach Alert*",
+        "otherOptions": {},
+        "attachments": [
+          {
+            "color": "#d32f2f",
+            "fields": {
+              "item": [
+                {
+                  "title": "Response SLA Breached",
+                  "value": "={{ $json.breached_response.length }} tickets",
+                  "short": true
+                },
+                {
+                  "title": "Resolution SLA Breached",
+                  "value": "={{ $json.breached_resolution.length }} tickets",
+                  "short": true
+                },
+                {
+                  "title": "Tickets at Risk",
+                  "value": "={{ $json.at_risk_response.length + $json.at_risk_resolution.length }}",
+                  "short": true
+                },
+                {
+                  "title": "On Track",
+                  "value": "={{ $json.on_track.length }}",
+                  "short": true
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "id": "slack-sla-alert",
+      "name": "Slack SLA Alert",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.2,
+      "position": [1580, 680],
+      "credentials": {
+        "slackApi": {
+          "id": "slack-creds",
+          "name": "Slack API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "breached_resolution",
+        "options": {}
+      },
+      "id": "split-breached",
+      "name": "Split Breached Tickets",
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [1580, 800]
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.assigned_agent_email }},{{ $env.IT_MANAGER_EMAIL }}",
+        "subject": "=🚨 SLA Breach: {{ $json.ticket_id }} - Immediate Action Required",
+        "emailType": "html",
+        "message": "=<div style=\"font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;\">\n<h2 style=\"color: #d32f2f;\">SLA Breach Alert</h2>\n<p>The following ticket has breached its SLA and requires immediate attention:</p>\n\n<div style=\"background: #ffebee; padding: 15px; border-radius: 4px; margin: 20px 0;\">\n<p><strong>Ticket ID:</strong> {{ $json.ticket_id }}</p>\n<p><strong>Subject:</strong> {{ $json.subject }}</p>\n<p><strong>Priority:</strong> {{ $json.priority }}</p>\n<p><strong>Resolution Deadline:</strong> {{ new Date($json.sla.resolution_deadline).toLocaleString() }}</p>\n<p><strong>Time Overdue:</strong> {{ Math.round((Date.now() - new Date($json.sla.resolution_deadline)) / (1000 * 60 * 60)) }} hours</p>\n</div>\n\n<p><strong>Action Required:</strong> Please escalate or resolve immediately.</p>\n\n<a href=\"{{ $env.IT_PORTAL_URL }}/agent/tickets/{{ $json.ticket_id }}\" style=\"background: #d32f2f; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px;\">Open Ticket Now</a>\n</div>",
+        "options": {}
+      },
+      "id": "email-sla-breach",
+      "name": "Email SLA Breach",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [1800, 800],
+      "credentials": {
+        "smtp": {
+          "id": "smtp-creds",
+          "name": "SMTP"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "New Ticket Webhook": {
+      "main": [
+        [
+          {
+            "node": "Set Ticket Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ticket Update Webhook": {
+      "main": [
+        [
+          {
+            "node": "Set Update Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SLA Check Trigger": {
+      "main": [
+        [
+          {
+            "node": "Set SLA Check",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Ticket Data": {
+      "main": [
+        [
+          {
+            "node": "Route by Action",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Update Data": {
+      "main": [
+        [
+          {
+            "node": "Route by Action",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set SLA Check": {
+      "main": [
+        [
+          {
+            "node": "Route by Action",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route by Action": {
+      "main": [
+        [
+          {
+            "node": "AI Classify Ticket",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Fetch Ticket",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Fetch Open Tickets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Classify Ticket": {
+      "main": [
+        [
+          {
+            "node": "Process Classification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Claude Sonnet": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Classify Ticket",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Process Classification": {
+      "main": [
+        [
+          {
+            "node": "Can Auto-Resolve?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Can Auto-Resolve?": {
+      "main": [
+        [
+          {
+            "node": "Send Auto-Resolution",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Save Ticket",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Auto-Resolution": {
+      "main": [
+        [
+          {
+            "node": "Save Auto-Resolved Ticket",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save Auto-Resolved Ticket": {
+      "main": [
+        [
+          {
+            "node": "Respond Ticket Created",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save Ticket": {
+      "main": [
+        [
+          {
+            "node": "Find Available Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Find Available Agent": {
+      "main": [
+        [
+          {
+            "node": "Assign Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Assign Agent": {
+      "main": [
+        [
+          {
+            "node": "Update Assignment",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Assignment": {
+      "main": [
+        [
+          {
+            "node": "Email Assigned Agent",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Email Requester",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Email Assigned Agent": {
+      "main": [
+        [
+          {
+            "node": "Slack New Ticket",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Slack New Ticket": {
+      "main": [
+        [
+          {
+            "node": "Respond Ticket Created",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Ticket": {
+      "main": [
+        [
+          {
+            "node": "Update Ticket Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Ticket Status": {
+      "main": [
+        [
+          {
+            "node": "Is Resolved?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Resolved?": {
+      "main": [
+        [
+          {
+            "node": "Email Resolution Notice",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond Update",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Email Resolution Notice": {
+      "main": [
+        [
+          {
+            "node": "Respond Update",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Open Tickets": {
+      "main": [
+        [
+          {
+            "node": "Check SLA Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check SLA Status": {
+      "main": [
+        [
+          {
+            "node": "Any SLA Breaches?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Any SLA Breaches?": {
+      "main": [
+        [
+          {
+            "node": "Slack SLA Alert",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Split Breached Tickets",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Split Breached Tickets": {
+      "main": [
+        [
+          {
+            "node": "Email SLA Breach",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "it-tickets-v1",
+  "meta": {
+    "instanceId": "n8n-workflows-library"
+  },
+  "id": "it-ticket-routing",
+  "tags": [
+    {
+      "id": "it",
+      "name": "IT"
+    },
+    {
+      "id": "helpdesk",
+      "name": "Helpdesk"
+    },
+    {
+      "id": "ticketing",
+      "name": "Ticketing"
+    }
+  ]
+}

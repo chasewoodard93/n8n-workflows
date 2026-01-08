@@ -1,0 +1,1062 @@
+{
+  "name": "System Monitoring and Alerts",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "alert-webhook",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "alert-webhook",
+      "name": "Alert Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 5
+            }
+          ]
+        }
+      },
+      "id": "health-check",
+      "name": "Health Check Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [240, 520]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 6
+            }
+          ]
+        }
+      },
+      "id": "daily-report",
+      "name": "Daily Report Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [240, 740]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "action",
+              "name": "action",
+              "value": "alert",
+              "type": "string"
+            },
+            {
+              "id": "alert_id",
+              "name": "alert_id",
+              "value": "=ALT-{{ Date.now() }}",
+              "type": "string"
+            },
+            {
+              "id": "source",
+              "name": "source",
+              "value": "={{ $json.body.source }}",
+              "type": "string"
+            },
+            {
+              "id": "severity",
+              "name": "severity",
+              "value": "={{ $json.body.severity }}",
+              "type": "string"
+            },
+            {
+              "id": "host",
+              "name": "host",
+              "value": "={{ $json.body.host }}",
+              "type": "string"
+            },
+            {
+              "id": "service",
+              "name": "service",
+              "value": "={{ $json.body.service }}",
+              "type": "string"
+            },
+            {
+              "id": "message",
+              "name": "message",
+              "value": "={{ $json.body.message }}",
+              "type": "string"
+            },
+            {
+              "id": "metric_name",
+              "name": "metric_name",
+              "value": "={{ $json.body.metric_name }}",
+              "type": "string"
+            },
+            {
+              "id": "metric_value",
+              "name": "metric_value",
+              "value": "={{ $json.body.metric_value }}",
+              "type": "number"
+            },
+            {
+              "id": "threshold",
+              "name": "threshold",
+              "value": "={{ $json.body.threshold }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "set-alert",
+      "name": "Set Alert Data",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "action",
+              "name": "action",
+              "value": "health_check",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "set-health",
+      "name": "Set Health Check",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [460, 520]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "action",
+              "name": "action",
+              "value": "daily_report",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "set-report",
+      "name": "Set Daily Report",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [460, 740]
+    },
+    {
+      "parameters": {
+        "rules": {
+          "rules": [
+            {
+              "outputKey": "alert",
+              "conditions": {
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.action }}",
+                    "rightValue": "alert",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "outputKey": "health",
+              "conditions": {
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.action }}",
+                    "rightValue": "health_check",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "outputKey": "report",
+              "conditions": {
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.action }}",
+                    "rightValue": "daily_report",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "route-action",
+      "name": "Route by Action",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [680, 520]
+    },
+    {
+      "parameters": {
+        "jsCode": "const alert = $input.first().json;\n\n// Determine alert priority and routing\nconst severityConfig = {\n  critical: { priority: 1, notify: ['pagerduty', 'slack', 'email'], escalate_minutes: 5 },\n  high: { priority: 2, notify: ['slack', 'email'], escalate_minutes: 15 },\n  medium: { priority: 3, notify: ['slack'], escalate_minutes: 60 },\n  low: { priority: 4, notify: ['slack'], escalate_minutes: 240 }\n};\n\nconst config = severityConfig[alert.severity] || severityConfig.medium;\n\n// Check for alert deduplication (same alert within 5 minutes)\nconst alertKey = `${alert.host}_${alert.service}_${alert.metric_name}`;\n\nreturn [{\n  json: {\n    ...alert,\n    alert_key: alertKey,\n    priority: config.priority,\n    notification_channels: config.notify,\n    escalate_after_minutes: config.escalate_minutes,\n    status: 'active',\n    created_at: new Date().toISOString(),\n    escalation_deadline: new Date(Date.now() + config.escalate_minutes * 60 * 1000).toISOString()\n  }\n}];"
+      },
+      "id": "process-alert",
+      "name": "Process Alert",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [920, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.MONITORING_API_URL }}/api/alerts",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $env.MONITORING_API_KEY }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json) }}",
+        "options": {}
+      },
+      "id": "save-alert",
+      "name": "Save Alert",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1140, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "is-critical",
+              "leftValue": "={{ $json.severity }}",
+              "rightValue": "critical",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "check-critical",
+      "name": "Is Critical?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [1360, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://events.pagerduty.com/v2/enqueue",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"routing_key\": \"{{ $env.PAGERDUTY_ROUTING_KEY }}\",\n  \"event_action\": \"trigger\",\n  \"dedup_key\": \"{{ $json.alert_key }}\",\n  \"payload\": {\n    \"summary\": \"{{ $json.severity.toUpperCase() }}: {{ $json.message }}\",\n    \"source\": \"{{ $json.host }}\",\n    \"severity\": \"{{ $json.severity }}\",\n    \"component\": \"{{ $json.service }}\",\n    \"custom_details\": {\n      \"metric\": \"{{ $json.metric_name }}\",\n      \"value\": {{ $json.metric_value }},\n      \"threshold\": {{ $json.threshold }}\n    }\n  }\n}",
+        "options": {}
+      },
+      "id": "pagerduty-alert",
+      "name": "PagerDuty Alert",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1580, 200]
+    },
+    {
+      "parameters": {
+        "channel": "={{ $env.SLACK_ONCALL_CHANNEL }}",
+        "text": "=🚨 *CRITICAL ALERT*",
+        "otherOptions": {},
+        "attachments": [
+          {
+            "color": "#d32f2f",
+            "fields": {
+              "item": [
+                {
+                  "title": "Host",
+                  "value": "={{ $json.host }}",
+                  "short": true
+                },
+                {
+                  "title": "Service",
+                  "value": "={{ $json.service }}",
+                  "short": true
+                },
+                {
+                  "title": "Metric",
+                  "value": "={{ $json.metric_name }}: {{ $json.metric_value }} (threshold: {{ $json.threshold }})",
+                  "short": false
+                },
+                {
+                  "title": "Message",
+                  "value": "={{ $json.message }}",
+                  "short": false
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "id": "slack-critical",
+      "name": "Slack Critical Alert",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.2,
+      "position": [1580, 340],
+      "credentials": {
+        "slackApi": {
+          "id": "slack-creds",
+          "name": "Slack API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $env.ONCALL_EMAIL }}",
+        "subject": "=🚨 CRITICAL: {{ $json.host }} - {{ $json.service }} Alert",
+        "emailType": "html",
+        "message": "=<div style=\"font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;\">\n<h2 style=\"color: #d32f2f;\">Critical System Alert</h2>\n\n<div style=\"background: #ffebee; padding: 15px; border-radius: 4px; margin: 20px 0;\">\n<p><strong>Alert ID:</strong> {{ $json.alert_id }}</p>\n<p><strong>Host:</strong> {{ $json.host }}</p>\n<p><strong>Service:</strong> {{ $json.service }}</p>\n<p><strong>Severity:</strong> {{ $json.severity.toUpperCase() }}</p>\n<p><strong>Time:</strong> {{ new Date().toISOString() }}</p>\n</div>\n\n<h3>Details</h3>\n<p><strong>Metric:</strong> {{ $json.metric_name }}</p>\n<p><strong>Current Value:</strong> {{ $json.metric_value }}</p>\n<p><strong>Threshold:</strong> {{ $json.threshold }}</p>\n<p><strong>Message:</strong> {{ $json.message }}</p>\n\n<p style=\"margin: 20px 0;\"><a href=\"{{ $env.MONITORING_DASHBOARD_URL }}/alerts/{{ $json.alert_id }}\" style=\"background: #d32f2f; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px;\">View Alert</a></p>\n</div>",
+        "options": {}
+      },
+      "id": "email-critical",
+      "name": "Email Critical Alert",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [1800, 200],
+      "credentials": {
+        "smtp": {
+          "id": "smtp-creds",
+          "name": "SMTP"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "channel": "={{ $env.SLACK_IT_ALERTS }}",
+        "text": "=⚠️ *System Alert - {{ $json.severity.toUpperCase() }}*",
+        "otherOptions": {},
+        "attachments": [
+          {
+            "color": "={{ $json.severity === 'high' ? '#ff9800' : '#2196f3' }}",
+            "fields": {
+              "item": [
+                {
+                  "title": "Alert ID",
+                  "value": "={{ $json.alert_id }}",
+                  "short": true
+                },
+                {
+                  "title": "Severity",
+                  "value": "={{ $json.severity.toUpperCase() }}",
+                  "short": true
+                },
+                {
+                  "title": "Host",
+                  "value": "={{ $json.host }}",
+                  "short": true
+                },
+                {
+                  "title": "Service",
+                  "value": "={{ $json.service }}",
+                  "short": true
+                },
+                {
+                  "title": "Message",
+                  "value": "={{ $json.message }}",
+                  "short": false
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "id": "slack-alert",
+      "name": "Slack Alert",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.2,
+      "position": [1580, 460],
+      "credentials": {
+        "slackApi": {
+          "id": "slack-creds",
+          "name": "Slack API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ success: true, alert_id: $json.alert_id, status: 'processed' }) }}",
+        "options": {}
+      },
+      "id": "respond-alert",
+      "name": "Respond Alert Received",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [2020, 300]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $env.MONITORING_API_URL }}/api/services",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $env.MONITORING_API_KEY }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "fetch-services",
+      "name": "Fetch Services",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [920, 520]
+    },
+    {
+      "parameters": {
+        "jsCode": "const services = $input.first().json.services || [];\nconst results = [];\n\nfor (const service of services) {\n  results.push({\n    json: {\n      service_id: service.id,\n      service_name: service.name,\n      health_endpoint: service.health_endpoint,\n      expected_status: service.expected_status || 200,\n      timeout_ms: service.timeout_ms || 5000\n    }\n  });\n}\n\nreturn results;"
+      },
+      "id": "prepare-checks",
+      "name": "Prepare Health Checks",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1140, 520]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $json.health_endpoint }}",
+        "options": {
+          "timeout": "={{ $json.timeout_ms }}"
+        }
+      },
+      "id": "perform-health-check",
+      "name": "Perform Health Check",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1360, 520],
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\nconst results = {\n  healthy: [],\n  unhealthy: [],\n  degraded: [],\n  timestamp: new Date().toISOString()\n};\n\nfor (const item of items) {\n  const service = {\n    name: item.json.service_name,\n    endpoint: item.json.health_endpoint,\n    response_time: item.json.response_time_ms,\n    status_code: item.json.statusCode\n  };\n  \n  if (item.json.error) {\n    service.status = 'unhealthy';\n    service.error = item.json.error;\n    results.unhealthy.push(service);\n  } else if (item.json.statusCode === item.json.expected_status) {\n    if (item.json.response_time_ms > 2000) {\n      service.status = 'degraded';\n      results.degraded.push(service);\n    } else {\n      service.status = 'healthy';\n      results.healthy.push(service);\n    }\n  } else {\n    service.status = 'unhealthy';\n    results.unhealthy.push(service);\n  }\n}\n\nresults.summary = {\n  total: items.length,\n  healthy: results.healthy.length,\n  unhealthy: results.unhealthy.length,\n  degraded: results.degraded.length,\n  health_percentage: Math.round((results.healthy.length / items.length) * 100)\n};\n\nreturn [{ json: results }];"
+      },
+      "id": "aggregate-results",
+      "name": "Aggregate Health Results",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1580, 520]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "has-unhealthy",
+              "leftValue": "={{ $json.unhealthy.length }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "check-unhealthy",
+      "name": "Any Unhealthy?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [1800, 520]
+    },
+    {
+      "parameters": {
+        "channel": "={{ $env.SLACK_IT_ALERTS }}",
+        "text": "=🔴 *Service Health Alert*",
+        "otherOptions": {},
+        "attachments": [
+          {
+            "color": "#d32f2f",
+            "fields": {
+              "item": [
+                {
+                  "title": "Unhealthy Services",
+                  "value": "={{ $json.unhealthy.map(s => s.name).join(', ') }}",
+                  "short": false
+                },
+                {
+                  "title": "Health Score",
+                  "value": "={{ $json.summary.health_percentage }}%",
+                  "short": true
+                },
+                {
+                  "title": "Total Services",
+                  "value": "={{ $json.summary.total }}",
+                  "short": true
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "id": "slack-health-alert",
+      "name": "Slack Health Alert",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.2,
+      "position": [2020, 460],
+      "credentials": {
+        "slackApi": {
+          "id": "slack-creds",
+          "name": "Slack API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.MONITORING_API_URL }}/api/health-checks",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $env.MONITORING_API_KEY }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json) }}",
+        "options": {}
+      },
+      "id": "save-health-check",
+      "name": "Save Health Check Results",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [2020, 580]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $env.MONITORING_API_URL }}/api/metrics/daily-summary",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $env.MONITORING_API_KEY }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "fetch-daily-metrics",
+      "name": "Fetch Daily Metrics",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [920, 740]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $env.MONITORING_API_URL }}/api/alerts/summary?period=24h",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $env.MONITORING_API_KEY }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "fetch-alert-summary",
+      "name": "Fetch Alert Summary",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [920, 880]
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "mergeByFields": {
+          "values": []
+        },
+        "options": {}
+      },
+      "id": "merge-report-data",
+      "name": "Merge Report Data",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [1140, 800]
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\nconst metrics = items[0]?.json || {};\nconst alerts = items[1]?.json || {};\n\nconst report = {\n  report_date: new Date().toISOString().split('T')[0],\n  infrastructure: {\n    uptime_percentage: metrics.uptime_percentage || 99.9,\n    total_hosts: metrics.total_hosts || 0,\n    healthy_hosts: metrics.healthy_hosts || 0,\n    average_cpu: metrics.average_cpu || 0,\n    average_memory: metrics.average_memory || 0,\n    average_disk: metrics.average_disk || 0\n  },\n  alerts: {\n    total_24h: alerts.total || 0,\n    critical: alerts.by_severity?.critical || 0,\n    high: alerts.by_severity?.high || 0,\n    medium: alerts.by_severity?.medium || 0,\n    low: alerts.by_severity?.low || 0,\n    resolved: alerts.resolved || 0,\n    mttr_minutes: alerts.mttr_minutes || 0\n  },\n  top_issues: alerts.top_issues || [],\n  recommendations: []\n};\n\n// Generate recommendations based on metrics\nif (report.infrastructure.average_cpu > 80) {\n  report.recommendations.push('CPU utilization is high. Consider scaling or optimization.');\n}\nif (report.infrastructure.average_memory > 85) {\n  report.recommendations.push('Memory usage is elevated. Review application memory consumption.');\n}\nif (report.infrastructure.average_disk > 80) {\n  report.recommendations.push('Disk usage is high. Plan for capacity expansion.');\n}\nif (report.alerts.critical > 0) {\n  report.recommendations.push(`${report.alerts.critical} critical alerts occurred. Review root causes.`);\n}\n\nreturn [{ json: report }];"
+      },
+      "id": "compile-report",
+      "name": "Compile Daily Report",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1360, 800]
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $env.IT_TEAM_EMAIL }}",
+        "subject": "=Daily Infrastructure Report - {{ $json.report_date }}",
+        "emailType": "html",
+        "message": "=<div style=\"font-family: Arial, sans-serif; max-width: 700px; margin: 0 auto;\">\n<h1>Daily Infrastructure Report</h1>\n<p><strong>Date:</strong> {{ $json.report_date }}</p>\n\n<h2>Infrastructure Health</h2>\n<table style=\"width: 100%; border-collapse: collapse; margin: 20px 0;\">\n<tr style=\"background: #f5f5f5;\">\n<td style=\"padding: 10px; border: 1px solid #ddd;\"><strong>Uptime</strong></td>\n<td style=\"padding: 10px; border: 1px solid #ddd;\">{{ $json.infrastructure.uptime_percentage }}%</td>\n<td style=\"padding: 10px; border: 1px solid #ddd;\"><strong>Hosts</strong></td>\n<td style=\"padding: 10px; border: 1px solid #ddd;\">{{ $json.infrastructure.healthy_hosts }}/{{ $json.infrastructure.total_hosts }}</td>\n</tr>\n<tr>\n<td style=\"padding: 10px; border: 1px solid #ddd;\"><strong>Avg CPU</strong></td>\n<td style=\"padding: 10px; border: 1px solid #ddd; color: {{ $json.infrastructure.average_cpu > 80 ? '#d32f2f' : '#4caf50' }};\">{{ $json.infrastructure.average_cpu }}%</td>\n<td style=\"padding: 10px; border: 1px solid #ddd;\"><strong>Avg Memory</strong></td>\n<td style=\"padding: 10px; border: 1px solid #ddd; color: {{ $json.infrastructure.average_memory > 85 ? '#d32f2f' : '#4caf50' }};\">{{ $json.infrastructure.average_memory }}%</td>\n</tr>\n<tr style=\"background: #f5f5f5;\">\n<td style=\"padding: 10px; border: 1px solid #ddd;\"><strong>Avg Disk</strong></td>\n<td style=\"padding: 10px; border: 1px solid #ddd; color: {{ $json.infrastructure.average_disk > 80 ? '#d32f2f' : '#4caf50' }};\">{{ $json.infrastructure.average_disk }}%</td>\n<td style=\"padding: 10px; border: 1px solid #ddd;\"><strong>MTTR</strong></td>\n<td style=\"padding: 10px; border: 1px solid #ddd;\">{{ $json.alerts.mttr_minutes }} min</td>\n</tr>\n</table>\n\n<h2>Alert Summary (24h)</h2>\n<table style=\"width: 100%; border-collapse: collapse; margin: 20px 0;\">\n<tr style=\"background: #f5f5f5;\">\n<th style=\"padding: 10px; border: 1px solid #ddd;\">Total</th>\n<th style=\"padding: 10px; border: 1px solid #ddd;\">Critical</th>\n<th style=\"padding: 10px; border: 1px solid #ddd;\">High</th>\n<th style=\"padding: 10px; border: 1px solid #ddd;\">Medium</th>\n<th style=\"padding: 10px; border: 1px solid #ddd;\">Low</th>\n<th style=\"padding: 10px; border: 1px solid #ddd;\">Resolved</th>\n</tr>\n<tr>\n<td style=\"padding: 10px; border: 1px solid #ddd; text-align: center;\">{{ $json.alerts.total_24h }}</td>\n<td style=\"padding: 10px; border: 1px solid #ddd; text-align: center; color: #d32f2f;\">{{ $json.alerts.critical }}</td>\n<td style=\"padding: 10px; border: 1px solid #ddd; text-align: center; color: #ff9800;\">{{ $json.alerts.high }}</td>\n<td style=\"padding: 10px; border: 1px solid #ddd; text-align: center;\">{{ $json.alerts.medium }}</td>\n<td style=\"padding: 10px; border: 1px solid #ddd; text-align: center;\">{{ $json.alerts.low }}</td>\n<td style=\"padding: 10px; border: 1px solid #ddd; text-align: center; color: #4caf50;\">{{ $json.alerts.resolved }}</td>\n</tr>\n</table>\n\n{{ $json.recommendations.length > 0 ? `<h2>Recommendations</h2><ul>${$json.recommendations.map(r => '<li>' + r + '</li>').join('')}</ul>` : '' }}\n\n<p><a href=\"{{ $env.MONITORING_DASHBOARD_URL }}\" style=\"background: #1976d2; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px;\">View Dashboard</a></p>\n</div>",
+        "options": {}
+      },
+      "id": "email-report",
+      "name": "Email Daily Report",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [1580, 800],
+      "credentials": {
+        "smtp": {
+          "id": "smtp-creds",
+          "name": "SMTP"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "channel": "={{ $env.SLACK_IT_CHANNEL }}",
+        "text": "=📊 *Daily Infrastructure Report - {{ $json.report_date }}*",
+        "otherOptions": {},
+        "attachments": [
+          {
+            "color": "={{ $json.infrastructure.uptime_percentage >= 99.9 ? '#4caf50' : $json.infrastructure.uptime_percentage >= 99 ? '#ff9800' : '#d32f2f' }}",
+            "fields": {
+              "item": [
+                {
+                  "title": "Uptime",
+                  "value": "={{ $json.infrastructure.uptime_percentage }}%",
+                  "short": true
+                },
+                {
+                  "title": "Healthy Hosts",
+                  "value": "={{ $json.infrastructure.healthy_hosts }}/{{ $json.infrastructure.total_hosts }}",
+                  "short": true
+                },
+                {
+                  "title": "Alerts (24h)",
+                  "value": "={{ $json.alerts.total_24h }} ({{ $json.alerts.critical }} critical)",
+                  "short": true
+                },
+                {
+                  "title": "MTTR",
+                  "value": "={{ $json.alerts.mttr_minutes }} min",
+                  "short": true
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "id": "slack-report",
+      "name": "Slack Daily Report",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.2,
+      "position": [1800, 800],
+      "credentials": {
+        "slackApi": {
+          "id": "slack-creds",
+          "name": "Slack API"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Alert Webhook": {
+      "main": [
+        [
+          {
+            "node": "Set Alert Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Health Check Trigger": {
+      "main": [
+        [
+          {
+            "node": "Set Health Check",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Daily Report Trigger": {
+      "main": [
+        [
+          {
+            "node": "Set Daily Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Alert Data": {
+      "main": [
+        [
+          {
+            "node": "Route by Action",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Health Check": {
+      "main": [
+        [
+          {
+            "node": "Route by Action",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Daily Report": {
+      "main": [
+        [
+          {
+            "node": "Route by Action",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route by Action": {
+      "main": [
+        [
+          {
+            "node": "Process Alert",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Fetch Services",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Fetch Daily Metrics",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Fetch Alert Summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Process Alert": {
+      "main": [
+        [
+          {
+            "node": "Save Alert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save Alert": {
+      "main": [
+        [
+          {
+            "node": "Is Critical?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Critical?": {
+      "main": [
+        [
+          {
+            "node": "PagerDuty Alert",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Slack Critical Alert",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Slack Alert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "PagerDuty Alert": {
+      "main": [
+        [
+          {
+            "node": "Email Critical Alert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Email Critical Alert": {
+      "main": [
+        [
+          {
+            "node": "Respond Alert Received",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Slack Critical Alert": {
+      "main": [
+        [
+          {
+            "node": "Respond Alert Received",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Slack Alert": {
+      "main": [
+        [
+          {
+            "node": "Respond Alert Received",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Services": {
+      "main": [
+        [
+          {
+            "node": "Prepare Health Checks",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Health Checks": {
+      "main": [
+        [
+          {
+            "node": "Perform Health Check",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Perform Health Check": {
+      "main": [
+        [
+          {
+            "node": "Aggregate Health Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate Health Results": {
+      "main": [
+        [
+          {
+            "node": "Any Unhealthy?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Any Unhealthy?": {
+      "main": [
+        [
+          {
+            "node": "Slack Health Alert",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Save Health Check Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Slack Health Alert": {
+      "main": [
+        [
+          {
+            "node": "Save Health Check Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Daily Metrics": {
+      "main": [
+        [
+          {
+            "node": "Merge Report Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Alert Summary": {
+      "main": [
+        [
+          {
+            "node": "Merge Report Data",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge Report Data": {
+      "main": [
+        [
+          {
+            "node": "Compile Daily Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Compile Daily Report": {
+      "main": [
+        [
+          {
+            "node": "Email Daily Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Email Daily Report": {
+      "main": [
+        [
+          {
+            "node": "Slack Daily Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "monitoring-v1",
+  "meta": {
+    "instanceId": "n8n-workflows-library"
+  },
+  "id": "system-monitoring",
+  "tags": [
+    {
+      "id": "it",
+      "name": "IT"
+    },
+    {
+      "id": "monitoring",
+      "name": "Monitoring"
+    },
+    {
+      "id": "alerts",
+      "name": "Alerts"
+    }
+  ]
+}
