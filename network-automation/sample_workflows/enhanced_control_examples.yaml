@@ -1,0 +1,222 @@
+workflow:
+  name: "Enhanced Workflow Control Examples"
+  description: "Demonstrates advanced workflow control features including conditionals, loops, error handling, and retry mechanisms"
+  
+  vars:
+    # Configuration variables
+    max_retries: 3
+    retry_delay: 2
+    interface_list: ["GigabitEthernet0/1", "GigabitEthernet0/2", "GigabitEthernet0/3"]
+    backup_enabled: true
+    validation_required: true
+    
+    # Platform-specific settings
+    platform_configs:
+      ios:
+        config_command: "show running-config"
+        backup_command: "copy running-config startup-config"
+      nxos:
+        config_command: "show running-config"
+        backup_command: "copy running-config startup-config"
+      eos:
+        config_command: "show running-config"
+        backup_command: "copy running-config startup-config"
+  
+  tasks:
+    # Example 1: Conditional Execution
+    - name: echo
+      args:
+        msg: "Starting enhanced workflow control demonstration"
+    
+    # Only run backup if backup_enabled is true
+    - name: backup_config
+      args:
+        backup_dir: "backups/{{ host.name }}"
+        include_timestamp: true
+      when: "{{ backup_enabled }}"
+      set_to: backup_result
+    
+    # Skip this task unless we're on Cisco devices
+    - name: echo
+      args:
+        msg: "Running Cisco-specific configuration on {{ host.name }}"
+      when: "{{ host.platform in ['ios', 'nxos'] }}"
+    
+    # Example 2: Loop with Items
+    - name: echo
+      args:
+        msg: "Configuring interface {{ item }}"
+      loop: "{{ interface_list }}"
+      set_to: interface_config_results
+    
+    # Example 3: Loop with Complex Items
+    - name: test_connectivity
+      args:
+        method: "tcp"
+        timeout: 5
+      with_items:
+        - { host: "{{ host.hostname }}", port: 22, name: "SSH" }
+        - { host: "{{ host.hostname }}", port: 443, name: "HTTPS" }
+        - { host: "{{ host.hostname }}", port: 161, name: "SNMP" }
+      set_to: connectivity_tests
+    
+    # Example 4: Retry with Backoff
+    - name: test_connectivity
+      args:
+        method: "ssh"
+        timeout: 10
+      retry:
+        max_attempts: "{{ max_retries }}"
+        delay: "{{ retry_delay }}"
+        backoff_factor: 2.0
+        max_delay: 30
+        retry_on: ["ConnectionError", "TimeoutError", "SSHException"]
+      set_to: ssh_connectivity
+    
+    # Example 5: Error Handling with Ignore Errors
+    - name: execute_command
+      args:
+        command: "show version"
+      ignore_errors: true
+      set_to: version_info
+    
+    # Example 6: Conditional with Complex Logic
+    - name: deploy_config
+      args:
+        template_file: "templates/{{ host.platform }}/interface_config.j2"
+        template_vars:
+          interfaces: "{{ interface_list }}"
+          enable_spanning_tree: true
+        backup_before: false  # Already backed up above
+        validate_after: "{{ validation_required }}"
+      when: "{{ backup_result.success | default(false) and host.platform in platform_configs.keys() }}"
+      retry:
+        max_attempts: 2
+        delay: 5
+      set_to: config_deployment
+    
+    # Example 7: Loop Until Condition
+    - name: test_connectivity
+      args:
+        method: "ping"
+        count: 1
+        timeout: 2
+      until: "{{ connectivity_result.success | default(false) }}"
+      set_to: connectivity_result
+      retry:
+        max_attempts: 10
+        delay: 3
+    
+    # Example 8: Task Dependencies
+    - name: validate_config
+      args:
+        validation_commands:
+          - "show ip interface brief"
+          - "show running-config | include interface"
+      depends_on: ["deploy_config"]
+      when: "{{ config_deployment.success | default(false) }}"
+      set_to: validation_result
+    
+    # Example 9: Error Recovery with Rescue
+    - name: execute_command
+      args:
+        command: "show interfaces status"
+      rescue:
+        - name: echo
+          args:
+            msg: "Primary command failed, trying alternative"
+        - name: execute_command
+          args:
+            command: "show ip interface brief"
+      set_to: interface_status
+    
+    # Example 10: Always Execute (Cleanup)
+    - name: echo
+      args:
+        msg: "Cleaning up temporary files and connections"
+      always: true
+    
+    # Example 11: Complex Conditional with Multiple Conditions
+    - name: deploy_config_api
+      args:
+        template_file: "templates/api/{{ host.platform }}_config.j2"
+        api_endpoint: "https://{{ host.hostname }}/api/v1/config"
+        api_method: "POST"
+        api_auth:
+          username: "{{ host.data.api_username }}"
+          password: "{{ host.data.api_password }}"
+      when: >
+        {{
+          host.data.api_enabled | default(false) and
+          host.platform in ['ios', 'nxos', 'eos'] and
+          ssh_connectivity.success | default(false)
+        }}
+      retry:
+        max_attempts: 3
+        delay: 5
+        backoff_factor: 1.5
+      ignore_errors: true
+      set_to: api_deployment
+    
+    # Example 12: Parallel Task Group (conceptual - would need parallel execution)
+    - name: discover_neighbors
+      args:
+        protocol: "both"
+        include_details: true
+      depends_on: []  # No dependencies, can run in parallel
+      set_to: neighbor_discovery
+    
+    - name: discover_interfaces
+      args:
+        interface_type: "all"
+        include_status: true
+      depends_on: []  # No dependencies, can run in parallel
+      set_to: interface_discovery
+    
+    - name: discover_device_info
+      args:
+        include_hardware: true
+        include_software: true
+      depends_on: []  # No dependencies, can run in parallel
+      set_to: device_discovery
+    
+    # Example 13: Final Summary with Complex Conditions
+    - name: set
+      args:
+        workflow_summary: |
+          Enhanced Workflow Control Demonstration Summary:
+          ============================================
+          
+          Host: {{ host.name }} ({{ host.platform }})
+          
+          Backup Status: {{ 'COMPLETED' if backup_result.success | default(false) else 'SKIPPED/FAILED' }}
+          Configuration Deployment: {{ 'SUCCESS' if config_deployment.success | default(false) else 'FAILED/SKIPPED' }}
+          API Deployment: {{ 'SUCCESS' if api_deployment.success | default(false) else 'FAILED/SKIPPED' }}
+          Validation: {{ 'PASSED' if validation_result.success | default(false) else 'FAILED/SKIPPED' }}
+          
+          Connectivity Tests:
+          - SSH: {{ 'PASS' if ssh_connectivity.success | default(false) else 'FAIL' }}
+          - Network: {{ 'PASS' if connectivity_result.success | default(false) else 'FAIL' }}
+          
+          Discovery Results:
+          - Neighbors: {{ neighbor_discovery.summary.total_neighbors | default('N/A') }}
+          - Interfaces: {{ interface_discovery.summary.total_interfaces | default('N/A') }}
+          - Device Model: {{ device_discovery.hardware.model | default('Unknown') }}
+          
+          Interface Configurations: {{ interface_config_results | length if interface_config_results else 0 }} processed
+          
+          Workflow completed at: {{ now() }}
+      depends_on: ["validate_config", "discover_neighbors", "discover_interfaces", "discover_device_info"]
+    
+    # Example 14: Final Report Generation
+    - name: write_file
+      args:
+        filename: "reports/enhanced_workflow_{{ host.name }}_{{ now().strftime('%Y%m%d_%H%M%S') }}.txt"
+        content: "{{ workflow_summary }}"
+        mkdir: true
+      always: true  # Always generate report, even if other tasks failed
+    
+    - name: echo
+      args:
+        msg: "Enhanced workflow control demonstration completed for {{ host.name }}"
+      always: true

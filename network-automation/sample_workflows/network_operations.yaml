@@ -1,0 +1,279 @@
+workflow:
+  name: "Comprehensive Network Operations"
+  description: "Demonstrates the enhanced network automation tasks for NornFlow"
+  
+  vars:
+    # Global variables for the workflow
+    backup_retention_days: 30
+    validation_timeout: 60
+    config_templates:
+      ios: "templates/cisco_ios/base_config.j2"
+      nxos: "templates/cisco_nxos/base_config.j2"
+      eos: "templates/arista_eos/base_config.j2"
+    
+    # SNMP configuration
+    snmp_config:
+      ro_community: "public"
+      rw_community: "private"
+      location: "{{ host.data.site_location | default('Unknown') }}"
+      contact: "{{ host.data.site_contact | default('netops@company.com') }}"
+  
+  inventory_filters:
+    # Only run on network devices (exclude servers, etc.)
+    groups: ["routers", "switches", "firewalls"]
+  
+  tasks:
+    # Phase 1: Pre-flight checks
+    - name: echo
+      args:
+        msg: "Starting network operations for {{ host.name }} ({{ host.platform }})"
+    
+    - name: test_connectivity
+      args:
+        method: "ssh"
+        timeout: 10
+        count: 3
+      set_to: connectivity_test
+    
+    # Phase 2: Device discovery and documentation
+    - name: discover_device_info
+      args:
+        include_hardware: true
+        include_software: true
+        include_inventory: true
+      set_to: device_info
+    
+    - name: discover_neighbors
+      args:
+        protocol: "both"  # Use both LLDP and CDP
+        parse_output: true
+        include_details: true
+      set_to: neighbor_info
+    
+    - name: discover_interfaces
+      args:
+        interface_type: "all"
+        include_status: true
+        include_config: false  # Skip config for discovery phase
+      set_to: interface_info
+    
+    # Phase 3: Create comprehensive device documentation
+    - name: set
+      args:
+        discovery_timestamp: "{{ ansible_date_time.iso8601 | default(now()) }}"
+        device_summary: |
+          Device: {{ host.name }}
+          Platform: {{ host.platform }}
+          Model: {{ device_info.hardware.model | default('Unknown') }}
+          Version: {{ device_info.software.version | default('Unknown') }}
+          Neighbors: {{ neighbor_info.summary.total_neighbors | default(0) }}
+          Interfaces: {{ interface_info.summary.total_interfaces | default(0) }}
+          Up Interfaces: {{ interface_info.summary.up_interfaces | default(0) }}
+    
+    - name: write_file
+      args:
+        filename: "documentation/{{ host.name }}/device_discovery_{{ discovery_timestamp[:10] }}.json"
+        content: |
+          {
+            "discovery_metadata": {
+              "timestamp": "{{ discovery_timestamp }}",
+              "workflow": "network_operations",
+              "nornflow_version": "enhanced"
+            },
+            "device_info": {{ device_info | to_json }},
+            "neighbor_info": {{ neighbor_info | to_json }},
+            "interface_info": {{ interface_info | to_json }},
+            "connectivity_test": {{ connectivity_test | to_json }}
+          }
+        mkdir: true
+    
+    # Phase 4: Configuration backup
+    - name: backup_config
+      args:
+        backup_dir: "backups/{{ host.name }}/{{ discovery_timestamp[:7] }}"  # YYYY-MM format
+        filename_template: "{host}_{timestamp}_running.cfg"
+        include_timestamp: true
+        config_type: "running"
+      set_to: backup_result
+    
+    - name: echo
+      args:
+        msg: "Configuration backed up to: {{ backup_result.backup_file }}"
+    
+    # Phase 5: Configuration validation (current state)
+    - name: validate_config
+      args:
+        validation_commands:
+          - "show version"
+          - "show ip interface brief"
+          - "show running-config | include hostname"
+        expected_patterns:
+          "show running-config | include hostname": "hostname {{ host.name }}"
+      set_to: current_validation
+    
+    # Phase 6: API Connectivity Testing (NEW)
+    - name: test_connectivity
+      args:
+        method: "api"
+        api_endpoint: "https://{{ host.hostname }}/api/v1/status"
+        api_method: "GET"
+        api_auth:
+          username: "{{ host.data.api_username | default('admin') }}"
+          password: "{{ host.data.api_password | default('admin') }}"
+        verify_ssl: false  # Many network devices use self-signed certs
+        timeout: 15
+      set_to: api_connectivity
+
+    # Phase 7: API Payload Testing (NEW)
+    - name: test_api_payload
+      args:
+        endpoint: "https://{{ host.hostname }}/api/v1/interfaces/test"
+        method: "POST"
+        payload_template: |
+          {
+            "interface": "Loopback999",
+            "description": "API Test Interface - {{ now() }}",
+            "ip_address": "192.168.255.1",
+            "subnet_mask": "255.255.255.255",
+            "enabled": true,
+            "test_mode": true
+          }
+        template_vars:
+          test_timestamp: "{{ now() }}"
+        headers:
+          Content-Type: "application/json"
+          Accept: "application/json"
+        auth:
+          username: "{{ host.data.api_username | default('admin') }}"
+          password: "{{ host.data.api_password | default('admin') }}"
+        expected_status: [200, 201, 202]
+        verify_ssl: false
+      set_to: api_payload_test
+      # Only run if API connectivity test passed
+      when: "{{ api_connectivity.success | default(false) }}"
+
+    # Phase 8: Optional configuration deployment (commented out for safety)
+    # Uncomment and customize these tasks for actual configuration deployment
+
+    # CLI-based deployment
+    # - name: deploy_config
+    #   args:
+    #     template_file: "{{ config_templates[host.platform] }}"
+    #     template_vars:
+    #       hostname: "{{ host.name }}"
+    #       domain_name: "{{ host.data.domain_name | default('company.local') }}"
+    #       management_vlan: "{{ host.data.mgmt_vlan | default(1) }}"
+    #       snmp: "{{ snmp_config }}"
+    #       ntp_servers: "{{ host.data.ntp_servers | default(['pool.ntp.org']) }}"
+    #       dns_servers: "{{ host.data.dns_servers | default(['8.8.8.8', '8.8.4.4']) }}"
+    #     deployment_method: "cli"
+    #     backup_before: false  # Already backed up above
+    #     validate_after: true
+    #     commit: true
+    #     rollback_on_error: true
+    #   set_to: cli_deployment_result
+
+    # API-based deployment (NEW)
+    # - name: deploy_config_api
+    #   args:
+    #     template_file: "templates/api/{{ host.platform }}_config.j2"
+    #     template_vars:
+    #       hostname: "{{ host.name }}"
+    #       management_vlan: "{{ host.data.mgmt_vlan | default(1) }}"
+    #       snmp: "{{ snmp_config }}"
+    #     api_endpoint: "https://{{ host.hostname }}/api/v1/config"
+    #     api_method: "POST"
+    #     api_headers:
+    #       Content-Type: "application/json"
+    #       Accept: "application/json"
+    #     api_auth:
+    #       username: "{{ host.data.api_username }}"
+    #       password: "{{ host.data.api_password }}"
+    #     backup_before: false  # Already backed up above
+    #     validate_after: true
+    #     rollback_on_error: true
+    #     commit: true
+    #     verify_ssl: false
+    #   set_to: api_deployment_result
+    #   when: "{{ api_connectivity.success and api_payload_test.success }}"
+    
+    # Phase 9: Post-deployment validation and reporting
+    - name: set
+      args:
+        operation_summary: |
+          Network Operations Summary for {{ host.name }}:
+          ================================================
+
+          Connectivity Tests:
+          - SSH Connectivity: {{ 'PASSED' if connectivity_test.success else 'FAILED' }} ({{ connectivity_test.response_time_ms }}ms)
+          - API Connectivity: {{ 'PASSED' if api_connectivity.success | default(false) else 'FAILED' }} ({{ api_connectivity.response_time_ms | default('N/A') }}ms)
+          - API Payload Test: {{ 'PASSED' if api_payload_test.success | default(false) else 'FAILED' }}
+
+          Device Information:
+          - Model: {{ device_info.hardware.model | default('Unknown') }}
+          - Software: {{ device_info.software.version | default('Unknown') }}
+          - Uptime: {{ device_info.software.uptime | default('Unknown') }}
+
+          Network Topology:
+          - Total Neighbors: {{ neighbor_info.summary.total_neighbors }}
+          - Discovery Protocols: {{ neighbor_info.summary.protocols_used | join(', ') }}
+
+          Interface Status:
+          - Total Interfaces: {{ interface_info.summary.total_interfaces }}
+          - Up: {{ interface_info.summary.up_interfaces }}
+          - Down: {{ interface_info.summary.down_interfaces }}
+          - Admin Down: {{ interface_info.summary.admin_down_interfaces }}
+
+          Configuration Management:
+          - Backup Created: {{ backup_result.backup_file }}
+          - Backup Size: {{ backup_result.size_bytes }} bytes
+          - Current Config Valid: {{ 'YES' if current_validation.overall_status == 'passed' else 'NO' }}
+
+          API Capabilities:
+          - API Endpoint: {{ api_connectivity.api_response.endpoint | default('Not tested') }}
+          - API Status: {{ api_connectivity.api_response.status_code | default('N/A') }}
+          - Payload Test Status: {{ api_payload_test.response.status_code | default('N/A') }}
+
+          Operation completed at: {{ discovery_timestamp }}
+    
+    - name: echo
+      args:
+        msg: "{{ operation_summary }}"
+    
+    # Phase 10: Generate comprehensive JSON report with API data
+    - name: write_file
+      args:
+        filename: "reports/{{ host.name }}_enhanced_discovery_{{ discovery_timestamp[:10] }}.json"
+        content: |
+          {
+            "discovery_metadata": {
+              "timestamp": "{{ discovery_timestamp }}",
+              "workflow": "network_operations_enhanced",
+              "nornflow_version": "enhanced_with_api",
+              "capabilities_tested": ["ssh", "api", "discovery", "backup"]
+            },
+            "connectivity_tests": {
+              "ssh": {{ connectivity_test | to_json }},
+              "api": {{ api_connectivity | default({}) | to_json }},
+              "api_payload": {{ api_payload_test | default({}) | to_json }}
+            },
+            "device_info": {{ device_info | to_json }},
+            "neighbor_info": {{ neighbor_info | to_json }},
+            "interface_info": {{ interface_info | to_json }},
+            "configuration_management": {
+              "backup_result": {{ backup_result | to_json }},
+              "validation_result": {{ current_validation | to_json }}
+            }
+          }
+        mkdir: true
+
+    # Phase 11: Generate text summary report
+    - name: write_file
+      args:
+        filename: "reports/{{ host.name }}_operations_{{ discovery_timestamp[:10] }}.txt"
+        content: "{{ operation_summary }}"
+        mkdir: true
+
+    - name: echo
+      args:
+        msg: "Enhanced network operations completed successfully for {{ host.name }}"

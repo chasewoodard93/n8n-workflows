@@ -1,0 +1,321 @@
+workflow:
+  name: "Enhanced Integration Framework Examples"
+  description: "Demonstrates comprehensive integration capabilities with NetBox, Git, monitoring platforms, and ITSM systems"
+  
+  vars:
+    # Integration configurations
+    netbox_config:
+      url: "https://netbox.company.com"
+      token: "{{ env.NETBOX_TOKEN }}"
+      ssl_verify: true
+    
+    git_config:
+      repo_path: "/opt/network-configs"
+      author_name: "NornFlow Automation"
+      author_email: "nornflow@company.com"
+      default_branch: "main"
+    
+    grafana_config:
+      url: "https://grafana.company.com"
+      api_key: "{{ env.GRAFANA_API_KEY }}"
+    
+    prometheus_config:
+      url: "https://prometheus.company.com"
+      pushgateway_url: "https://pushgateway.company.com"
+    
+    infoblox_config:
+      url: "https://infoblox.company.com"
+      username: "{{ env.INFOBLOX_USER }}"
+      password: "{{ env.INFOBLOX_PASS }}"
+      wapi_version: "v2.12"
+    
+    servicenow_config:
+      instance_url: "https://company.service-now.com"
+      username: "{{ env.SNOW_USER }}"
+      password: "{{ env.SNOW_PASS }}"
+    
+    jira_config:
+      server_url: "https://company.atlassian.net"
+      username: "{{ env.JIRA_USER }}"
+      api_token: "{{ env.JIRA_TOKEN }}"
+    
+    # Workflow variables
+    change_description: "Automated network configuration update via NornFlow"
+    maintenance_window: "2024-01-15T02:00:00Z"
+    project_key: "NET"
+    
+  tasks:
+    # Example 1: ITSM Integration - Create Change Request
+    - name: servicenow_create_change
+      args:
+        short_description: "Network Configuration Update - {{ host.name }}"
+        description: |
+          Automated network configuration update for {{ host.name }}
+          
+          Details:
+          - Device: {{ host.name }}
+          - Platform: {{ host.platform }}
+          - Site: {{ host.data.site | default('Unknown') }}
+          - Planned Start: {{ maintenance_window }}
+          
+          This change is part of automated network maintenance.
+        category: "Network"
+        impact: "3"
+        urgency: "3"
+        risk: "3"
+        change_type: "Normal"
+        servicenow_config: "{{ servicenow_config }}"
+      set_to: change_request
+    
+    # Example 2: Jira Integration - Create Tracking Issue
+    - name: jira_create_issue
+      args:
+        project_key: "{{ project_key }}"
+        issue_type: "Task"
+        summary: "Network Automation: {{ host.name }} Configuration Update"
+        description: |
+          Automated configuration update for network device {{ host.name }}
+          
+          ServiceNow Change: {{ change_request.change_number }}
+          Device Details:
+          - Hostname: {{ host.name }}
+          - Platform: {{ host.platform }}
+          - Management IP: {{ host.hostname }}
+          
+          This issue tracks the automated configuration deployment.
+        priority: "Medium"
+        labels: ["automation", "network", "{{ host.platform }}"]
+        jira_config: "{{ jira_config }}"
+      depends_on: "servicenow_create_change"
+      set_to: tracking_issue
+    
+    # Example 3: NetBox Integration - Get Device Information
+    - name: netbox_get_device
+      args:
+        device_name: "{{ host.name }}"
+        netbox_config: "{{ netbox_config }}"
+      set_to: netbox_device
+    
+    # Example 4: NetBox Integration - Get Configuration Context
+    - name: netbox_get_config_context
+      args:
+        device_name: "{{ host.name }}"
+        netbox_config: "{{ netbox_config }}"
+      depends_on: "netbox_get_device"
+      set_to: config_context
+    
+    # Example 5: Git Integration - Backup Current Configuration
+    - name: backup_config
+      args:
+        backup_dir: "{{ git_config.repo_path }}/backups/{{ host.name }}"
+        include_timestamp: true
+      set_to: backup_result
+    
+    # Example 6: Git Integration - Commit Backup to Repository
+    - name: git_commit_config
+      args:
+        config_content: "{{ backup_result.config_content }}"
+        device_name: "{{ host.name }}"
+        commit_message: "Pre-change backup for {{ host.name }} - Change {{ change_request.change_number }}"
+        branch: "main"
+        git_config: "{{ git_config }}"
+      depends_on: "backup_config"
+      set_to: git_backup
+    
+    # Example 7: Infoblox Integration - Get Next Available IP (if needed)
+    - name: infoblox_get_next_ip
+      args:
+        network: "{{ config_context.config_context.management_network | default('192.168.1.0/24') }}"
+        exclude_dhcp: true
+        infoblox_config: "{{ infoblox_config }}"
+      when: "{{ config_context.config_context.auto_assign_ip | default(false) }}"
+      set_to: next_ip
+    
+    # Example 8: Deploy Configuration with Enhanced Control
+    - name: deploy_config
+      args:
+        template_file: "templates/{{ host.platform }}/base_config.j2"
+        template_vars:
+          netbox_data: "{{ netbox_device }}"
+          config_context: "{{ config_context.config_context }}"
+          change_number: "{{ change_request.change_number }}"
+          new_ip: "{{ next_ip.next_ip | default(None) }}"
+        backup_before: false  # Already backed up
+        validate_after: true
+      depends_on: ["git_commit_config"]
+      retry:
+        max_attempts: 3
+        delay: 10
+        backoff_factor: 1.5
+      set_to: deployment_result
+    
+    # Example 9: Git Integration - Commit New Configuration
+    - name: git_commit_config
+      args:
+        config_content: "{{ deployment_result.new_config }}"
+        device_name: "{{ host.name }}"
+        commit_message: "Deploy new configuration for {{ host.name }} - Change {{ change_request.change_number }}"
+        branch: "main"
+        git_config: "{{ git_config }}"
+      when: "{{ deployment_result.success }}"
+      depends_on: "deploy_config"
+      set_to: git_deployment
+    
+    # Example 10: NetBox Integration - Update Device Status
+    - name: netbox_update_device
+      args:
+        device_name: "{{ host.name }}"
+        updates:
+          status: "active"
+          custom_fields:
+            last_config_update: "{{ now().isoformat() }}"
+            change_number: "{{ change_request.change_number }}"
+        netbox_config: "{{ netbox_config }}"
+      when: "{{ deployment_result.success }}"
+      depends_on: "deploy_config"
+      set_to: netbox_update
+    
+    # Example 11: Prometheus Integration - Push Deployment Metrics
+    - name: prometheus_push_metrics
+      args:
+        job_name: "nornflow_deployments"
+        instance: "{{ host.name }}"
+        metrics:
+          nornflow_deployment_success: "{{ 1 if deployment_result.success else 0 }}"
+          nornflow_deployment_duration_seconds: "{{ deployment_result.duration | default(0) }}"
+          nornflow_config_lines_changed: "{{ deployment_result.lines_changed | default(0) }}"
+        prometheus_config: "{{ prometheus_config }}"
+      depends_on: "deploy_config"
+      ignore_errors: true
+      set_to: metrics_push
+    
+    # Example 12: Grafana Integration - Create Alert Silence During Maintenance
+    - name: grafana_silence_alert
+      args:
+        alert_name: "{{ host.name }}_connectivity"
+        duration_minutes: 30
+        comment: "Silenced during automated configuration deployment - Change {{ change_request.change_number }}"
+        grafana_config: "{{ grafana_config }}"
+      depends_on: "deploy_config"
+      ignore_errors: true
+      set_to: alert_silence
+    
+    # Example 13: Validation and Rollback Logic
+    - name: validate_config
+      args:
+        validation_commands:
+          - "show version"
+          - "show ip interface brief"
+          - "show running-config | include hostname"
+        expected_results:
+          - "{{ host.name }}"
+      depends_on: "deploy_config"
+      rescue:
+        # Rollback on validation failure
+        - name: git_rollback_config
+          args:
+            device_name: "{{ host.name }}"
+            commit_hash: "{{ git_backup.commit_hash }}"
+            git_config: "{{ git_config }}"
+          set_to: rollback_config
+        
+        - name: deploy_config
+          args:
+            config_content: "{{ rollback_config.config_content }}"
+            backup_before: false
+          set_to: rollback_result
+      set_to: validation_result
+    
+    # Example 14: Update ITSM Systems with Results
+    - name: servicenow_update_change
+      args:
+        change_number: "{{ change_request.change_number }}"
+        state: "{{ '3' if deployment_result.success and validation_result.success else '4' }}"  # Implement/Failed
+        work_notes: |
+          Automated deployment completed:
+          
+          Deployment Status: {{ 'SUCCESS' if deployment_result.success else 'FAILED' }}
+          Validation Status: {{ 'PASSED' if validation_result.success else 'FAILED' }}
+          
+          Git Commit: {{ git_deployment.commit_hash | default('N/A') }}
+          Jira Issue: {{ tracking_issue.issue_key }}
+          
+          {% if not deployment_result.success or not validation_result.success %}
+          Rollback Status: {{ 'COMPLETED' if rollback_result.success | default(false) else 'FAILED' }}
+          {% endif %}
+          
+          Deployment completed at: {{ now().isoformat() }}
+        servicenow_config: "{{ servicenow_config }}"
+      depends_on: ["validate_config"]
+      always: true
+      set_to: change_update
+    
+    # Example 15: Update Jira Issue
+    - name: jira_transition_issue
+      args:
+        issue_key: "{{ tracking_issue.issue_key }}"
+        transition_name: "{{ 'Done' if deployment_result.success and validation_result.success else 'Failed' }}"
+        comment: |
+          Automated deployment completed for {{ host.name }}
+          
+          Results:
+          - Deployment: {{ 'SUCCESS' if deployment_result.success else 'FAILED' }}
+          - Validation: {{ 'PASSED' if validation_result.success else 'FAILED' }}
+          - ServiceNow Change: {{ change_request.change_number }}
+          - Git Commit: {{ git_deployment.commit_hash | default('N/A') }}
+          
+          {% if metrics_push.success | default(false) %}
+          Metrics pushed to Prometheus for monitoring.
+          {% endif %}
+        jira_config: "{{ jira_config }}"
+      depends_on: ["servicenow_update_change"]
+      always: true
+      set_to: issue_transition
+    
+    # Example 16: Final Integration Summary
+    - name: set
+      args:
+        integration_summary: |
+          Enhanced Integration Framework Demonstration Summary
+          ===================================================
+          
+          Host: {{ host.name }} ({{ host.platform }})
+          Change Management:
+          - ServiceNow Change: {{ change_request.change_number }} ({{ change_update.new_state }})
+          - Jira Issue: {{ tracking_issue.issue_key }} ({{ issue_transition.transition_name }})
+          
+          Configuration Management:
+          - NetBox Device ID: {{ netbox_device.id }}
+          - Git Backup Commit: {{ git_backup.commit_hash }}
+          - Git Deploy Commit: {{ git_deployment.commit_hash | default('N/A') }}
+          
+          Deployment Results:
+          - Configuration Deployed: {{ 'YES' if deployment_result.success else 'NO' }}
+          - Validation Passed: {{ 'YES' if validation_result.success else 'NO' }}
+          - NetBox Updated: {{ 'YES' if netbox_update.success | default(false) else 'NO' }}
+          
+          Monitoring Integration:
+          - Metrics Pushed: {{ 'YES' if metrics_push.success | default(false) else 'NO' }}
+          - Alerts Silenced: {{ 'YES' if alert_silence.success | default(false) else 'NO' }}
+          
+          Network Services:
+          {% if next_ip.next_ip is defined %}
+          - New IP Assigned: {{ next_ip.next_ip }}
+          {% endif %}
+          
+          Completed: {{ now().isoformat() }}
+      depends_on: ["jira_transition_issue"]
+      always: true
+    
+    # Example 17: Generate Integration Report
+    - name: write_file
+      args:
+        filename: "reports/integration_demo_{{ host.name }}_{{ now().strftime('%Y%m%d_%H%M%S') }}.txt"
+        content: "{{ integration_summary }}"
+        mkdir: true
+      always: true
+    
+    - name: echo
+      args:
+        msg: "Enhanced integration framework demonstration completed for {{ host.name }}"
+      always: true

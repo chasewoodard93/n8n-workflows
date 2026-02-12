@@ -1,0 +1,349 @@
+{
+  "name": "Enhanced AI Learning Network Automation",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "🤖 AI Network Automation Generator",
+        "formDescription": "Generate, test, and improve network automation with AI learning loop",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Project Name",
+              "fieldType": "text",
+              "requiredField": true,
+              "fieldOptions": {
+                "placeholder": "e.g., VLAN Configuration Automation"
+              }
+            },
+            {
+              "fieldLabel": "Automation Task",
+              "fieldType": "textarea",
+              "requiredField": true,
+              "fieldOptions": {
+                "placeholder": "Describe what you want to automate (e.g., Configure VLANs across all switches, backup configurations, deploy ACLs)"
+              }
+            },
+            {
+              "fieldLabel": "Target Device Types",
+              "fieldType": "multiselect",
+              "requiredField": true,
+              "fieldOptions": {
+                "values": [
+                  {"option": "Cisco IOS/IOS-XE"},
+                  {"option": "Cisco NX-OS"},
+                  {"option": "Juniper JunOS"},
+                  {"option": "Arista EOS"},
+                  {"option": "F5 BIG-IP"},
+                  {"option": "Palo Alto PAN-OS"},
+                  {"option": "Fortinet FortiGate"},
+                  {"option": "Linux"},
+                  {"option": "Ubuntu"}
+                ]
+              }
+            },
+            {
+              "fieldLabel": "Special Requirements",
+              "fieldType": "textarea",
+              "fieldOptions": {
+                "placeholder": "Any special requirements, constraints, or custom logic needed..."
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "user_input_form",
+      "name": "User Input Form",
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2,
+      "position": [240, 300],
+      "webhookId": "ai-automation-generator"
+    },
+    {
+      "parameters": {
+        "url": "https://api.anthropic.com/v1/messages",
+        "sendHeaders": true,
+        "headerParameters": {
+          "values": [
+            {
+              "name": "x-api-key",
+              "value": "{{ $vars.claude_api_key }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "anthropic-version",
+              "value": "2023-06-01"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "values": [
+            {
+              "name": "model",
+              "value": "claude-3-sonnet-20240229"
+            },
+            {
+              "name": "max_tokens",
+              "value": "4000"
+            },
+            {
+              "name": "messages",
+              "value": "[{\"role\": \"user\", \"content\": \"You are an expert network automation engineer. Generate complete Nornir-based Python automation code.\\n\\nProject: {{ $('User Input Form').first().json.project_name }}\\nTask: {{ $('User Input Form').first().json.automation_task }}\\nDevices: {{ $('User Input Form').first().json.target_device_types }}\\nRequirements: {{ $('User Input Form').first().json.special_requirements }}\\n\\nGenerate complete code including:\\n1. Main workflow script\\n2. Nornir inventory files\\n3. Configuration templates\\n4. Requirements.txt\\n5. README.md\\n\\nReturn as JSON with filename: content pairs.\"}]"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "generate_initial_code",
+      "name": "Generate Initial Code",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "url": "http://localhost:8001/api/improve-until-success",
+        "sendHeaders": true,
+        "headerParameters": {
+          "values": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $vars.improvement_api_key }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "values": [
+            {
+              "name": "workflow_name",
+              "value": "{{ $('User Input Form').first().json.project_name.replace(/[^a-zA-Z0-9]/g, '-').toLowerCase() }}"
+            },
+            {
+              "name": "initial_code",
+              "value": "{{ $('Generate Initial Code').first().json.content[0].text | fromJson }}"
+            },
+            {
+              "name": "environment_config",
+              "value": "{\n  \"environment_type\": \"auto\",\n  \"device_types\": {{ JSON.stringify($('User Input Form').first().json.target_device_types) }},\n  \"topology_requirements\": {\n    \"management_network\": \"192.168.100.0/24\",\n    \"interconnects\": \"auto\"\n  }\n}"
+            },
+            {
+              "name": "user_requirements",
+              "value": "{{ $('User Input Form').first().json.automation_task }}"
+            },
+            {
+              "name": "project_id",
+              "value": "ai-generated-{{ new Date().getTime() }}"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 1800000
+        }
+      },
+      "id": "ai_learning_loop",
+      "name": "🤖 AI Learning Loop",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [680, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "success_check",
+              "leftValue": "{{ $('AI Learning Loop').first().json.final_status }}",
+              "rightValue": "success",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "check_improvement_result",
+      "name": "Check Improvement Result",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [900, 300]
+    },
+    {
+      "parameters": {
+        "url": "https://api.github.com/repos/{{ $vars.github_username }}/{{ $vars.github_repo }}/contents/workflows/{{ $('AI Learning Loop').first().json.workflow_name }}/main.py",
+        "sendHeaders": true,
+        "headerParameters": {
+          "values": [
+            {
+              "name": "Authorization",
+              "value": "token {{ $vars.github_token }}"
+            },
+            {
+              "name": "Accept",
+              "value": "application/vnd.github.v3+json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "values": [
+            {
+              "name": "message",
+              "value": "🤖 AI-Generated & Tested Network Automation: {{ $('AI Learning Loop').first().json.workflow_name }}\\n\\nAutomatically generated, tested, and improved by AI learning loop.\\nAll tests passed successfully in lab environment.\\n\\nAttempts: {{ $('AI Learning Loop').first().json.attempts.length }}\\nDuration: {{ $('AI Learning Loop').first().json.duration_minutes }} minutes\\nStatus: Production Ready ✅"
+            },
+            {
+              "name": "content",
+              "value": "{{ $('AI Learning Loop').first().json.final_code['main.py'] | base64 }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "commit_to_github",
+      "name": "📝 Commit to GitHub",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [1120, 200]
+    },
+    {
+      "parameters": {
+        "channel": "{{ $vars.slack_channel }}",
+        "text": "🎉 *AI Network Automation SUCCESS!*\\n\\n*Project:* {{ $('User Input Form').first().json.project_name }}\\n*Task:* {{ $('User Input Form').first().json.automation_task }}\\n*Devices:* {{ $('User Input Form').first().json.target_device_types.join(', ') }}\\n\\n*🤖 AI Learning Results:*\\n• Improvement Attempts: {{ $('AI Learning Loop').first().json.attempts.length }}\\n• Duration: {{ $('AI Learning Loop').first().json.duration_minutes }} minutes\\n• Final Status: ✅ All tests passed\\n• Code Quality: Production ready\\n\\n*🔗 GitHub:* {{ $('Commit to GitHub').first().json.html_url }}\\n\\n*The AI learning loop successfully generated, tested, and improved the automation until perfect!* 🚀",
+        "attachments": [
+          {
+            "color": "good",
+            "fields": [
+              {
+                "title": "Test Results Summary",
+                "value": "{{ $('AI Learning Loop').first().json.attempts[-1].test_results.summary }}",
+                "short": false
+              },
+              {
+                "title": "AI Improvements Made",
+                "value": "{{ $('AI Learning Loop').first().json.attempts.map(a => a.changes_applied.join(', ')).filter(Boolean).join('\\n') }}",
+                "short": false
+              }
+            ]
+          }
+        ]
+      },
+      "id": "notify_success",
+      "name": "🎉 Notify Success",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.1,
+      "position": [1340, 200]
+    },
+    {
+      "parameters": {
+        "channel": "{{ $vars.slack_channel }}",
+        "text": "❌ *AI Network Automation Failed*\\n\\n*Project:* {{ $('User Input Form').first().json.project_name }}\\n*Issue:* AI learning loop could not fix all problems\\n\\n*🤖 AI Attempts:* {{ $('AI Learning Loop').first().json.attempts.length }}/{{ $vars.max_improvement_attempts }}\\n*Status:* {{ $('AI Learning Loop').first().json.final_status }}\\n*Error:* {{ $('AI Learning Loop').first().json.error || 'Maximum attempts reached' }}\\n\\n*Manual review required.* 🔍",
+        "attachments": [
+          {
+            "color": "danger",
+            "fields": [
+              {
+                "title": "Last Failure Analysis",
+                "value": "{{ $('AI Learning Loop').first().json.attempts[-1].failure_analysis[0].root_cause }}",
+                "short": false
+              }
+            ]
+          }
+        ]
+      },
+      "id": "notify_failure",
+      "name": "❌ Notify Failure",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.1,
+      "position": [1120, 400]
+    }
+  ],
+  "connections": {
+    "User Input Form": {
+      "main": [
+        [
+          {
+            "node": "Generate Initial Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Initial Code": {
+      "main": [
+        [
+          {
+            "node": "AI Learning Loop",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Learning Loop": {
+      "main": [
+        [
+          {
+            "node": "Check Improvement Result",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Improvement Result": {
+      "main": [
+        [
+          {
+            "node": "Commit to GitHub",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Notify Failure",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Commit to GitHub": {
+      "main": [
+        [
+          {
+            "node": "Notify Success",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2024-01-15T10:00:00.000Z",
+  "versionId": "1"
+}

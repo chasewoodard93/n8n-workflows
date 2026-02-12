@@ -1,0 +1,302 @@
+{
+  "name": "Network Automation Stack Generator",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "Network Automation Stack Generator",
+        "formDescription": "Generate a complete NornFlow NetOps project tailored to your infrastructure",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Project Name",
+              "fieldType": "text",
+              "requiredField": true,
+              "fieldOptions": {}
+            },
+            {
+              "fieldLabel": "Company Name",
+              "fieldType": "text",
+              "requiredField": true,
+              "fieldOptions": {}
+            },
+            {
+              "fieldLabel": "Network Devices (JSON)",
+              "fieldType": "textarea",
+              "requiredField": true,
+              "fieldOptions": {
+                "placeholder": "[{\"type\":\"switch\",\"vendor\":\"cisco\",\"model\":\"catalyst-9300\",\"platform\":\"ios\",\"quantity\":10,\"ip_range_start\":\"192.168.1.10\",\"site\":\"datacenter-1\",\"role\":\"access\"}]"
+              }
+            },
+            {
+              "fieldLabel": "Enable NetBox Integration",
+              "fieldType": "dropdown",
+              "requiredField": true,
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Yes"
+                  },
+                  {
+                    "option": "No"
+                  }
+                ]
+              }
+            },
+            {
+              "fieldLabel": "NetBox URL",
+              "fieldType": "text",
+              "requiredField": false,
+              "fieldOptions": {}
+            },
+            {
+              "fieldLabel": "Enable ServiceNow Integration",
+              "fieldType": "dropdown",
+              "requiredField": true,
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Yes"
+                  },
+                  {
+                    "option": "No"
+                  }
+                ]
+              }
+            },
+            {
+              "fieldLabel": "ServiceNow Instance URL",
+              "fieldType": "text",
+              "requiredField": false,
+              "fieldOptions": {}
+            },
+            {
+              "fieldLabel": "Enable Grafana/Prometheus",
+              "fieldType": "dropdown",
+              "requiredField": true,
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Yes"
+                  },
+                  {
+                    "option": "No"
+                  }
+                ]
+              }
+            },
+            {
+              "fieldLabel": "Grafana URL",
+              "fieldType": "text",
+              "requiredField": false,
+              "fieldOptions": {}
+            },
+            {
+              "fieldLabel": "Git Provider",
+              "fieldType": "dropdown",
+              "requiredField": true,
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "GitHub"
+                  },
+                  {
+                    "option": "GitLab"
+                  },
+                  {
+                    "option": "Bitbucket"
+                  }
+                ]
+              }
+            },
+            {
+              "fieldLabel": "Git Repository",
+              "fieldType": "text",
+              "requiredField": true,
+              "fieldOptions": {
+                "placeholder": "company/network-automation"
+              }
+            },
+            {
+              "fieldLabel": "Workflows to Generate",
+              "fieldType": "multiselect",
+              "requiredField": true,
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Backup"
+                  },
+                  {
+                    "option": "Deployment"
+                  },
+                  {
+                    "option": "Discovery"
+                  },
+                  {
+                    "option": "Compliance"
+                  },
+                  {
+                    "option": "Change Management"
+                  }
+                ]
+              }
+            },
+            {
+              "fieldLabel": "Backup Schedule (Cron)",
+              "fieldType": "text",
+              "requiredField": false,
+              "fieldOptions": {
+                "placeholder": "0 2 * * *"
+              }
+            },
+            {
+              "fieldLabel": "Failure Strategy",
+              "fieldType": "dropdown",
+              "requiredField": true,
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "skip-failed"
+                  },
+                  {
+                    "option": "fail-fast"
+                  },
+                  {
+                    "option": "run-all"
+                  }
+                ]
+              }
+            },
+            {
+              "fieldLabel": "Your Email",
+              "fieldType": "email",
+              "requiredField": true,
+              "fieldOptions": {}
+            }
+          ]
+        },
+        "options": {}
+      },
+      "name": "Form Trigger",
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 1,
+      "position": [
+        250,
+        300
+      ],
+      "webhookId": "network-stack-generator"
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "project_name",
+              "value": "={{ $json[\"Project Name\"] }}"
+            },
+            {
+              "name": "company_name",
+              "value": "={{ $json[\"Company Name\"] }}"
+            },
+            {
+              "name": "user_email",
+              "value": "={{ $json[\"Your Email\"] }}"
+            },
+            {
+              "name": "failure_strategy",
+              "value": "={{ $json[\"Failure Strategy\"] }}"
+            },
+            {
+              "name": "backup_schedule",
+              "value": "={{ $json[\"Backup Schedule (Cron)\"] || '0 2 * * *' }}"
+            },
+            {
+              "name": "git_provider",
+              "value": "={{ $json[\"Git Provider\"] }}"
+            },
+            {
+              "name": "git_repository",
+              "value": "={{ $json[\"Git Repository\"] }}"
+            }
+          ],
+          "boolean": [
+            {
+              "name": "netbox_enabled",
+              "value": "={{ $json[\"Enable NetBox Integration\"] === 'Yes' }}"
+            },
+            {
+              "name": "servicenow_enabled",
+              "value": "={{ $json[\"Enable ServiceNow Integration\"] === 'Yes' }}"
+            },
+            {
+              "name": "grafana_enabled",
+              "value": "={{ $json[\"Enable Grafana/Prometheus\"] === 'Yes' }}"
+            }
+          ],
+          "array": [
+            {
+              "name": "devices",
+              "value": "={{ JSON.parse($json[\"Network Devices (JSON)\"]) }}"
+            },
+            {
+              "name": "workflows",
+              "value": "={{ $json[\"Workflows to Generate\"] }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "name": "Parse Form Data",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        450,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "functionCode": "// Generate hosts.yaml from device list\nconst devices = $input.item.json.devices;\nconst projectName = $input.item.json.project_name;\n\nlet hostsYaml = \"---\\n\";\nlet deviceCount = 0;\n\ndevices.forEach((device) => {\n  for (let i = 0; i < device.quantity; i++) {\n    deviceCount++;\n    const deviceNum = i + 1;\n    const deviceName = `${device.type}-${String(deviceNum).padStart(2, '0')}`;\n    \n    // Calculate IP address\n    const ipParts = device.ip_range_start.split('.');\n    const lastOctet = parseInt(ipParts[3]) + i;\n    const ip = `${ipParts[0]}.${ipParts[1]}.${ipParts[2]}.${lastOctet}`;\n    \n    hostsYaml += `${deviceName}:\\n`;\n    hostsYaml += `  hostname: ${ip}\\n`;\n    hostsYaml += `  platform: ${device.platform}\\n`;\n    hostsYaml += `  groups:\\n`;\n    hostsYaml += `    - ${device.type}s\\n`;\n    hostsYaml += `    - ${device.role}\\n`;\n    hostsYaml += `  data:\\n`;\n    hostsYaml += `    site: ${device.site}\\n`;\n    hostsYaml += `    role: ${device.role}\\n`;\n    hostsYaml += `    vendor: ${device.vendor}\\n`;\n    hostsYaml += `    model: ${device.model}\\n`;\n    hostsYaml += `\\n`;\n  }\n});\n\nreturn {\n  json: {\n    ...$input.item.json,\n    hostsYaml,\n    deviceCount\n  }\n};"
+      },
+      "name": "Generate Hosts YAML",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        650,
+        300
+      ]
+    }
+  ],
+  "connections": {
+    "Form Trigger": {
+      "main": [
+        [
+          {
+            "node": "Parse Form Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Form Data": {
+      "main": [
+        [
+          {
+            "node": "Generate Hosts YAML",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {},
+  "versionId": "1",
+  "id": "network-stack-generator",
+  "meta": {
+    "instanceId": "your-instance-id"
+  },
+  "tags": []
+}
+

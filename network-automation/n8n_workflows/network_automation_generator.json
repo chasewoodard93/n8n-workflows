@@ -1,0 +1,922 @@
+{
+  "name": "AI Network Automation Generator",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "Network Automation Project Generator",
+        "formDescription": "Create intelligent network automation workflows using AI",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Project Name",
+              "fieldType": "text",
+              "requiredField": true,
+              "fieldOptions": {}
+            },
+            {
+              "fieldLabel": "Automation Task Type",
+              "fieldType": "select",
+              "requiredField": true,
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Configuration Backup"
+                  },
+                  {
+                    "option": "Configuration Deployment"
+                  },
+                  {
+                    "option": "Network Discovery"
+                  },
+                  {
+                    "option": "Compliance Checking"
+                  },
+                  {
+                    "option": "Performance Monitoring"
+                  },
+                  {
+                    "option": "Security Audit"
+                  },
+                  {
+                    "option": "Firmware Upgrade"
+                  },
+                  {
+                    "option": "Custom Task"
+                  }
+                ]
+              }
+            },
+            {
+              "fieldLabel": "Target Device Types",
+              "fieldType": "multiselect",
+              "requiredField": true,
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Cisco IOS/IOS-XE"
+                  },
+                  {
+                    "option": "Cisco NX-OS"
+                  },
+                  {
+                    "option": "Juniper JunOS"
+                  },
+                  {
+                    "option": "Arista EOS"
+                  },
+                  {
+                    "option": "Palo Alto PAN-OS"
+                  },
+                  {
+                    "option": "Fortinet FortiOS"
+                  },
+                  {
+                    "option": "Linux Servers"
+                  },
+                  {
+                    "option": "Windows Servers"
+                  }
+                ]
+              }
+            },
+            {
+              "fieldLabel": "Device Inventory Source",
+              "fieldType": "select",
+              "requiredField": true,
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "NetBox IPAM"
+                  },
+                  {
+                    "option": "CSV File Upload"
+                  },
+                  {
+                    "option": "Manual Entry"
+                  },
+                  {
+                    "option": "Network Discovery"
+                  },
+                  {
+                    "option": "Existing Nornir Inventory"
+                  }
+                ]
+              }
+            },
+            {
+              "fieldLabel": "Authentication Method",
+              "fieldType": "select",
+              "requiredField": true,
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Username/Password"
+                  },
+                  {
+                    "option": "SSH Keys"
+                  },
+                  {
+                    "option": "API Tokens"
+                  },
+                  {
+                    "option": "Certificate-based"
+                  },
+                  {
+                    "option": "Mixed Authentication"
+                  }
+                ]
+              }
+            },
+            {
+              "fieldLabel": "Secrets Management",
+              "fieldType": "select",
+              "requiredField": true,
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "HashiCorp Vault"
+                  },
+                  {
+                    "option": "AWS Secrets Manager"
+                  },
+                  {
+                    "option": "Azure Key Vault"
+                  },
+                  {
+                    "option": "Doppler"
+                  },
+                  {
+                    "option": "Local Encrypted Storage"
+                  }
+                ]
+              }
+            },
+            {
+              "fieldLabel": "Required Variables",
+              "fieldType": "textarea",
+              "requiredField": false,
+              "fieldOptions": {
+                "placeholder": "Enter variables in YAML format:\nvlan_id: 100\ninterface_range: GigabitEthernet1/0/1-24\nbackup_location: /backups/configs"
+              }
+            },
+            {
+              "fieldLabel": "Special Requirements",
+              "fieldType": "textarea",
+              "requiredField": false,
+              "fieldOptions": {
+                "placeholder": "Describe any special requirements, constraints, or custom logic needed for this automation task..."
+              }
+            },
+            {
+              "fieldLabel": "Testing Environment",
+              "fieldType": "select",
+              "requiredField": true,
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "ContainerLab Virtual Devices"
+                  },
+                  {
+                    "option": "Azure Lab Environment"
+                  },
+                  {
+                    "option": "AWS Lab Environment"
+                  },
+                  {
+                    "option": "Existing Test Lab"
+                  },
+                  {
+                    "option": "Production (Careful Mode)"
+                  }
+                ]
+              }
+            },
+            {
+              "fieldLabel": "Notification Preferences",
+              "fieldType": "multiselect",
+              "requiredField": false,
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Slack Notifications"
+                  },
+                  {
+                    "option": "Email Notifications"
+                  },
+                  {
+                    "option": "Teams Notifications"
+                  },
+                  {
+                    "option": "Webhook Notifications"
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "user_input_form",
+      "name": "Project Requirements Form",
+      "type": "n8n-nodes-base.form",
+      "typeVersion": 2,
+      "position": [
+        240,
+        300
+      ],
+      "webhookId": "automation-generator"
+    },
+    {
+      "parameters": {
+        "url": "https://api.anthropic.com/v1/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "values": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $vars.anthropic_api_key }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "anthropic-version",
+              "value": "2023-06-01"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "values": [
+            {
+              "name": "model",
+              "value": "claude-3-5-sonnet-20241022"
+            },
+            {
+              "name": "max_tokens",
+              "value": "4000"
+            },
+            {
+              "name": "messages",
+              "value": "[{\"role\": \"user\", \"content\": \"You are an expert network automation engineer specializing in Nornir and Python. Your task is to analyze user requirements and create comprehensive network automation workflows.\\n\\nYou will receive project requirements and must:\\n1. Analyze the automation task and device types\\n2. Design the optimal Nornir workflow structure\\n3. Identify required Nornir plugins and Python libraries\\n4. Create detailed task specifications\\n5. Plan testing strategies\\n6. Generate implementation roadmap\\n\\nRespond with a structured JSON containing:\\n- workflow_design: Detailed workflow structure\\n- required_plugins: List of Nornir plugins needed\\n- python_dependencies: Required Python packages\\n- task_specifications: Detailed task definitions\\n- testing_plan: Comprehensive testing strategy\\n- implementation_steps: Step-by-step implementation plan\\n\\nProject Requirements:\\n\\nProject Name: {{ $('Project Requirements Form').first().json.project_name }}\\nTask Type: {{ $('Project Requirements Form').first().json.automation_task_type }}\\nDevice Types: {{ $('Project Requirements Form').first().json.target_device_types }}\\nInventory Source: {{ $('Project Requirements Form').first().json.device_inventory_source }}\\nAuthentication: {{ $('Project Requirements Form').first().json.authentication_method }}\\nSecrets Management: {{ $('Project Requirements Form').first().json.secrets_management }}\\nVariables: {{ $('Project Requirements Form').first().json.required_variables }}\\nSpecial Requirements: {{ $('Project Requirements Form').first().json.special_requirements }}\\nTesting Environment: {{ $('Project Requirements Form').first().json.testing_environment }}\\n\\nPlease analyze these requirements and provide a comprehensive automation design.\"}]"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "ai_analysis",
+      "name": "Claude Project Analysis",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        460,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "url": "https://api.anthropic.com/v1/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "values": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $vars.anthropic_api_key }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "anthropic-version",
+              "value": "2023-06-01"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "values": [
+            {
+              "name": "model",
+              "value": "claude-3-5-sonnet-20241022"
+            },
+            {
+              "name": "max_tokens",
+              "value": "4000"
+            },
+            {
+              "name": "messages",
+              "value": "[{\"role\": \"user\", \"content\": \"You are a Python/Nornir code generation expert. Based on the workflow design provided, generate complete, production-ready Python code.\\n\\nGenerate:\\n1. Nornir inventory files (hosts.yaml, groups.yaml, defaults.yaml)\\n2. Main workflow Python script with proper error handling\\n3. Custom Nornir tasks if needed\\n4. Configuration templates (Jinja2)\\n5. Test scripts for validation\\n6. Requirements.txt file\\n7. README.md with usage instructions\\n\\nEnsure code follows best practices:\\n- Proper error handling and logging\\n- Type hints and docstrings\\n- Modular design with reusable functions\\n- Security considerations\\n- Performance optimization\\n\\nReturn as JSON with file_name: file_content pairs.\\n\\nWorkflow Design: {{ $('Claude Project Analysis').first().json.content[0].text | fromJson.workflow_design }}\\nTask Specifications: {{ $('Claude Project Analysis').first().json.content[0].text | fromJson.task_specifications }}\\nRequired Plugins: {{ $('Claude Project Analysis').first().json.content[0].text | fromJson.required_plugins }}\\nPython Dependencies: {{ $('Claude Project Analysis').first().json.content[0].text | fromJson.python_dependencies }}\\n\\nGenerate complete Python/Nornir implementation.\"}]"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "code_generation",
+      "name": "Claude Code Generation",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        680,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "url": "http://nornflow-netops:5000/api/projects/create",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "values": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $('Get_NornFlow_Token').first().json.token }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "values": [
+            {
+              "name": "project_name",
+              "value": "{{ $('Project Requirements Form').first().json.project_name }}"
+            },
+            {
+              "name": "task_type",
+              "value": "{{ $('Project Requirements Form').first().json.automation_task_type }}"
+            },
+            {
+              "name": "device_types",
+              "value": "{{ $('Project Requirements Form').first().json.target_device_types }}"
+            },
+            {
+              "name": "generated_code",
+              "value": "{{ $('AI Code Generation').first().json }}"
+            },
+            {
+              "name": "workflow_design",
+              "value": "{{ $('AI Project Analysis').first().json.workflow_design }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "create_nornflow_project",
+      "name": "Create NornFlow Project",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        900,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "url": "http://nornflow-netops:5000/api/auth/login",
+        "sendBody": true,
+        "bodyParameters": {
+          "values": [
+            {
+              "name": "username",
+              "value": "{{ $vars.nornflow_username }}"
+            },
+            {
+              "name": "password",
+              "value": "{{ $vars.nornflow_password }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "get_nornflow_token",
+      "name": "Get NornFlow Token",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        680,
+        180
+      ]
+    },
+    {
+      "parameters": {
+        "url": "http://nornflow-netops:5000/api/execution/start",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "values": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $('Get NornFlow Token').first().json.token }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "values": [
+            {
+              "name": "workflow_file",
+              "value": "{{ $('Create NornFlow Project').first().json.workflow_file }}"
+            },
+            {
+              "name": "variables",
+              "value": "{{ $('Project Requirements Form').first().json.required_variables }}"
+            },
+            {
+              "name": "test_mode",
+              "value": "true"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "test_workflow",
+      "name": "Test Generated Workflow",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1120,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "url": "https://api.anthropic.com/v1/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "values": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $vars.anthropic_api_key }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "anthropic-version",
+              "value": "2023-06-01"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "values": [
+            {
+              "name": "model",
+              "value": "claude-3-5-sonnet-20241022"
+            },
+            {
+              "name": "max_tokens",
+              "value": "4000"
+            },
+            {
+              "name": "messages",
+              "value": "[{\"role\": \"user\", \"content\": \"You are a network automation testing expert. Analyze test results and determine if the workflow needs improvements.\\n\\nIf tests failed:\\n1. Analyze error messages and logs\\n2. Identify root causes\\n3. Suggest specific code fixes\\n4. Generate improved code\\n5. Provide debugging recommendations\\n\\nIf tests passed:\\n1. Validate completeness\\n2. Check for edge cases\\n3. Suggest optimizations\\n4. Approve for production\\n\\nReturn JSON with:\\n- status: 'passed' or 'failed'\\n- analysis: Detailed analysis\\n- improvements: Specific improvements needed\\n- fixed_code: Updated code if fixes needed\\n- recommendations: Next steps\\n\\nTest Results:\\n{{ $('Test Generated Workflow').first().json }}\\n\\nOriginal Code:\\n{{ $('Claude Code Generation').first().json.content[0].text | fromJson }}\\n\\nAnalyze and provide recommendations.\"}]"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "analyze_test_results",
+      "name": "Claude Test Analysis",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1340,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "test_status",
+              "leftValue": "{{ $('AI Test Analysis').first().json.status }}",
+              "rightValue": "passed",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "check_test_results",
+      "name": "Check Test Results",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        1560,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "url": "http://labflow:5000/api/environments/create",
+        "sendHeaders": true,
+        "headerParameters": {
+          "values": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $vars.labflow_token }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "values": [
+            {
+              "name": "environment_type",
+              "value": "{{ $('Project Requirements Form').first().json.testing_environment }}"
+            },
+            {
+              "name": "device_types",
+              "value": "{{ $('Project Requirements Form').first().json.target_device_types }}"
+            },
+            {
+              "name": "topology_requirements",
+              "value": "{{ $('AI Project Analysis').first().json.testing_plan }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "create_lab_environment",
+      "name": "Create Lab Environment",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1780,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "url": "http://labflow:5000/api/testing/run",
+        "sendHeaders": true,
+        "headerParameters": {
+          "values": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $vars.labflow_token }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "values": [
+            {
+              "name": "environment_id",
+              "value": "{{ $('Create Lab Environment').first().json.environment_id }}"
+            },
+            {
+              "name": "workflow_code",
+              "value": "{{ $('AI Code Generation').first().json }}"
+            },
+            {
+              "name": "test_scenarios",
+              "value": "{{ $('AI Project Analysis').first().json.testing_plan }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "run_lab_tests",
+      "name": "Run Lab Tests",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        2000,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "resource": "repository",
+        "operation": "create",
+        "owner": "{{ $vars.github_username }}",
+        "repository": "{{ $('Project Requirements Form').first().json.project_name }}-automation",
+        "additionalFields": {
+          "description": "AI-generated network automation for {{ $('Project Requirements Form').first().json.automation_task_type }}",
+          "private": false,
+          "autoInit": true
+        }
+      },
+      "id": "create_github_repo",
+      "name": "Create GitHub Repository",
+      "type": "n8n-nodes-base.github",
+      "typeVersion": 1,
+      "position": [
+        2220,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "resource": "file",
+        "operation": "create",
+        "owner": "{{ $vars.github_username }}",
+        "repository": "{{ $('Project Requirements Form').first().json.project_name }}-automation",
+        "filePath": "main.py",
+        "fileContent": "{{ $('AI Code Generation').first().json.main_py }}",
+        "additionalFields": {
+          "committer": {
+            "name": "N8N Automation Bot",
+            "email": "automation@company.com"
+          },
+          "message": "Initial commit: AI-generated network automation workflow"
+        }
+      },
+      "id": "commit_main_code",
+      "name": "Commit Main Code",
+      "type": "n8n-nodes-base.github",
+      "typeVersion": 1,
+      "position": [
+        2440,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "channel": "{{ $vars.slack_channel }}",
+        "text": "🎉 *Network Automation Workflow Created Successfully!*\n\n*Project:* {{ $('Project Requirements Form').first().json.project_name }}\n*Task Type:* {{ $('Project Requirements Form').first().json.automation_task_type }}\n*Device Types:* {{ $('Project Requirements Form').first().json.target_device_types }}\n\n*✅ Status:* All tests passed\n*🔗 Repository:* {{ $('Create GitHub Repository').first().json.html_url }}\n*🧪 Lab Results:* {{ $('Run Lab Tests').first().json.test_summary }}\n\n*Next Steps:*\n• Review the generated code\n• Deploy to production when ready\n• Monitor execution results\n\n*Generated by:* AI Network Automation Generator",
+        "attachments": [
+          {
+            "color": "good",
+            "fields": [
+              {
+                "title": "Test Results",
+                "value": "{{ $('Run Lab Tests').first().json.detailed_results }}",
+                "short": false
+              }
+            ]
+          }
+        ]
+      },
+      "id": "notify_success",
+      "name": "Notify Success",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.1,
+      "position": [
+        2660,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "url": "http://nornflow-netops:5000/api/projects/update",
+        "sendHeaders": true,
+        "headerParameters": {
+          "values": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $('Get NornFlow Token').first().json.token }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "values": [
+            {
+              "name": "project_id",
+              "value": "{{ $('Create NornFlow Project').first().json.project_id }}"
+            },
+            {
+              "name": "improved_code",
+              "value": "{{ $('AI Test Analysis').first().json.fixed_code }}"
+            },
+            {
+              "name": "iteration",
+              "value": "{{ $('AI Test Analysis').first().json.iteration || 1 }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "update_workflow",
+      "name": "Update Workflow",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1560,
+        500
+      ]
+    },
+    {
+      "parameters": {
+        "channel": "{{ $vars.slack_channel }}",
+        "text": "⚠️ *Network Automation Workflow Needs Improvement*\n\n*Project:* {{ $('Project Requirements Form').first().json.project_name }}\n*Issue:* {{ $('AI Test Analysis').first().json.analysis }}\n\n*🔄 Status:* Iterating and improving\n*🛠️ Action:* AI is fixing the issues automatically\n\n*Will notify when tests pass successfully.*",
+        "attachments": [
+          {
+            "color": "warning",
+            "fields": [
+              {
+                "title": "Improvements Made",
+                "value": "{{ $('AI Test Analysis').first().json.improvements }}",
+                "short": false
+              }
+            ]
+          }
+        ]
+      },
+      "id": "notify_iteration",
+      "name": "Notify Iteration",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.1,
+      "position": [
+        1780,
+        500
+      ]
+    }
+  ],
+  "connections": {
+    "Project Requirements Form": {
+      "main": [
+        [
+          {
+            "node": "Get NornFlow Token",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "AI Project Analysis",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Project Analysis": {
+      "main": [
+        [
+          {
+            "node": "AI Code Generation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Code Generation": {
+      "main": [
+        [
+          {
+            "node": "Create NornFlow Project",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get NornFlow Token": {
+      "main": [
+        [
+          {
+            "node": "Create NornFlow Project",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create NornFlow Project": {
+      "main": [
+        [
+          {
+            "node": "Test Generated Workflow",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Test Generated Workflow": {
+      "main": [
+        [
+          {
+            "node": "AI Test Analysis",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Test Analysis": {
+      "main": [
+        [
+          {
+            "node": "Check Test Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Test Results": {
+      "main": [
+        [
+          {
+            "node": "Create Lab Environment",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Update Workflow",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Lab Environment": {
+      "main": [
+        [
+          {
+            "node": "Run Lab Tests",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Run Lab Tests": {
+      "main": [
+        [
+          {
+            "node": "Create GitHub Repository",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create GitHub Repository": {
+      "main": [
+        [
+          {
+            "node": "Commit Main Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Commit Main Code": {
+      "main": [
+        [
+          {
+            "node": "Notify Success",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Workflow": {
+      "main": [
+        [
+          {
+            "node": "Notify Iteration",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Test Generated Workflow",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2024-01-15T10:00:00.000Z",
+  "versionId": "1"
+}
